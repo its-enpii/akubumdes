@@ -51,12 +51,33 @@ const installmentMethodOptions = [
 ];
 
 const frequencyOptions = [
-    { value: 'weekly', label: 'Mingguan' },
-    { value: 'biweekly', label: 'Dua Mingguan' },
-    { value: 'monthly', label: 'Bulanan' },
-    { value: 'bimonthly', label: 'Dua Bulanan' },
-    { value: 'quarterly', label: 'Tiga Bulanan' },
-    { value: 'at_maturity', label: 'Sekaligus di Akhir' },
+    { value: 'weekly', label: 'Frekuensi — Mingguan' },
+    { value: 'biweekly', label: 'Frekuensi — Dua Mingguan' },
+    { value: 'monthly', label: 'Frekuensi — Bulanan' },
+    { value: 'bimonthly', label: 'Frekuensi — Tiap 2 Bulan' },
+    { value: 'quarterly', label: 'Frekuensi — Tiap 3 Bulan' },
+    { value: 'every_4_months', label: 'Frekuensi — Tiap 4 Bulan' },
+    { value: 'every_5_months', label: 'Frekuensi — Tiap 5 Bulan' },
+    { value: 'every_6_months', label: 'Frekuensi — Tiap 6 Bulan' },
+    { value: 'every_7_months', label: 'Frekuensi — Tiap 7 Bulan' },
+    { value: 'every_8_months', label: 'Frekuensi — Tiap 8 Bulan' },
+    { value: 'every_9_months', label: 'Frekuensi — Tiap 9 Bulan' },
+    { value: 'every_10_months', label: 'Frekuensi — Tiap 10 Bulan' },
+    { value: 'every_11_months', label: 'Frekuensi — Tiap 11 Bulan' },
+    { value: 'every_12_months', label: 'Frekuensi — Tiap 12 Bulan' },
+    { value: 'every_24_months', label: 'Frekuensi — Tiap 24 Bulan' },
+    { value: 'every_36_months', label: 'Frekuensi — Tiap 36 Bulan' },
+    { value: 'at_maturity', label: 'Lainnya — Sekaligus di Akhir' },
+];
+
+const graceOptions = [
+    { value: 0, label: 'Tanpa Penundaan' },
+    { value: 1, label: 'M1 — Angsuran ditunda 1 bulan' },
+    { value: 2, label: 'M2 — Pokok ditunda 2 bulan' },
+    { value: 3, label: 'M3 — Pokok ditunda 3 bulan' },
+    { value: 6, label: 'M6 — Pokok ditunda 6 bulan' },
+    { value: 12, label: 'M12 — Pokok ditunda 12 bulan' },
+    { value: 24, label: 'M24 — Pokok ditunda 24 bulan' },
 ];
 
 function roundingLabel(step, productRounding) {
@@ -227,6 +248,8 @@ const editForm = useForm({
     installment_method: props.loan.installment_method ?? 'flat',
     principal_frequency: props.loan.principal_frequency ?? 'monthly',
     interest_frequency: props.loan.interest_frequency ?? 'monthly',
+    principal_grace_months: props.loan.principal_grace_months ?? 0,
+    interest_grace_months: props.loan.interest_grace_months ?? 0,
     rounding_step: props.loan.rounding_step !== null && props.loan.rounding_step !== undefined ? String(props.loan.rounding_step) : '',
     beneficiary_amounts: Object.fromEntries((props.loan.beneficiaries ?? []).map((b) => [String(b.member_row_id), Number(b.allocated_amount ?? 0)])),
 });
@@ -493,6 +516,8 @@ const rescheduleForm = useForm({
     installment_method: props.loan.installment_method ?? 'flat',
     principal_frequency: props.loan.principal_frequency ?? 'monthly',
     interest_frequency: props.loan.interest_frequency ?? 'monthly',
+    principal_grace_months: props.loan.principal_grace_months ?? 0,
+    interest_grace_months: props.loan.interest_grace_months ?? 0,
     rounding_step: props.loan.rounding_step !== null && props.loan.rounding_step !== undefined ? String(props.loan.rounding_step) : '',
 });
 
@@ -508,6 +533,8 @@ function openRescheduleModal() {
     rescheduleForm.installment_method = props.loan.installment_method ?? 'flat';
     rescheduleForm.principal_frequency = props.loan.principal_frequency ?? 'monthly';
     rescheduleForm.interest_frequency = props.loan.interest_frequency ?? 'monthly';
+    rescheduleForm.principal_grace_months = props.loan.principal_grace_months ?? 0;
+    rescheduleForm.interest_grace_months = props.loan.interest_grace_months ?? 0;
     rescheduleForm.rounding_step = props.loan.rounding_step !== null && props.loan.rounding_step !== undefined ? String(props.loan.rounding_step) : '';
     rescheduleForm.clearErrors();
     rescheduleModalOpen.value = true;
@@ -1235,6 +1262,10 @@ function setAllocatedAmount(memberRowId, value) {
                         <SmartSelect v-model="rescheduleForm.interest_frequency" label="Angsuran Jasa" :options="frequencyOptions" required :error="rescheduleForm.errors.interest_frequency" />
                         <SmartSelect v-model="rescheduleForm.rounding_step" label="Pembulatan Angsuran" :options="roundingOptions" :error="rescheduleForm.errors.rounding_step" />
                     </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <SmartSelect v-model="rescheduleForm.principal_grace_months" label="Grace Period Pokok" :options="graceOptions" required :error="rescheduleForm.errors.principal_grace_months" />
+                        <SmartSelect v-model="rescheduleForm.interest_grace_months" label="Grace Period Jasa" :options="graceOptions" required :error="rescheduleForm.errors.interest_grace_months" />
+                    </div>
                 </form>
                 <template #footer>
                     <AppButton variant="secondary" @click="rescheduleModalOpen = false" :disabled="rescheduleForm.processing">Batal</AppButton>
@@ -1321,6 +1352,10 @@ function setAllocatedAmount(memberRowId, value) {
                         <SmartSelect v-model="editForm.principal_frequency" label="Angsuran Pokok" :options="frequencyOptions" required :error="editForm.errors.principal_frequency" />
                         <SmartSelect v-model="editForm.interest_frequency" label="Angsuran Jasa" :options="frequencyOptions" required :error="editForm.errors.interest_frequency" />
                         <SmartSelect v-model="editForm.rounding_step" label="Pembulatan Angsuran" :options="roundingOptions" :error="editForm.errors.rounding_step" />
+                    </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <SmartSelect v-model="editForm.principal_grace_months" label="Grace Period Pokok" :options="graceOptions" required :error="editForm.errors.principal_grace_months" />
+                        <SmartSelect v-model="editForm.interest_grace_months" label="Grace Period Jasa" :options="graceOptions" required :error="editForm.errors.interest_grace_months" />
                     </div>
                     <div>
                         <h3 class="text-sm font-bold uppercase tracking-wider text-primary">Pengajuan per Pemanfaat</h3>

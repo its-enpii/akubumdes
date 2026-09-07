@@ -60,6 +60,17 @@ final class LoanService
         'monthly' => 1.0,
         'bimonthly' => 0.5,
         'quarterly' => 0.3333,
+        'every_4_months' => 0.25,
+        'every_5_months' => 0.2,
+        'every_6_months' => 1 / 6,
+        'every_7_months' => 1 / 7,
+        'every_8_months' => 0.125,
+        'every_9_months' => 1 / 9,
+        'every_10_months' => 0.1,
+        'every_11_months' => 1 / 11,
+        'every_12_months' => 1 / 12,
+        'every_24_months' => 1 / 24,
+        'every_36_months' => 1 / 36,
         'at_maturity' => null,
     ];
 
@@ -69,6 +80,17 @@ final class LoanService
         'monthly' => ['months' => 1],
         'bimonthly' => ['months' => 2],
         'quarterly' => ['months' => 3],
+        'every_4_months' => ['months' => 4],
+        'every_5_months' => ['months' => 5],
+        'every_6_months' => ['months' => 6],
+        'every_7_months' => ['months' => 7],
+        'every_8_months' => ['months' => 8],
+        'every_9_months' => ['months' => 9],
+        'every_10_months' => ['months' => 10],
+        'every_11_months' => ['months' => 11],
+        'every_12_months' => ['months' => 12],
+        'every_24_months' => ['months' => 24],
+        'every_36_months' => ['months' => 36],
     ];
 
     public function __construct(
@@ -94,9 +116,11 @@ final class LoanService
             $method = $data['installment_method'];
             $principalFreq = $data['principal_frequency'];
             $interestFreq = $data['interest_frequency'];
+            $principalGraceMonths = (int) ($data['principal_grace_months'] ?? 0);
+            $interestGraceMonths = (int) ($data['interest_grace_months'] ?? 0);
 
-            $principalPeriods = $this->periods($principalFreq, $term);
-            $interestPeriods = $this->periods($interestFreq, $term);
+            $principalPeriods = $this->periods($principalFreq, $term, $principalGraceMonths);
+            $interestPeriods = $this->periods($interestFreq, $term, $interestGraceMonths);
             $principalRatePerPeriod = $principalPeriods > 0 ? round($serviceRateTotal / $principalPeriods, 4) : 0.0;
             $interestRatePerPeriod = $interestPeriods > 0 ? round($serviceRateTotal / $interestPeriods, 4) : 0.0;
 
@@ -112,6 +136,8 @@ final class LoanService
                 'installment_method' => $method,
                 'principal_frequency' => $principalFreq,
                 'interest_frequency' => $interestFreq,
+                'principal_grace_months' => $principalGraceMonths,
+                'interest_grace_months' => $interestGraceMonths,
                 'rounding_step' => isset($data['rounding_step']) && $data['rounding_step'] !== '' ? (int) $data['rounding_step'] : null,
                 'status' => 'draft',
                 'created_by_user_id' => $userId,
@@ -148,8 +174,8 @@ final class LoanService
                 ]);
             }
 
-            $this->generatePrincipalSchedule($loan, $principal, $principalPeriods, $principalRatePerPeriod, $principalFreq, $data['proposed_at']);
-            $this->generateInterestSchedule($loan, $principal, $interestPeriods, $interestRatePerPeriod, $method, $interestFreq, $data['proposed_at']);
+            $this->generatePrincipalSchedule($loan, $principal, $principalPeriods, $principalRatePerPeriod, $principalFreq, $data['proposed_at'], $principalGraceMonths);
+            $this->generateInterestSchedule($loan, $principal, $interestPeriods, $interestRatePerPeriod, $method, $interestFreq, $data['proposed_at'], $interestGraceMonths);
 
             $loan->statusHistories()->create([
                 'from_status' => null,
@@ -989,9 +1015,11 @@ final class LoanService
             $method = (string) $data['installment_method'];
             $principalFreq = (string) $data['principal_frequency'];
             $interestFreq = (string) $data['interest_frequency'];
+            $principalGraceMonths = (int) ($data['principal_grace_months'] ?? $loan->principal_grace_months);
+            $interestGraceMonths = (int) ($data['interest_grace_months'] ?? $loan->interest_grace_months);
 
-            $principalPeriods = $this->periods($principalFreq, $term);
-            $interestPeriods = $this->periods($interestFreq, $term);
+            $principalPeriods = $this->periods($principalFreq, $term, $principalGraceMonths);
+            $interestPeriods = $this->periods($interestFreq, $term, $interestGraceMonths);
             $principalRatePerPeriod = $principalPeriods > 0 ? round($serviceRateTotal / $principalPeriods, 4) : 0.0;
             $interestRatePerPeriod = $interestPeriods > 0 ? round($serviceRateTotal / $interestPeriods, 4) : 0.0;
 
@@ -1067,6 +1095,8 @@ final class LoanService
                 'installment_method' => $method,
                 'principal_frequency' => $principalFreq,
                 'interest_frequency' => $interestFreq,
+                'principal_grace_months' => $principalGraceMonths,
+                'interest_grace_months' => $interestGraceMonths,
                 'rounding_step' => isset($data['rounding_step']) && $data['rounding_step'] !== '' ? (int) $data['rounding_step'] : $loan->rounding_step,
                 'status' => 'active',
                 'verification_notes' => $loan->verification_notes,
@@ -1119,8 +1149,8 @@ final class LoanService
                 ]);
             }
 
-            $this->generatePrincipalSchedule($newLoan, $principalRemaining, $principalPeriods, $principalRatePerPeriod, $principalFreq, $rescheduledAt->toDateString());
-            $this->generateInterestSchedule($newLoan, $principalRemaining, $interestPeriods, $interestRatePerPeriod, $method, $interestFreq, $rescheduledAt->toDateString());
+            $this->generatePrincipalSchedule($newLoan, $principalRemaining, $principalPeriods, $principalRatePerPeriod, $principalFreq, $rescheduledAt->toDateString(), $principalGraceMonths);
+            $this->generateInterestSchedule($newLoan, $principalRemaining, $interestPeriods, $interestRatePerPeriod, $method, $interestFreq, $rescheduledAt->toDateString(), $interestGraceMonths);
 
             foreach (['draft', 'verified', 'waiting', 'active'] as $to) {
                 $newLoan->statusHistories()->create([
@@ -1281,13 +1311,37 @@ final class LoanService
         );
     }
 
-    private function periods(string $frequency, int $term): int
+    public static function intervalMonths(string $frequency): int
+    {
+        return match ($frequency) {
+            'bimonthly' => 2,
+            'quarterly' => 3,
+            'every_4_months' => 4,
+            'every_5_months' => 5,
+            'every_6_months' => 6,
+            'every_7_months' => 7,
+            'every_8_months' => 8,
+            'every_9_months' => 9,
+            'every_10_months' => 10,
+            'every_11_months' => 11,
+            'every_12_months' => 12,
+            'every_24_months' => 24,
+            'every_36_months' => 36,
+            'at_maturity' => 0,
+            default => 1,
+        };
+    }
+
+    private function periods(string $frequency, int $term, int $graceMonths = 0): int
     {
         if ($frequency === 'at_maturity') {
             return 1;
         }
 
-        return (int) max(1, round($term * self::FREQUENCY_PER_MONTH[$frequency]));
+        $interval = self::intervalMonths($frequency);
+        $firstPeriod = $graceMonths + $interval;
+
+        return max(1, (int) floor(($term - $firstPeriod) / $interval) + 1);
     }
 
     public function resolveRoundingStep(Loan $loan): int
@@ -1318,7 +1372,7 @@ final class LoanService
         return (float) (round($amount / $step) * $step);
     }
 
-    private function generatePrincipalSchedule(Loan $loan, float $principal, int $periods, float $ratePerPeriod, string $frequency, string $startDate): void
+    private function generatePrincipalSchedule(Loan $loan, float $principal, int $periods, float $ratePerPeriod, string $frequency, string $startDate, int $graceMonths = 0): void
     {
         $start = CarbonImmutable::parse($startDate);
         $roundingStep = $this->resolveRoundingStep($loan);
@@ -1336,7 +1390,7 @@ final class LoanService
 
             $due = $frequency === 'at_maturity'
                 ? $start->addMonths((int) $loan->term_months)
-                : $this->advance($start, $frequency, $i);
+                : $this->advance($start, $frequency, $i + $graceMonths);
 
             LoanInstallment::query()->create([
                 'loan_row_id' => $loan->row_id,
@@ -1350,7 +1404,7 @@ final class LoanService
         }
     }
 
-    private function generateInterestSchedule(Loan $loan, float $principal, int $periods, float $ratePerPeriod, string $method, string $frequency, string $startDate): void
+    private function generateInterestSchedule(Loan $loan, float $principal, int $periods, float $ratePerPeriod, string $method, string $frequency, string $startDate, int $graceMonths = 0): void
     {
         $start = CarbonImmutable::parse($startDate);
         $roundingStep = $this->resolveRoundingStep($loan);
@@ -1364,7 +1418,7 @@ final class LoanService
                     'loan_row_id' => $loan->row_id,
                     'component' => 'interest',
                     'installment_number' => $i,
-                    'due_date' => $this->advance($start, $frequency, $i)->toDateString(),
+                    'due_date' => $this->advance($start, $frequency, $i + $graceMonths)->toDateString(),
                     'principal_due' => 0,
                     'interest_due' => $perPeriod,
                     'status' => 'pending',
@@ -1392,7 +1446,7 @@ final class LoanService
                     'loan_row_id' => $loan->row_id,
                     'component' => 'interest',
                     'installment_number' => $i,
-                    'due_date' => $this->advance($start, $frequency, $i)->toDateString(),
+                    'due_date' => $this->advance($start, $frequency, $i + $graceMonths)->toDateString(),
                     'principal_due' => 0,
                     'interest_due' => $interestPart,
                     'status' => 'pending',
@@ -1417,7 +1471,7 @@ final class LoanService
                     'loan_row_id' => $loan->row_id,
                     'component' => 'interest',
                     'installment_number' => $i,
-                    'due_date' => $this->advance($start, $frequency, $i)->toDateString(),
+                    'due_date' => $this->advance($start, $frequency, $i + $graceMonths)->toDateString(),
                     'principal_due' => 0,
                     'interest_due' => $interestPart,
                     'status' => 'pending',
@@ -1477,8 +1531,10 @@ final class LoanService
         $term = (int) $loan->term_months;
         $serviceRateTotal = (float) ($loan->service_rate_total ?? $loan->interest_rate ?? 0);
 
-        $principalPeriods = $this->periods($principalFreq, $term);
-        $interestPeriods = $this->periods($interestFreq, $term);
+        $principalGraceMonths = (int) ($loan->principal_grace_months ?? 0);
+        $interestGraceMonths = (int) ($loan->interest_grace_months ?? 0);
+        $principalPeriods = $this->periods($principalFreq, $term, $principalGraceMonths);
+        $interestPeriods = $this->periods($interestFreq, $term, $interestGraceMonths);
         $principalRatePerPeriod = $principalPeriods > 0 ? round($serviceRateTotal / $principalPeriods, 4) : 0.0;
         $interestRatePerPeriod = $interestPeriods > 0 ? round($serviceRateTotal / $interestPeriods, 4) : 0.0;
 
@@ -1491,8 +1547,8 @@ final class LoanService
         $loan->refresh();
 
         if ($principal > 0) {
-            $this->generatePrincipalSchedule($loan, $principal, $principalPeriods, $principalRatePerPeriod, $principalFreq, $startDate);
-            $this->generateInterestSchedule($loan, $principal, $interestPeriods, $interestRatePerPeriod, $method, $interestFreq, $startDate);
+            $this->generatePrincipalSchedule($loan, $principal, $principalPeriods, $principalRatePerPeriod, $principalFreq, $startDate, $principalGraceMonths);
+            $this->generateInterestSchedule($loan, $principal, $interestPeriods, $interestRatePerPeriod, $method, $interestFreq, $startDate, $interestGraceMonths);
         }
     }
 

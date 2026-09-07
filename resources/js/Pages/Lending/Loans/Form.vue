@@ -34,12 +34,33 @@ const installmentMethodOptions = [
 ];
 
 const principalFrequencyOptions = [
-    { value: 'weekly', label: 'Mingguan' },
-    { value: 'biweekly', label: 'Dua Mingguan' },
-    { value: 'monthly', label: 'Bulanan' },
-    { value: 'bimonthly', label: 'Dua Bulanan' },
-    { value: 'quarterly', label: 'Tiga Bulanan' },
-    { value: 'at_maturity', label: 'Sekaligus di Akhir' },
+    { value: 'weekly', label: 'Frekuensi — Mingguan' },
+    { value: 'biweekly', label: 'Frekuensi — Dua Mingguan' },
+    { value: 'monthly', label: 'Frekuensi — Bulanan' },
+    { value: 'bimonthly', label: 'Frekuensi — Tiap 2 Bulan' },
+    { value: 'quarterly', label: 'Frekuensi — Tiap 3 Bulan' },
+    { value: 'every_4_months', label: 'Frekuensi — Tiap 4 Bulan' },
+    { value: 'every_5_months', label: 'Frekuensi — Tiap 5 Bulan' },
+    { value: 'every_6_months', label: 'Frekuensi — Tiap 6 Bulan' },
+    { value: 'every_7_months', label: 'Frekuensi — Tiap 7 Bulan' },
+    { value: 'every_8_months', label: 'Frekuensi — Tiap 8 Bulan' },
+    { value: 'every_9_months', label: 'Frekuensi — Tiap 9 Bulan' },
+    { value: 'every_10_months', label: 'Frekuensi — Tiap 10 Bulan' },
+    { value: 'every_11_months', label: 'Frekuensi — Tiap 11 Bulan' },
+    { value: 'every_12_months', label: 'Frekuensi — Tiap 12 Bulan' },
+    { value: 'every_24_months', label: 'Frekuensi — Tiap 24 Bulan' },
+    { value: 'every_36_months', label: 'Frekuensi — Tiap 36 Bulan' },
+    { value: 'at_maturity', label: 'Lainnya — Sekaligus di Akhir' },
+];
+
+const graceOptions = [
+    { value: 0, label: 'Tanpa Penundaan' },
+    { value: 1, label: 'M1 — Angsuran ditunda 1 bulan' },
+    { value: 2, label: 'M2 — Pokok ditunda 2 bulan' },
+    { value: 3, label: 'M3 — Pokok ditunda 3 bulan' },
+    { value: 6, label: 'M6 — Pokok ditunda 6 bulan' },
+    { value: 12, label: 'M12 — Pokok ditunda 12 bulan' },
+    { value: 24, label: 'M24 — Pokok ditunda 24 bulan' },
 ];
 
 const roundingOptions = [
@@ -54,11 +75,23 @@ const roundingOptions = [
 ];
 
 const interestFrequencyOptions = [
-    { value: 'weekly', label: 'Mingguan' },
-    { value: 'biweekly', label: 'Dua Mingguan' },
-    { value: 'monthly', label: 'Bulanan' },
-    { value: 'bimonthly', label: 'Dua Bulanan' },
-    { value: 'quarterly', label: 'Tiga Bulanan' },
+    { value: 'weekly', label: 'Frekuensi — Mingguan' },
+    { value: 'biweekly', label: 'Frekuensi — Dua Mingguan' },
+    { value: 'monthly', label: 'Frekuensi — Bulanan' },
+    { value: 'bimonthly', label: 'Frekuensi — Tiap 2 Bulan' },
+    { value: 'quarterly', label: 'Frekuensi — Tiap 3 Bulan' },
+    { value: 'every_4_months', label: 'Frekuensi — Tiap 4 Bulan' },
+    { value: 'every_5_months', label: 'Frekuensi — Tiap 5 Bulan' },
+    { value: 'every_6_months', label: 'Frekuensi — Tiap 6 Bulan' },
+    { value: 'every_7_months', label: 'Frekuensi — Tiap 7 Bulan' },
+    { value: 'every_8_months', label: 'Frekuensi — Tiap 8 Bulan' },
+    { value: 'every_9_months', label: 'Frekuensi — Tiap 9 Bulan' },
+    { value: 'every_10_months', label: 'Frekuensi — Tiap 10 Bulan' },
+    { value: 'every_11_months', label: 'Frekuensi — Tiap 11 Bulan' },
+    { value: 'every_12_months', label: 'Frekuensi — Tiap 12 Bulan' },
+    { value: 'every_24_months', label: 'Frekuensi — Tiap 24 Bulan' },
+    { value: 'every_36_months', label: 'Frekuensi — Tiap 36 Bulan' },
+    { value: 'at_maturity', label: 'Lainnya — Sekaligus di Akhir' },
 ];
 
 const frequencyMultiplier = {
@@ -67,6 +100,17 @@ const frequencyMultiplier = {
     monthly: 1,
     bimonthly: 0.5,
     quarterly: 0.3333,
+    every_4_months: 0.25,
+    every_5_months: 0.2,
+    every_6_months: 1 / 6,
+    every_7_months: 1 / 7,
+    every_8_months: 0.125,
+    every_9_months: 1 / 9,
+    every_10_months: 0.1,
+    every_11_months: 1 / 11,
+    every_12_months: 1 / 12,
+    every_24_months: 1 / 24,
+    every_36_months: 1 / 36,
 };
 
 const selectedGroupId = ref('');
@@ -89,6 +133,8 @@ const form = useForm({
     installment_method: 'flat',
     principal_frequency: 'monthly',
     interest_frequency: 'monthly',
+    principal_grace_months: 0,
+    interest_grace_months: 0,
     chair_id: '',
     secretary_id: '',
     treasurer_id: '',
@@ -121,10 +167,14 @@ const periodPreview = computed(() => {
     const months = Number(form.term_months);
     const total = Number(form.service_rate_total);
     if (!months || !total) return null;
+    const principalStep = Math.round(1 / (frequencyMultiplier[form.principal_frequency] || 1));
+    const interestStep = Math.round(1 / (frequencyMultiplier[form.interest_frequency] || 1));
+    const principalFirst = principalStep + Number(form.principal_grace_months || 0);
+    const interestFirst = interestStep + Number(form.interest_grace_months || 0);
     const principalPeriods = form.principal_frequency === 'at_maturity'
         ? 1
-        : Math.max(1, Math.round(months * (frequencyMultiplier[form.principal_frequency] || 0)));
-    const interestPeriods = Math.max(1, Math.round(months * (frequencyMultiplier[form.interest_frequency] || 0)));
+        : Math.max(1, Math.floor((months - principalFirst) / principalStep) + 1);
+    const interestPeriods = Math.max(1, Math.floor((months - interestFirst) / interestStep) + 1);
     return {
         principal: { periods: principalPeriods, perPeriod: (total / principalPeriods).toFixed(3) },
         interest: { periods: interestPeriods, perPeriod: (total / interestPeriods).toFixed(3) },
@@ -276,6 +326,10 @@ function addBeneficiary() {
                             <SmartSelect v-model="form.installment_method" label="Metode Hitung Jasa" :options="installmentMethodOptions" required :error="form.errors.installment_method" />
                             <SmartSelect v-model="form.principal_frequency" label="Angsuran Pokok" :options="principalFrequencyOptions" required :error="form.errors.principal_frequency" />
                             <SmartSelect v-model="form.interest_frequency" label="Angsuran Jasa" :options="interestFrequencyOptions" required :error="form.errors.interest_frequency" />
+                        </div>
+                        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                            <SmartSelect v-model="form.principal_grace_months" label="Grace Period Pokok" :options="graceOptions" required :error="form.errors.principal_grace_months" />
+                            <SmartSelect v-model="form.interest_grace_months" label="Grace Period Jasa" :options="graceOptions" required :error="form.errors.interest_grace_months" />
                         </div>
                     </section>
 

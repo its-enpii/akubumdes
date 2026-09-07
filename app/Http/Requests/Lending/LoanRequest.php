@@ -7,7 +7,9 @@ namespace App\Http\Requests\Lending;
 use App\Domain\Lending\Models\LoanProduct;
 use App\Domain\Membership\Models\Group;
 use App\Domain\Membership\Models\Member;
+use App\Enums\Frequency;
 use App\Http\Requests\Concerns\AuthorizesPermission;
+use App\Rules\ValidLoanSchedule;
 use App\Tenancy\TenantContext;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -48,8 +50,10 @@ final class LoanRequest extends FormRequest
             'service_rate_total' => ['required', 'numeric', 'min:0', 'max:5000'],
             'term_months' => ['required', 'integer', 'min:1', 'max:120'],
             'installment_method' => ['required', Rule::in(['flat', 'annuity', 'effective'])],
-            'principal_frequency' => ['required', Rule::in(['weekly', 'biweekly', 'monthly', 'bimonthly', 'quarterly', 'at_maturity'])],
-            'interest_frequency' => ['required', Rule::in(['weekly', 'biweekly', 'monthly', 'bimonthly', 'quarterly'])],
+            'principal_frequency' => ['required', 'string', Rule::in(Frequency::values())],
+            'interest_frequency' => ['required', 'string', Rule::in(Frequency::values())],
+            'principal_grace_months' => ['nullable', 'integer', 'min:0', 'max:120', new ValidLoanSchedule],
+            'interest_grace_months' => ['nullable', 'integer', 'min:0', 'max:120', new ValidLoanSchedule],
             'rounding_step' => ['nullable', 'integer', 'in:0,100,500,1000,5000,10000,50000'],
             'chair_id' => ['required', 'integer', Rule::exists(Member::class, 'row_id')->where(fn ($query) => $query->where('tenant_id', $tenantId))],
             'secretary_id' => ['required', 'integer', 'different:chair_id', Rule::exists(Member::class, 'row_id')->where(fn ($query) => $query->where('tenant_id', $tenantId))],

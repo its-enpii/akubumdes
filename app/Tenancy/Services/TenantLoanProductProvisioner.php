@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Tenancy\Services;
 
 use App\Domain\Lending\Models\LoanProduct;
+use App\Tenancy\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 final readonly class TenantLoanProductProvisioner
 {
     public function ensureDefaults(): void
     {
+        $tenantId = app(TenantContext::class)->id();
         DB::connection('tenant')->transaction(function (): void {
             LoanProduct::query()->whereNotIn('code', ['spp', 'uep', 'pl'])->delete();
 

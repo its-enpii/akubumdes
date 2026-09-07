@@ -13,6 +13,17 @@ final class LoanSimulationService
         'quarterly' => 3,
         'semi_annually' => 6,
         'annually' => 12,
+        'every_4_months' => 4,
+        'every_5_months' => 5,
+        'every_6_months' => 6,
+        'every_7_months' => 7,
+        'every_8_months' => 8,
+        'every_9_months' => 9,
+        'every_10_months' => 10,
+        'every_11_months' => 11,
+        'every_12_months' => 12,
+        'every_24_months' => 24,
+        'every_36_months' => 36,
         'at_maturity' => 0,
     ];
 
@@ -79,14 +90,16 @@ final class LoanSimulationService
 
         $principalFreq = (string) ($params['principal_frequency'] ?? 'monthly');
         $interestFreq = (string) ($params['interest_frequency'] ?? 'monthly');
+        $principalGrace = max(0, (int) ($params['principal_grace_months'] ?? 0));
+        $interestGrace = max(0, (int) ($params['interest_grace_months'] ?? 0));
         $roundingStep = isset($params['rounding_step']) ? max(0, (int) $params['rounding_step']) : 500;
         $startDateStr = (string) ($params['start_date'] ?? date('Y-m-d'));
         $start = CarbonImmutable::parse($startDateStr);
 
         $schedule = match ($method) {
-            'annuity' => $this->calculateAnnuity($principal, $termMonths, $rateMonthly, $principalFreq, $roundingStep, $start),
-            'declining' => $this->calculateDeclining($principal, $termMonths, $rateMonthly, $principalFreq, $roundingStep, $start),
-            default => $this->calculateFlat($principal, $termMonths, $rateMonthly, $principalFreq, $interestFreq, $roundingStep, $start),
+            'annuity' => $this->calculateAnnuity($principal, $termMonths, $rateMonthly, $principalFreq, $roundingStep, $start, $principalGrace),
+            'declining' => $this->calculateDeclining($principal, $termMonths, $rateMonthly, $principalFreq, $roundingStep, $start, $principalGrace),
+            default => $this->calculateFlat($principal, $termMonths, $rateMonthly, $principalFreq, $interestFreq, $roundingStep, $start, $principalGrace, $interestGrace),
         };
 
         $totalInterest = 0.0;
@@ -108,6 +121,8 @@ final class LoanSimulationService
                 'installment_method' => $method,
                 'principal_frequency' => $principalFreq,
                 'interest_frequency' => $interestFreq,
+                'principal_grace_months' => $principalGrace,
+                'interest_grace_months' => $interestGrace,
                 'rounding_step' => $roundingStep,
                 'start_date' => $startDateStr,
             ],
@@ -141,9 +156,11 @@ final class LoanSimulationService
         string $interestFreq,
         int $roundingStep,
         CarbonImmutable $start,
+        int $principalGrace = 0,
+        int $interestGrace = 0,
     ): array {
-        $pPeriods = $this->periodsCount($principalFreq, $termMonths);
-        $iPeriods = $this->periodsCount($interestFreq, $termMonths);
+        $pPeriods = $this->periodsCount($principalFreq, $termMonths, $principalGrace);
+        $iPeriods = $this->periodsCount($interestFreq, $termMonths, $interestGrace);
         $totalInterest = $principal * ($rateMonthly / 100) * $termMonths;
 
         $rawPrincipalPerPeriod = $pPeriods > 0 ? $principal / $pPeriods : $principal;
@@ -153,7 +170,7 @@ final class LoanSimulationService
         $roundedInterest = $this->roundValue($rawInterestPerPeriod, $roundingStep);
 
         // When principal and interest frequencies are identical (e.g. monthly-monthly)
-        if ($principalFreq === $interestFreq) {
+        if ($principalFreq === $interestFreq && $principalGrace === $interestGrace) {
             $periods = $pPeriods;
             $schedule = [];
             $accumulatedPrincipal = 0.0;
@@ -172,7 +189,7 @@ final class LoanSimulationService
                 $accumulatedInterest = round($accumulatedInterest + $iDue, 2);
 
                 $remaining = max(0.0, round($remaining - $pDue, 2));
-                $dueDate = $this->advanceDate($start, $principalFreq, $i, $termMonths);
+                $dueDate = $this->advanceDate($start, $principalFreq, $i + $principalGrace, $termMonths);
 
                 $schedule[] = [
                     'number' => $i,
@@ -198,7 +215,7 @@ final class LoanSimulationService
 
         $principalDueMap = [];
         for ($p = 1; $p <= $pPeriods; $p++) {
-            $m = $principalFreq === 'at_maturity' ? $termMonths : $p * $pMonthsStep;
+            $m = $principalFreq === 'at_maturity' ? $termMonths : ($p + $principalGrace) * $pMonthsStep;
             $pDue = ($p === $pPeriods) ? round($principal - $accumulatedPrincipal, 2) : $roundedPrincipal;
             $accumulatedPrincipal = round($accumulatedPrincipal + $pDue, 2);
             $principalDueMap[$m] = $pDue;
@@ -206,7 +223,7 @@ final class LoanSimulationService
 
         $interestDueMap = [];
         for ($it = 1; $it <= $iPeriods; $it++) {
-            $m = $interestFreq === 'at_maturity' ? $termMonths : $it * $iMonthsStep;
+            $m = $interestFreq === 'at_maturity' ? $termMonths : ($it + $interestGrace) * $iMonthsStep;
             $iDue = ($it === $iPeriods) ? round($totalInterest - $accumulatedInterest, 2) : $roundedInterest;
             $accumulatedInterest = round($accumulatedInterest + $iDue, 2);
             $interestDueMap[$m] = $iDue;
@@ -247,8 +264,9 @@ final class LoanSimulationService
         string $principalFreq,
         int $roundingStep,
         CarbonImmutable $start,
+        int $principalGrace = 0,
     ): array {
-        $pPeriods = $this->periodsCount($principalFreq, $termMonths);
+        $pPeriods = $this->periodsCount($principalFreq, $termMonths, $principalGrace);
         $rawPrincipalPerPeriod = $pPeriods > 0 ? $principal / $pPeriods : $principal;
         $roundedPrincipal = $this->roundValue($rawPrincipalPerPeriod, $roundingStep);
 
@@ -268,7 +286,7 @@ final class LoanSimulationService
             $rawInterest = $remaining * $periodicRate;
             $iDue = $this->roundValue($rawInterest, $roundingStep);
             $remaining = max(0.0, round($remaining - $pDue, 2));
-            $dueDate = $this->advanceDate($start, $principalFreq, $i, $termMonths);
+            $dueDate = $this->advanceDate($start, $principalFreq, $i + $principalGrace, $termMonths);
 
             $schedule[] = [
                 'number' => $i,
@@ -295,8 +313,9 @@ final class LoanSimulationService
         string $principalFreq,
         int $roundingStep,
         CarbonImmutable $start,
+        int $principalGrace = 0,
     ): array {
-        $periods = $this->periodsCount($principalFreq, $termMonths);
+        $periods = $this->periodsCount($principalFreq, $termMonths, $principalGrace);
         $monthsPerPeriod = $periods > 0 ? (int) round($termMonths / $periods) : 1;
         $periodicRate = ($rateMonthly / 100) * $monthsPerPeriod;
 
@@ -326,7 +345,7 @@ final class LoanSimulationService
                 $remaining = max(0.0, round($remaining - $pDue, 2));
             }
 
-            $dueDate = $this->advanceDate($start, $principalFreq, $i, $termMonths);
+            $dueDate = $this->advanceDate($start, $principalFreq, $i + $principalGrace, $termMonths);
 
             $schedule[] = [
                 'number' => $i,
@@ -341,7 +360,7 @@ final class LoanSimulationService
         return $schedule;
     }
 
-    private function periodsCount(string $frequency, int $termMonths): int
+    private function periodsCount(string $frequency, int $termMonths, int $graceMonths = 0): int
     {
         if ($frequency === 'at_maturity') {
             return 1;
@@ -352,7 +371,9 @@ final class LoanSimulationService
             return 1;
         }
 
-        return max(1, (int) round($termMonths / $step));
+        $firstPeriod = $graceMonths + $step;
+
+        return max(1, (int) floor(($termMonths - $firstPeriod) / $step) + 1);
     }
 
     private function advanceDate(CarbonImmutable $start, string $frequency, int $periodIndex, int $termMonths): CarbonImmutable

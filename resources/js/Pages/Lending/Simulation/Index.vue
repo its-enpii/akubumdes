@@ -32,6 +32,8 @@ const form = reactive({
     installment_method: props.defaultSimulation.parameters.installment_method || 'flat',
     principal_frequency: props.defaultSimulation.parameters.principal_frequency || 'monthly',
     interest_frequency: props.defaultSimulation.parameters.interest_frequency || 'monthly',
+    principal_grace_months: props.defaultSimulation.parameters.principal_grace_months || 0,
+    interest_grace_months: props.defaultSimulation.parameters.interest_grace_months || 0,
     rounding_step: props.defaultSimulation.parameters.rounding_step !== undefined ? Number(props.defaultSimulation.parameters.rounding_step) : 500,
     start_date: props.defaultSimulation.parameters.start_date || new Date().toISOString().slice(0, 10),
 });
@@ -79,8 +81,29 @@ const FREQUENCY_MONTHS = {
     quarterly: 3,
     semi_annually: 6,
     annually: 12,
+    every_4_months: 4,
+    every_5_months: 5,
+    every_6_months: 6,
+    every_7_months: 7,
+    every_8_months: 8,
+    every_9_months: 9,
+    every_10_months: 10,
+    every_11_months: 11,
+    every_12_months: 12,
+    every_24_months: 24,
+    every_36_months: 36,
     at_maturity: 0,
 };
+
+const graceOptions = [
+    { value: 0, label: 'Tanpa Penundaan' },
+    { value: 1, label: 'M1 — Angsuran ditunda 1 bulan' },
+    { value: 2, label: 'M2 — Pokok ditunda 2 bulan' },
+    { value: 3, label: 'M3 — Pokok ditunda 3 bulan' },
+    { value: 6, label: 'M6 — Pokok ditunda 6 bulan' },
+    { value: 12, label: 'M12 — Pokok ditunda 12 bulan' },
+    { value: 24, label: 'M24 — Pokok ditunda 24 bulan' },
+];
 
 function roundVal(amount, step) {
     const s = parseInt(step, 10) || 0;
@@ -118,6 +141,8 @@ const simulationResult = computed(() => {
     const method = form.installment_method || 'flat';
     const principalFreq = form.principal_frequency || 'monthly';
     const interestFreq = form.interest_frequency || 'monthly';
+    const principalGrace = Math.max(0, parseInt(form.principal_grace_months || 0, 10));
+    const interestGrace = Math.max(0, parseInt(form.interest_grace_months || 0, 10));
     const roundingStep = Math.max(0, parseInt(form.rounding_step ?? 500, 10));
     const startDate = form.start_date || new Date().toISOString().slice(0, 10);
 
@@ -136,7 +161,7 @@ const simulationResult = computed(() => {
 
     if (method === 'annuity') {
         const pStep = FREQUENCY_MONTHS[principalFreq] ?? 1;
-        const periods = principalFreq === 'at_maturity' ? 1 : Math.max(1, Math.round(termMonths / pStep));
+        const periods = principalFreq === 'at_maturity' ? 1 : Math.max(1, Math.floor((termMonths - principalGrace - pStep) / pStep) + 1);
         const monthsPerPeriod = periods > 0 ? Math.round(termMonths / periods) : 1;
         const periodicRate = (rateMonthly / 100) * monthsPerPeriod;
 
@@ -162,7 +187,7 @@ const simulationResult = computed(() => {
                 remaining = Math.max(0, Math.round((remaining - pDue) * 100) / 100);
             }
 
-            const m = principalFreq === 'at_maturity' ? termMonths : i * pStep;
+            const m = principalFreq === 'at_maturity' ? termMonths : (i + principalGrace) * pStep;
 
             schedule.push({
                 number: i,
@@ -175,7 +200,7 @@ const simulationResult = computed(() => {
         }
     } else if (method === 'declining') {
         const pStep = FREQUENCY_MONTHS[principalFreq] ?? 1;
-        const pPeriods = principalFreq === 'at_maturity' ? 1 : Math.max(1, Math.round(termMonths / pStep));
+        const pPeriods = principalFreq === 'at_maturity' ? 1 : Math.max(1, Math.floor((termMonths - principalGrace - pStep) / pStep) + 1);
         const rawP = pPeriods > 0 ? principal / pPeriods : principal;
         const roundedP = roundVal(rawP, roundingStep);
         const monthsPerPeriod = pPeriods > 0 ? Math.round(termMonths / pPeriods) : 1;
@@ -193,7 +218,7 @@ const simulationResult = computed(() => {
             const rawInterest = remaining * periodicRate;
             const iDue = roundVal(rawInterest, roundingStep);
             remaining = Math.max(0, Math.round((remaining - pDue) * 100) / 100);
-            const m = principalFreq === 'at_maturity' ? termMonths : i * pStep;
+            const m = principalFreq === 'at_maturity' ? termMonths : (i + principalGrace) * pStep;
 
             schedule.push({
                 number: i,
@@ -208,8 +233,8 @@ const simulationResult = computed(() => {
         // Flat calculation
         const pStep = FREQUENCY_MONTHS[principalFreq] ?? 1;
         const iStep = FREQUENCY_MONTHS[interestFreq] ?? 1;
-        const pPeriods = principalFreq === 'at_maturity' ? 1 : Math.max(1, Math.round(termMonths / pStep));
-        const iPeriods = interestFreq === 'at_maturity' ? 1 : Math.max(1, Math.round(termMonths / iStep));
+        const pPeriods = principalFreq === 'at_maturity' ? 1 : Math.max(1, Math.floor((termMonths - principalGrace - pStep) / pStep) + 1);
+        const iPeriods = interestFreq === 'at_maturity' ? 1 : Math.max(1, Math.floor((termMonths - interestGrace - iStep) / iStep) + 1);
         const totalInterest = principal * (rateMonthly / 100) * termMonths;
 
         const roundedP = roundVal(pPeriods > 0 ? principal / pPeriods : principal, roundingStep);
@@ -232,7 +257,7 @@ const simulationResult = computed(() => {
                 accI += iDue;
 
                 remaining = Math.max(0, Math.round((remaining - pDue) * 100) / 100);
-                const m = principalFreq === 'at_maturity' ? termMonths : i * pStep;
+                const m = principalFreq === 'at_maturity' ? termMonths : (i + principalGrace) * pStep;
 
                 schedule.push({
                     number: i,
@@ -250,7 +275,7 @@ const simulationResult = computed(() => {
 
             const pMap = {};
             for (let p = 1; p <= pPeriods; p++) {
-                const m = principalFreq === 'at_maturity' ? termMonths : p * pStep;
+                const m = principalFreq === 'at_maturity' ? termMonths : (p + principalGrace) * pStep;
                 const pDue = (p === pPeriods) ? Math.round((principal - accP) * 100) / 100 : roundedP;
                 accP += pDue;
                 pMap[m] = pDue;
@@ -258,7 +283,7 @@ const simulationResult = computed(() => {
 
             const iMap = {};
             for (let it = 1; it <= iPeriods; it++) {
-                const m = interestFreq === 'at_maturity' ? termMonths : it * iStep;
+                const m = interestFreq === 'at_maturity' ? termMonths : (it + interestGrace) * iStep;
                 const iDue = (it === iPeriods) ? Math.round((totalInterest - accI) * 100) / 100 : roundedI;
                 accI += iDue;
                 iMap[m] = iDue;
@@ -321,6 +346,8 @@ function openPdf() {
         installment_method: form.installment_method,
         principal_frequency: form.principal_frequency,
         interest_frequency: form.interest_frequency,
+        principal_grace_months: form.principal_grace_months,
+        interest_grace_months: form.interest_grace_months,
         rounding_step: form.rounding_step,
         start_date: form.start_date,
         borrower_name: form.borrower_name || 'Calon Peminjam',
@@ -340,6 +367,8 @@ function resetForm() {
     form.installment_method = 'flat';
     form.principal_frequency = 'monthly';
     form.interest_frequency = 'monthly';
+    form.principal_grace_months = 0;
+    form.interest_grace_months = 0;
     form.rounding_step = 500;
     form.start_date = new Date().toISOString().slice(0, 10);
 }
@@ -454,6 +483,19 @@ Est. Angsuran/Bln: ${money(s.estimated_monthly)}`;
                                         {{ amt >= 1000000 ? (amt / 1000000) + ' Jt' : money(amt) }}
                                     </button>
                                 </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <SmartSelect
+                                    v-model="form.principal_grace_months"
+                                    label="Grace Period Pokok"
+                                    :options="graceOptions"
+                                />
+                                <SmartSelect
+                                    v-model="form.interest_grace_months"
+                                    label="Grace Period Jasa"
+                                    :options="graceOptions"
+                                />
                             </div>
 
                             <!-- Tenor / Jangka Waktu -->

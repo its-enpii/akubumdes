@@ -91,6 +91,8 @@ final class LegacyLendingNormalizer
         $seq = max(1, (int) ($row->pinjaman_ke ?? 1));
         $status = $this->mapStatus(LegacyRow::str($row, ['status']));
         $method = $this->mapInstallmentMethod(LegacyRow::str($row, ['sistem_angsuran', 'jenis_jasa']));
+        $systemId = (int) (LegacyRow::str($row, ['sistem_angsuran']) ?? '0');
+        $system = $this->mapInstallmentSystem($systemId);
 
         $spk = LegacyRow::str($row, ['spk_no']);
         $loanNumber = $spk !== null && $spk !== '' ? $spk : ('PK-'.$legacyId);
@@ -106,6 +108,10 @@ final class LegacyLendingNormalizer
                 interestRate: $rate,
                 termMonths: $term,
                 installmentMethod: $method,
+                principalFrequency: $system['principal_frequency'],
+                interestFrequency: $system['interest_frequency'],
+                principalGraceMonths: $system['principal_grace_months'],
+                interestGraceMonths: $system['interest_grace_months'],
                 status: $status,
                 proposedAt: LegacyRow::date($row, ['tgl_proposal']),
                 verifiedAt: LegacyRow::date($row, ['tgl_verifikasi']),
@@ -319,6 +325,63 @@ final class LegacyLendingNormalizer
             'H' => 'written_off',
             'T' => 'draft',
             default => $v === '' ? 'active' : 'active',
+        };
+    }
+
+    /**
+     * @return array{principal_frequency: string, interest_frequency: string, principal_grace_months: int, interest_grace_months: int}
+     */
+    private function mapInstallmentSystem(int $legacyId): array
+    {
+        return match ($legacyId) {
+            25 => [
+                'principal_frequency' => 'monthly',
+                'interest_frequency' => 'monthly',
+                'principal_grace_months' => 1,
+                'interest_grace_months' => 1,
+            ],
+            16, 22 => [
+                'principal_frequency' => 'every_24_months',
+                'interest_frequency' => $legacyId === 16 ? 'monthly' : 'every_24_months',
+                'principal_grace_months' => 0,
+                'interest_grace_months' => 0,
+            ],
+            26 => [
+                'principal_frequency' => 'monthly',
+                'interest_frequency' => 'monthly',
+                'principal_grace_months' => 6,
+                'interest_grace_months' => 0,
+            ],
+            15 => [
+                'principal_frequency' => 'monthly',
+                'interest_frequency' => 'monthly',
+                'principal_grace_months' => 2,
+                'interest_grace_months' => 0,
+            ],
+            14 => [
+                'principal_frequency' => 'monthly',
+                'interest_frequency' => 'monthly',
+                'principal_grace_months' => 3,
+                'interest_grace_months' => 0,
+            ],
+            20 => [
+                'principal_frequency' => 'monthly',
+                'interest_frequency' => 'monthly',
+                'principal_grace_months' => 12,
+                'interest_grace_months' => 0,
+            ],
+            5 => [
+                'principal_frequency' => 'monthly',
+                'interest_frequency' => 'monthly',
+                'principal_grace_months' => 2,
+                'interest_grace_months' => 0,
+            ],
+            default => [
+                'principal_frequency' => 'monthly',
+                'interest_frequency' => 'monthly',
+                'principal_grace_months' => 0,
+                'interest_grace_months' => 0,
+            ],
         };
     }
 

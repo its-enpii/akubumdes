@@ -777,6 +777,8 @@ final class LoanController
             'installment_method' => $loan->installment_method,
             'principal_frequency' => $loan->principal_frequency,
             'interest_frequency' => $loan->interest_frequency,
+            'principal_grace_months' => (int) ($loan->principal_grace_months ?? 0),
+            'interest_grace_months' => (int) ($loan->interest_grace_months ?? 0),
             'rounding_step' => $loan->rounding_step !== null ? (int) $loan->rounding_step : null,
             'verification_notes' => $loan->verification_notes,
             'guidance_notes' => $loan->guidance_notes,
