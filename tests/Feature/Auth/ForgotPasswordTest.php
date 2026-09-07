@@ -41,6 +41,12 @@ final class ForgotPasswordTest extends TestCase
         $this->get(route('password.request'))->assertOk();
     }
 
+    public function test_forgot_password_route_is_registered_with_native_path(): void
+    {
+        self::assertSame('/forgot-password', route('password.request', absolute: false));
+        $this->get('/forgot-password')->assertOk();
+    }
+
     public function test_send_otp_with_valid_username_redirects_to_otp_form_even_when_gateway_fails(): void
     {
         $user = $this->createTenantUser();

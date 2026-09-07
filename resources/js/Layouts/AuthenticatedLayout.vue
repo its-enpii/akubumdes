@@ -1,5 +1,5 @@
 <script setup>
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import AppButton from '../Components/AppButton.vue';
 import AppIcon from '../Components/AppIcon.vue';
@@ -25,6 +25,8 @@ const assistantEnabled = computed(() => {
     return can('assistant.use');
 });
 const currentPath = computed(() => page.url.split('?')[0]);
+const sidebarNav = ref(null);
+const sidebarScrollTop = ref(0);
 const mobileMenuOpen = ref(false);
 const expanded = ref({});
 const logoutForm = useForm({});
@@ -387,6 +389,23 @@ function askLogout() {
     logoutOpen.value = true;
 }
 
+function preserveSidebarScroll() {
+    if (sidebarNav.value) {
+        sidebarScrollTop.value = sidebarNav.value.scrollTop;
+    }
+}
+
+function restoreSidebarScroll() {
+    nextTick(() => {
+        if (sidebarNav.value) {
+            sidebarNav.value.scrollTop = sidebarScrollTop.value;
+        }
+    });
+}
+
+router.on('before', preserveSidebarScroll);
+router.on('navigate', restoreSidebarScroll);
+
 function logout() {
     logoutForm.post('/logout', {
         onFinish: () => {
@@ -417,7 +436,7 @@ function logout() {
                 <div><p class="font-bold leading-none text-on-primary">BUMDesma/LKD</p><p class="mt-1 text-[10px] font-semibold uppercase tracking-widest text-primary-fixed-dim">Financial Management</p></div>
             </div>
 
-            <nav class="scrollbar-hidden flex-1 space-y-5 overflow-y-auto px-2" aria-label="Navigasi utama">
+            <nav ref="sidebarNav" class="scrollbar-hidden flex-1 space-y-5 overflow-y-auto px-2" aria-label="Navigasi utama">
                 <section v-for="section in visibleSections" :key="section.label">
                     <h2 class="mb-1 px-4 text-[10px] font-bold uppercase tracking-[0.18em] text-primary-fixed-dim/70">{{ section.label }}</h2>
                     <div class="space-y-1">

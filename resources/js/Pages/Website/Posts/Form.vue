@@ -2,8 +2,11 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
+import AppDatePicker from '../../../Components/AppDatePicker.vue';
+import AppFileUpload from '../../../Components/AppFileUpload.vue';
 import AppInput from '../../../Components/AppInput.vue';
 import AppRichEditor from '../../../Components/AppRichEditor.vue';
+import AppTextarea from '../../../Components/AppTextarea.vue';
 import SmartSelect from '../../../Components/SmartSelect.vue';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout.vue';
 
@@ -59,7 +62,7 @@ function submit() {
                             />
                         </div>
                         <div class="mt-4">
-                            <label class="mb-1.5 block text-sm font-medium text-on-surface-variant">Isi Berita</label>
+                            <label class="ml-1 block text-sm font-bold uppercase tracking-wider text-primary">Isi Berita</label>
                             <AppRichEditor v-model="form.content" placeholder="Tulis isi berita…" />
                             <p v-if="form.errors.content" class="mt-1 text-sm text-error">{{ form.errors.content }}</p>
                         </div>
@@ -68,27 +71,19 @@ function submit() {
                     <section class="border-t border-outline-variant pt-4">
                         <h2 class="font-semibold text-primary">Ringkasan &amp; Gambar Sampul</h2>
                         <div class="mt-3 grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-on-surface-variant">Ringkasan (excerpt)</label>
-                                <textarea
-                                    v-model="form.excerpt"
-                                    rows="3"
-                                    class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary focus:outline-none"
-                                    placeholder="Ringkasan singkat yang tampil di daftar berita…"
-                                />
-                                <p v-if="form.errors.excerpt" class="mt-1 text-sm text-error">{{ form.errors.excerpt }}</p>
-                            </div>
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-on-surface-variant">Gambar Sampul</label>
-                                <input
-                                    type="file"
-                                    accept="image/png,image/jpeg,image/webp"
-                                    class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface file:mr-3 file:rounded-full file:border-0 file:bg-primary-container file:px-4 file:py-1.5 file:text-sm file:font-semibold file:text-on-primary-container"
-                                    @change="e => form.cover_image = e.target.files[0]"
-                                >
-                                <p class="mt-1 text-xs text-on-surface-variant">PNG / JPG / WebP · Maks 2 MB</p>
-                                <p v-if="form.errors.cover_image" class="mt-1 text-sm text-error">{{ form.errors.cover_image }}</p>
-                            </div>
+                            <AppTextarea
+                                v-model="form.excerpt"
+                                label="Ringkasan (excerpt)"
+                                placeholder="Ringkasan singkat yang tampil di daftar berita…"
+                                :error="form.errors.excerpt"
+                            />
+                            <AppFileUpload
+                                v-model="form.cover_image"
+                                label="Gambar Sampul"
+                                accept="image/png,image/jpeg,image/webp"
+                                hint="PNG / JPG / WebP · Maks 2 MB"
+                                :error="form.errors.cover_image"
+                            />
                         </div>
                     </section>
 
@@ -101,11 +96,10 @@ function submit() {
                                 :options="statusOptions"
                                 :error="form.errors.status"
                             />
-                            <AppInput
+                            <AppDatePicker
                                 v-model="form.published_at"
                                 label="Tanggal Terbit"
                                 icon="event"
-                                type="datetime-local"
                                 hint="Kosongkan saat mempublikasikan untuk memakai waktu sekarang."
                                 :error="form.errors.published_at"
                             />

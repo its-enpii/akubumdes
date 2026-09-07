@@ -2,6 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
+import AppDatePicker from '../../../Components/AppDatePicker.vue';
 import AppInput from '../../../Components/AppInput.vue';
 import AppRichEditor from '../../../Components/AppRichEditor.vue';
 import SmartSelect from '../../../Components/SmartSelect.vue';
@@ -57,7 +58,7 @@ function submit() {
                             />
                         </div>
                         <div class="mt-4">
-                            <label class="mb-1.5 block text-sm font-medium text-on-surface-variant">Isi Halaman</label>
+                            <label class="ml-1 block text-sm font-bold uppercase tracking-wider text-primary">Isi Halaman</label>
                             <AppRichEditor v-model="form.content" placeholder="Tulis isi halaman…" />
                             <p v-if="form.errors.content" class="mt-1 text-sm text-error">{{ form.errors.content }}</p>
                         </div>
@@ -72,11 +73,10 @@ function submit() {
                                 :options="statusOptions"
                                 :error="form.errors.status"
                             />
-                            <AppInput
+                            <AppDatePicker
                                 v-model="form.published_at"
                                 label="Tanggal Terbit"
                                 icon="event"
-                                type="datetime-local"
                                 hint="Kosongkan saat mempublikasikan untuk memakai waktu sekarang."
                                 :error="form.errors.published_at"
                             />
