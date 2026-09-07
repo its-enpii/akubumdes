@@ -21,6 +21,7 @@ use App\Assistant\Handlers\SearchLoansHandler;
 use App\Assistant\Handlers\SearchMembersHandler;
 use App\Assistant\Handlers\SendBillingNoticesHandler;
 use App\Assistant\Handlers\SimulateLoanHandler;
+use App\Domain\Migration\Support\LegacyConnection;
 use App\Models\Platform\PersonalAccessToken;
 use App\Tenancy\TenantContext;
 use Enpii\Assistant\Contracts\SessionResolver;
@@ -34,6 +35,10 @@ final class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->singleton(
+            LegacyConnection::class,
+        );
+
         // enpii/assistant package bindings
         $this->app->bind(TenantResolver::class, fn () => new class implements TenantResolver
         {

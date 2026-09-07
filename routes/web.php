@@ -216,6 +216,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::get('/migration', [AdminMigrationController::class, 'index'])->name('migration.index');
     Route::get('/migrations', [AdminMigrationController::class, 'index'])->name('migrations.index');
     Route::get('/migration/discover', [AdminMigrationController::class, 'discover'])->name('migration.discover');
+    Route::get('/migration/legacy-tenants', [AdminMigrationController::class, 'legacyTenants'])->name('migration.legacy-tenants');
     Route::post('/migrations', [AdminMigrationController::class, 'store'])->name('migrations.store');
     Route::get('/migrations/{run}', [AdminMigrationController::class, 'show'])->name('migrations.show');
     Route::get('/migrations/{run}/stream', [AdminMigrationController::class, 'stream'])->name('migrations.stream');

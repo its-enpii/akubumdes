@@ -29,9 +29,14 @@ let sseSource = null;
 // the remote legacy MySQL can take 60+ seconds, so the page renders
 // immediately and only runs discovery when the user opens the form.
 const discoveredSuffixes = ref(props.discovered_suffixes ?? []);
+const legacyTenants = ref([]);
 const isDiscovering = ref(false);
+const isLoadingLegacyTenants = ref(false);
 const discoveryError = ref(null);
+const legacyTenantsError = ref(null);
 const discoveryCount = ref(discoveredSuffixes.value.length);
+const isExpertMode = ref(false);
+const simpleFallbackMode = ref('auto');
 
 const runDiscovery = async (force = false) => {
     if (isDiscovering.value) return;
@@ -54,10 +59,29 @@ const runDiscovery = async (force = false) => {
     }
 };
 
-onMounted(() => {
-    if (!discoveredSuffixes.value || discoveredSuffixes.value.length === 0) {
-        runDiscovery(false);
+const runLegacyTenantLoad = async (force = false) => {
+    if (isLoadingLegacyTenants.value) return;
+    isLoadingLegacyTenants.value = true;
+    legacyTenantsError.value = null;
+    try {
+        const url = '/admin/migration/legacy-tenants' + (force ? '?refresh=1' : '');
+        const res = await fetch(url, { headers: { Accept: 'application/json' } });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) {
+            legacyTenantsError.value = data.error || `HTTP ${res.status}`;
+            return;
+        }
+        legacyTenants.value = Array.isArray(data.legacy_tenants) ? data.legacy_tenants : [];
+    } catch (e) {
+        legacyTenantsError.value = e?.message ?? 'Gagal memuat daftar tenant legacy.';
+    } finally {
+        isLoadingLegacyTenants.value = false;
     }
+};
+
+onMounted(() => {
+    runLegacyTenantLoad(false);
+    runDiscovery(false);
 });
 
 const tenantOptions = computed(() =>
@@ -67,6 +91,33 @@ const tenantOptions = computed(() =>
         subtitle: `Code: ${t.code} • Tenant ID #${t.row_id}`,
         badge: `ID #${t.row_id}`,
     }))
+);
+
+const selectedLegacyTenant = computed(() =>
+    legacyTenants.value.find(item => String(item.legacy_id) === String(form.legacy_id)) ?? null,
+);
+
+const legacyTenantOptions = computed(() =>
+    legacyTenants.value.map(item => {
+        const tenant = item.next_tenant;
+        return {
+            value: item.legacy_id,
+            label: `${item.legacy_name} (${item.legacy_code})`,
+            subtitle: tenant
+                ? `Target: ${tenant.name} (${tenant.code})`
+                : 'Belum ada tenant Next — tenant baru dapat dibuat otomatis.',
+            badge: tenant ? tenant.name : 'Belum ada tenant Next',
+        };
+    }),
+);
+
+const manualFallbackTenantOptions = computed(() =>
+    props.tenants.map(t => ({
+        value: t.row_id,
+        label: t.name,
+        subtitle: `Code: ${t.code} • District: ${t.district_code ?? '-'}`,
+        badge: `ID #${t.row_id}`,
+    })),
 );
 
 const suffixOptions = computed(() => {
@@ -88,8 +139,10 @@ const suffixOptions = computed(() => {
 });
 
 const form = useForm({
-    tenant_id: props.tenants[0]?.row_id ?? '',
-    suffix: '1',
+    legacy_id: '',
+    tenant_id: '',
+    suffix: '',
+    auto_provision: true,
     is_dry_run: false,
     run_immediately: false,
     chunk: 500,
@@ -108,6 +161,14 @@ const form = useForm({
 });
 
 const submitCutover = () => {
+    if (!isExpertMode.value) {
+        form.suffix = '';
+        form.tenant_id = simpleFallbackMode.value === 'manual' ? form.tenant_id : '';
+        form.auto_provision = simpleFallbackMode.value === 'auto';
+    } else {
+        form.legacy_id = '';
+        form.auto_provision = false;
+    }
     form.post('/admin/migrations', {
         preserveScroll: true,
         onSuccess: () => {
@@ -117,6 +178,33 @@ const submitCutover = () => {
         },
     });
 };
+
+const resetFormForMode = (mode) => {
+    if (mode === 'expert') {
+        form.legacy_id = '';
+        form.auto_provision = false;
+        if (!form.tenant_id) form.tenant_id = props.tenants[0]?.row_id ?? '';
+        if (!form.suffix) form.suffix = '1';
+        return;
+    }
+
+    form.suffix = '';
+    form.auto_provision = simpleFallbackMode.value === 'auto';
+    if (simpleFallbackMode.value === 'manual') {
+        if (!form.tenant_id) form.tenant_id = props.tenants[0]?.row_id ?? '';
+        return;
+    }
+    form.tenant_id = selectedLegacyTenant.value?.next_tenant?.row_id ?? '';
+};
+
+watch(selectedLegacyTenant, (item) => {
+    if (isExpertMode.value) return;
+    form.tenant_id = item?.next_tenant?.row_id ?? '';
+    form.auto_provision = simpleFallbackMode.value === 'auto';
+});
+
+watch(simpleFallbackMode, () => resetFormForMode('simple'));
+watch(isExpertMode, () => resetFormForMode(isExpertMode.value ? 'expert' : 'simple'));
 
 const onLogScroll = () => {
     if (!logTerminal.value) return;
@@ -313,108 +401,170 @@ const getStepStatusVariant = (status) => {
                         </template>
 
                         <form @submit.prevent="submitCutover" class="space-y-5">
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <!-- Tenant Selection via SmartSelect -->
+                            <div v-if="!isExpertMode" class="space-y-4">
                                 <div>
                                     <SmartSelect
+                                        v-model="form.legacy_id"
+                                        label="Pilih Tenant Legacy"
+                                        :options="legacyTenantOptions"
+                                        :error="form.errors.legacy_id"
+                                        :loading="isLoadingLegacyTenants"
+                                        hint="Nama kecamatan dicocokkan dengan district_code tenant Next."
+                                        searchable
+                                        required
+                                    />
+                                    <p v-if="legacyTenantsError" class="mt-2 text-sm text-error">{{ legacyTenantsError }}</p>
+                                </div>
+
+                                <div v-if="selectedLegacyTenant" class="space-y-3 rounded-xl border border-outline-variant p-4">
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <div>
+                                            <p class="text-sm font-semibold text-primary">Target</p>
+                                            <p v-if="selectedLegacyTenant.next_tenant" class="text-xs text-on-surface-variant">
+                                                {{ selectedLegacyTenant.next_tenant.name }} ({{ selectedLegacyTenant.next_tenant.code }})
+                                            </p>
+                                            <p v-else class="text-xs text-on-surface-variant">
+                                                Tenant Next belum ditemukan untuk kd_kec {{ selectedLegacyTenant.legacy_code }}.
+                                            </p>
+                                        </div>
+                                        <AppBadge :tone="selectedLegacyTenant.next_tenant ? 'success' : 'warning'">
+                                            {{ selectedLegacyTenant.next_tenant ? 'Tenant Next ketemu' : 'Belum ada tenant Next' }}
+                                        </AppBadge>
+                                    </div>
+
+                                    <div v-if="!selectedLegacyTenant.next_tenant" class="grid gap-3 sm:grid-cols-2">
+                                        <AppButton
+                                            type="button"
+                                            :variant="simpleFallbackMode === 'auto' ? 'primary' : 'secondary'"
+                                            size="compact"
+                                            @click="simpleFallbackMode = 'auto'"
+                                        >
+                                            Buat tenant baru otomatis
+                                        </AppButton>
+                                        <AppButton
+                                            type="button"
+                                            :variant="simpleFallbackMode === 'manual' ? 'primary' : 'secondary'"
+                                            size="compact"
+                                            @click="simpleFallbackMode = 'manual'"
+                                        >
+                                            Pilih tenant Next manual
+                                        </AppButton>
+                                    </div>
+
+                                    <SmartSelect
+                                        v-if="!selectedLegacyTenant.next_tenant && simpleFallbackMode === 'manual'"
                                         v-model="form.tenant_id"
-                                        label="Pilih Tenant Target"
-                                        :options="tenantOptions"
+                                        label="Pilih Tenant Next"
+                                        :options="manualFallbackTenantOptions"
                                         :error="form.errors.tenant_id"
                                         searchable
                                         required
                                     />
                                 </div>
 
-                                <!-- Suffix Lokasi ID Selection -->
-                                <div class="space-y-2">
-                                    <SmartSelect
-                                        v-if="discoveredSuffixes.length > 0"
-                                        v-model="form.suffix"
-                                        label="ID Lokasi (Suffix Terdeteksi)"
-                                        :options="suffixOptions"
-                                        :error="form.errors.suffix"
-                                        searchable
-                                        required
+                                <div class="rounded-xl border border-outline-variant p-4">
+                                    <AppSwitch
+                                        v-model="form.is_dry_run"
+                                        label="Mode Dry-Run (Simulasi / Uji Coba)"
+                                        description="Menjalankan simulasi validasi tanpa menyimpan perubahan ke database utama."
+                                        icon="science"
                                     />
-                                    <AppInput
-                                        v-else
-                                        v-model="form.suffix"
-                                        label="ID Lokasi (Suffix Legacy DB)"
-                                        placeholder="misal: 1 atau 76"
-                                        hint="Akhiran tabel transaksi_* di database legacy (contoh: 1 untuk transaksi_1)"
-                                        required
-                                        :error="form.errors.suffix"
-                                    />
-                                    <div class="flex items-center justify-between gap-2 text-xs">
-                                        <span class="text-on-surface-variant">
-                                            <template v-if="isDiscovering">Memindai database legacy… ({{ Math.round(70) }}s)</template>
-                                            <template v-else-if="discoveryError">
-                                                <span class="text-error">Gagal memindai: {{ discoveryError }}</span>
-                                            </template>
-                                            <template v-else-if="discoveredSuffixes.length > 0">
-                                                {{ discoveryCount }} suffix terdeteksi.
-                                            </template>
-                                            <template v-else>
-                                                Belum ada suffix terdeteksi — klik "Pindai Ulang DB Legacy".
-                                            </template>
-                                        </span>
-                                        <AppButton
-                                            type="button"
-                                            variant="ghost"
-                                            size="compact"
-                                            icon="search"
-                                            :disabled="isDiscovering"
-                                            @click="runDiscovery(true)"
-                                        >
-                                            Pindai Ulang DB Legacy
-                                        </AppButton>
-                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Execution Mode Toggles -->
-                            <div class="space-y-3 rounded-xl border border-outline-variant p-4">
-                                <AppSwitch
-                                    v-model="form.is_dry_run"
-                                    label="Mode Dry-Run (Simulasi / Uji Coba)"
-                                    description="Menjalankan simulasi validasi tanpa menyimpan perubahan ke database utama."
-                                    icon="science"
-                                />
-
-                                <AppSwitch
-                                    v-model="form.run_immediately"
-                                    label="Eksekusi Langsung (Synchronous Execution)"
-                                    description="Jalankan langsung di server tanpa menunggu antrean background worker."
-                                    icon="bolt"
-                                />
-                            </div>
-
-                            <!-- Opsi Lanjutan & Skipping -->
-                            <div class="space-y-4 rounded-xl border border-outline-variant p-4">
-                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <div v-else class="space-y-5">
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
-                                        <AppInput v-model="form.chunk" label="Chunk Size" type="number" min="10" max="5000" />
+                                        <SmartSelect
+                                            v-model="form.tenant_id"
+                                            label="Pilih Tenant Target"
+                                            :options="tenantOptions"
+                                            :error="form.errors.tenant_id"
+                                            searchable
+                                            required
+                                        />
                                     </div>
-                                    <div>
-                                        <AppDatePicker v-model="form.from_year" label="Tahun Fiskal Dari" mode="year" placeholder="Pilih Tahun" />
-                                    </div>
-                                    <div>
-                                        <AppDatePicker v-model="form.to_year" label="Tahun Fiskal Sampai" mode="year" placeholder="Pilih Tahun" />
+
+                                    <div class="space-y-2">
+                                        <SmartSelect
+                                            v-if="discoveredSuffixes.length > 0"
+                                            v-model="form.suffix"
+                                            label="ID Lokasi (Suffix Terdeteksi)"
+                                            :options="suffixOptions"
+                                            :error="form.errors.suffix"
+                                            searchable
+                                            required
+                                        />
+                                        <AppInput
+                                            v-else
+                                            v-model="form.suffix"
+                                            label="ID Lokasi (Suffix Legacy DB)"
+                                            placeholder="misal: 1 atau 76"
+                                            hint="Akhiran tabel transaksi_* di database legacy (contoh: 1 untuk transaksi_1)"
+                                            required
+                                            :error="form.errors.suffix"
+                                        />
+                                        <div class="flex items-center justify-between gap-2 text-xs">
+                                            <span class="text-on-surface-variant">
+                                                <template v-if="isDiscovering">Memindai database legacy… ({{ Math.round(70) }}s)</template>
+                                                <template v-else-if="discoveryError">
+                                                    <span class="text-error">Gagal memindai: {{ discoveryError }}</span>
+                                                </template>
+                                                <template v-else-if="discoveredSuffixes.length > 0">
+                                                    {{ discoveryCount }} suffix terdeteksi.
+                                                </template>
+                                                <template v-else>
+                                                    Belum ada suffix terdeteksi — klik "Pindai Ulang DB Legacy".
+                                                </template>
+                                            </span>
+                                            <AppButton
+                                                type="button"
+                                                variant="ghost"
+                                                size="compact"
+                                                icon="search"
+                                                :disabled="isDiscovering"
+                                                @click="runDiscovery(true)"
+                                            >
+                                                Pindai Ulang DB Legacy
+                                            </AppButton>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="space-y-3">
-                                    <span class="block text-xs font-bold uppercase tracking-wider text-primary">Lompati Step (Optional Skipping):</span>
-                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                        <AppSwitch v-model="form.skip_fiscal" label="Lompati Periode Fiskal" description="Skip Fiscal Periods" />
-                                        <AppSwitch v-model="form.skip_coa" label="Lompati Bagan Akun (COA)" description="Skip COA Import" />
-                                        <AppSwitch v-model="form.skip_accounting" label="Lompati Jurnal Akuntansi" description="Skip Accounting Jurnal" />
-                                        <AppSwitch v-model="form.skip_membership" label="Lompati Keanggotaan" description="Skip Keanggotaan" />
-                                        <AppSwitch v-model="form.skip_lending" label="Lompati Data Pinjaman" description="Skip Pinjaman" />
-                                        <AppSwitch v-model="form.skip_payment_progress" label="Lompati Progress Angsuran" description="Skip Progress Angsuran" />
-                                        <AppSwitch v-model="form.skip_reconcile" label="Lompati Rekonsiliasi" description="Skip Rekonsiliasi" />
-                                        <AppSwitch v-model="form.skip_sequences" label="Lompati Sequences" description="Skip Sequences" />
+                                <div class="space-y-3 rounded-xl border border-outline-variant p-4">
+                                    <AppSwitch
+                                        v-model="form.run_immediately"
+                                        label="Eksekusi Langsung (Synchronous Execution)"
+                                        description="Jalankan langsung di server tanpa menunggu antrean background worker."
+                                        icon="bolt"
+                                    />
+                                </div>
+
+                                <div class="space-y-4 rounded-xl border border-outline-variant p-4">
+                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                        <div>
+                                            <AppInput v-model="form.chunk" label="Chunk Size" type="number" min="10" max="5000" />
+                                        </div>
+                                        <div>
+                                            <AppDatePicker v-model="form.from_year" label="Tahun Fiskal Dari" mode="year" placeholder="Pilih Tahun" />
+                                        </div>
+                                        <div>
+                                            <AppDatePicker v-model="form.to_year" label="Tahun Fiskal Sampai" mode="year" placeholder="Pilih Tahun" />
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-3">
+                                        <span class="block text-xs font-bold uppercase tracking-wider text-primary">Lompati Step (Optional Skipping):</span>
+                                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <AppSwitch v-model="form.skip_fiscal" label="Lompati Periode Fiskal" description="Skip Fiscal Periods" />
+                                            <AppSwitch v-model="form.skip_coa" label="Lompati Bagan Akun (COA)" description="Skip COA Import" />
+                                            <AppSwitch v-model="form.skip_accounting" label="Lompati Jurnal Akuntansi" description="Skip Accounting Jurnal" />
+                                            <AppSwitch v-model="form.skip_membership" label="Lompati Keanggotaan" description="Skip Keanggotaan" />
+                                            <AppSwitch v-model="form.skip_lending" label="Lompati Data Pinjaman" description="Skip Pinjaman" />
+                                            <AppSwitch v-model="form.skip_payment_progress" label="Lompati Progress Angsuran" description="Skip Progress Angsuran" />
+                                            <AppSwitch v-model="form.skip_reconcile" label="Lompati Rekonsiliasi" description="Skip Rekonsiliasi" />
+                                            <AppSwitch v-model="form.skip_sequences" label="Lompati Sequences" description="Skip Sequences" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -424,6 +574,18 @@ const getStepStatusVariant = (status) => {
                                 <AppButton type="submit" variant="primary" icon="play_arrow" :disabled="form.processing">
                                     <span v-if="form.processing">Sedang Memproses...</span>
                                     <span v-else>Jalankan Migrasi Data</span>
+                                </AppButton>
+                            </div>
+
+                            <div class="flex justify-center border-t border-outline-variant pt-3">
+                                <AppButton
+                                    type="button"
+                                    variant="ghost"
+                                    size="compact"
+                                    :icon="isExpertMode ? 'expand_less' : 'expand_more'"
+                                    @click="isExpertMode = !isExpertMode"
+                                >
+                                    Mode Expert (lanjutan)
                                 </AppButton>
                             </div>
                         </form>
@@ -492,7 +654,14 @@ const getStepStatusVariant = (status) => {
                             <tr v-for="run in runs.data" :key="run.id" class="transition hover:bg-surface-container-low/50">
                                 <td class="px-4 py-3 font-mono font-bold text-primary">#{{ run.id }}</td>
                                 <td class="px-4 py-3 font-medium text-on-surface">{{ run.tenant_name }}</td>
-                                <td class="px-4 py-3 font-mono text-on-surface-variant">{{ run.suffix }}</td>
+                                <td class="px-4 py-3 font-mono text-on-surface-variant">
+                                    <div class="space-y-1">
+                                        <span>{{ run.suffix }}</span>
+                                        <span v-if="run.options?.legacy_name" class="block">
+                                            <AppBadge tone="neutral" class="text-[10px]">Legacy: {{ run.options.legacy_name }}</AppBadge>
+                                        </span>
+                                    </div>
+                                </td>
                                 <td class="px-4 py-3">
                                     <AppBadge :tone="run.is_dry_run ? 'neutral' : 'warning'">
                                         {{ run.is_dry_run ? 'Dry Run' : 'Live Cutover' }}
