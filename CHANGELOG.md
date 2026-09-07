@@ -3,6 +3,16 @@
 Semua perubahan penting pada proyek **SIDBM Next** didokumentasikan dalam berkas ini.
 Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
+## [2026-09-07]
+
+### Added
+- **Sistem Angsuran Legacy (23 Sistem) & Grace Period:**
+  - Master data tabel shard `installment_systems` berisi 23 sistem angsuran legacy SI DBM (seeder `InstallmentSystemSeeder`, provisioning otomatis per-tenant via `TenantInstallmentSystemProvisioner`).
+  - Enum frekuensi baru pada mesin pinjaman & simulasi: `every_4` s/d `every_12`, `every_24`, dan `every_36` bulan; `weekly`, `bimonthly`, `quarterly`, dan `at_maturity` tetap didukung.
+  - Kolom `principal_grace_months` & `interest_grace_months` pada tabel `loans`: sistem M1/M2/M3/M6/M12/M24/Musiman kini menghasilkan jadwal yang benar (pokok dan/atau jasa ditunda N bulan setelah cair; total pokok tetap, pembulatan diserap angsuran terakhir; M1 menunda pokok+jasa, sisanya pokok saja).
+  - `LegacyLendingNormalizer` & `LegacyLoanLoader` tidak lagi memaksa `flat`: `sistem_angsuran`/`sa_jasa` legacy dipetakan ke frekuensi + grace yang sesuai.
+  - UI Form/Show/Simulasi pinjaman menggunakan SmartSelect bergrup (Frekuensi / M-system / Lainnya) + rule validasi `ValidLoanSchedule` (interval melebihi jangka ditolak).
+
 ## [2026-09-04]
 
 ### Added
