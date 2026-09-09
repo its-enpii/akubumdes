@@ -446,6 +446,7 @@ final class LoanController
             'installments',
             'payments.allocations',
             'statusHistories' => fn ($q) => $q->orderBy('changed_at'),
+            'statusHistories.changedByUser:row_id,name',
         ]);
 
         $disbursementAccount = $loan->disbursement_account_row_id
@@ -744,10 +745,17 @@ final class LoanController
         $histories = $loan->statusHistories->map(fn ($h): array => [
             'from_status' => $h->from_status,
             'to_status' => $h->to_status,
-            'notes' => $h->notes,
             'principal_amount' => $h->principal_amount !== null ? (float) $h->principal_amount : null,
+            'notes' => $h->notes,
+            'term_months' => $h->term_months !== null ? (int) $h->term_months : null,
+            'service_rate_total' => $h->service_rate_total !== null ? (float) $h->service_rate_total : null,
+            'principal_frequency' => $h->principal_frequency,
+            'interest_frequency' => $h->interest_frequency,
+            'principal_grace_months' => $h->principal_grace_months !== null ? (int) $h->principal_grace_months : null,
+            'interest_grace_months' => $h->interest_grace_months !== null ? (int) $h->interest_grace_months : null,
             'changed_at' => $h->changed_at?->format('Y-m-d H:i'),
             'changed_by_user_id' => $h->changed_by_user_id,
+            'changed_by_user_name' => $h->changedByUser?->name,
         ])->values()->all();
 
         return [

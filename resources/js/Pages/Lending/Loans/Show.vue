@@ -80,6 +80,28 @@ const graceOptions = [
     { value: 24, label: 'M24 — Pokok ditunda 24 bulan' },
 ];
 
+const frequencyLabels = Object.fromEntries(frequencyOptions.map((option) => [option.value, option.label.replace('Frekuensi — ', '')]));
+
+const auditStageHistories = computed(() => {
+    const histories = props.loan.status_histories || [];
+    const preferred = ['draft', 'verified', 'waiting', 'active', 'disbursed'];
+
+    return preferred.map((status) => {
+        const rows = histories.filter((history) => history.to_status === status);
+        return rows.at(-1) || null;
+    }).filter(Boolean);
+});
+
+const auditOtherHistories = computed(() => {
+    const auditStatuses = ['draft', 'verified', 'waiting', 'active', 'disbursed'];
+
+    return [...(props.loan.status_histories || [])]
+        .filter((history) => !auditStatuses.includes(history.to_status))
+        .reverse();
+});
+
+const auditHistoryModalOpen = ref(false);
+
 function roundingLabel(step, productRounding) {
     const effective = step !== null && step !== undefined && step !== '' ? step : productRounding;
     if (!effective || effective === '0' || effective === 'decimal_2') return 'Tanpa Pembulatan';
@@ -94,6 +116,18 @@ function roundingLabel(step, productRounding) {
 
 function percent(value) {
     return `${Number(value ?? 0).toFixed(2)}%`;
+}
+
+function monthlyRate(value, termMonths) {
+    const rate = Number(value ?? 0);
+    const months = Number(termMonths ?? 0);
+    if (!months) return '—';
+    return `${(rate / months).toFixed(2)}% / bulan`;
+}
+
+function systemLabel(frequency, graceMonths) {
+    const label = frequencyLabels[frequency] || frequency || '—';
+    return Number(graceMonths ?? 0) > 0 ? `${label} · Grace ${graceMonths} bulan` : label;
 }
 
 function formatDate(value) {
@@ -667,6 +701,7 @@ function setAllocatedAmount(memberRowId, value) {
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
                     <AppBadge :tone="statusMeta.tone">{{ statusMeta.label }}</AppBadge>
+                    <AppButton type="button" variant="secondary" icon="history" size="compact" @click="auditHistoryModalOpen = true">Riwayat &amp; Audit Parameter</AppButton>
                     <a v-if="card_url" :href="card_url" target="_blank" rel="noopener">
                         <AppButton type="button" variant="secondary" icon="credit_card" size="compact">Kartu Angsuran</AppButton>
                     </a>
@@ -934,6 +969,95 @@ function setAllocatedAmount(memberRowId, value) {
                 </template>
             </AppModal>
 
+            <AppModal v-model="auditHistoryModalOpen" title="Riwayat & Audit Parameter Pinjaman" size="lg">
+                <div class="space-y-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[56rem] text-left text-sm">
+                            <thead class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+                                <tr>
+                                    <th class="py-3 pr-4">Parameter</th>
+                                    <th class="py-3 px-4">1. Proposal (P)</th>
+                                    <th class="py-3 px-4">2. Verifikasi (V)</th>
+                                    <th class="py-3 px-4">3. Penetapan Alokasi (W)</th>
+                                    <th class="py-3 pl-4">4. Realisasi Pencairan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant">
+                                <tr>
+                                    <th class="py-3 pr-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Tanggal &amp; Status</th>
+                                    <td v-for="history in auditStageHistories" :key="`status-${history.to_status}-${history.changed_at}`" class="py-3 px-4 first:pl-4 last:pl-4">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <AppBadge :tone="history.to_status === 'draft' ? 'warning' : history.to_status === 'verified' ? 'primary' : history.to_status === 'waiting' ? 'secondary' : 'success'">
+                                                {{ history.to_status === 'draft' ? 'P / Proposal' : history.to_status === 'verified' ? 'V / Verifikasi' : history.to_status === 'waiting' ? 'W / Tunggu' : 'Pencairan' }}
+                                            </AppBadge>
+                                            <span class="text-xs text-on-surface-variant">{{ formatDateTime(history.changed_at) }}</span>
+                                        </div>
+                                    </td>
+                                    <td v-if="auditStageHistories.length < 4" class="py-3 pl-4 text-on-surface-variant" :colspan="4 - auditStageHistories.length">Belum tersedia</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-3 pr-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Plafon / Nominal</th>
+                                    <td v-for="history in auditStageHistories" :key="`amount-${history.to_status}-${history.changed_at}`" class="py-3 px-4 font-semibold text-primary">{{ currency(history.principal_amount) }}</td>
+                                    <td v-if="auditStageHistories.length < 4" class="py-3 pl-4 text-on-surface-variant" :colspan="4 - auditStageHistories.length">—</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-3 pr-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Jangka Waktu</th>
+                                    <td v-for="history in auditStageHistories" :key="`term-${history.to_status}-${history.changed_at}`" class="py-3 px-4">{{ history.term_months ?? '—' }} Bulan</td>
+                                    <td v-if="auditStageHistories.length < 4" class="py-3 pl-4 text-on-surface-variant" :colspan="4 - auditStageHistories.length">—</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-3 pr-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Pros Jasa / Bunga</th>
+                                    <td v-for="history in auditStageHistories" :key="`rate-${history.to_status}-${history.changed_at}`" class="py-3 px-4">
+                                        {{ percent(history.service_rate_total) }} total · {{ monthlyRate(history.service_rate_total, history.term_months) }}
+                                    </td>
+                                    <td v-if="auditStageHistories.length < 4" class="py-3 pl-4 text-on-surface-variant" :colspan="4 - auditStageHistories.length">—</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-3 pr-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Sistem Pokok</th>
+                                    <td v-for="history in auditStageHistories" :key="`principal-system-${history.to_status}-${history.changed_at}`" class="py-3 px-4">
+                                        {{ systemLabel(history.principal_frequency, history.principal_grace_months) }}
+                                    </td>
+                                    <td v-if="auditStageHistories.length < 4" class="py-3 pl-4 text-on-surface-variant" :colspan="4 - auditStageHistories.length">—</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-3 pr-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Sistem Jasa</th>
+                                    <td v-for="history in auditStageHistories" :key="`interest-system-${history.to_status}-${history.changed_at}`" class="py-3 px-4">
+                                        {{ systemLabel(history.interest_frequency, history.interest_grace_months) }}
+                                    </td>
+                                    <td v-if="auditStageHistories.length < 4" class="py-3 pl-4 text-on-surface-variant" :colspan="4 - auditStageHistories.length">—</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-3 pr-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Petugas / Penanggung Jawab</th>
+                                    <td v-for="history in auditStageHistories" :key="`user-${history.to_status}-${history.changed_at}`" class="py-3 px-4">{{ history.changed_by_user_name || (history.changed_by_user_id ? `#${history.changed_by_user_id}` : '—') }}</td>
+                                    <td v-if="auditStageHistories.length < 4" class="py-3 pl-4 text-on-surface-variant" :colspan="4 - auditStageHistories.length">—</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-3 pr-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Catatan / Hasil Keputusan</th>
+                                    <td v-for="history in auditStageHistories" :key="`notes-${history.to_status}-${history.changed_at}`" class="py-3 px-4 text-on-surface-variant">{{ history.notes || '—' }}</td>
+                                    <td v-if="auditStageHistories.length < 4" class="py-3 pl-4 text-on-surface-variant" :colspan="4 - auditStageHistories.length">—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div v-if="auditOtherHistories.length > 0">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">Timeline Tambahan</h3>
+                        <ol class="relative mt-4 ml-3 space-y-4 border-l-2 border-outline-variant pl-6">
+                            <li v-for="history in auditOtherHistories" :key="`other-${history.to_status}-${history.changed_at}`" class="relative">
+                                <span class="absolute -left-[37px] top-0 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">·</span>
+                                <p class="text-sm font-semibold text-primary">{{ history.from_status || 'awal' }} → {{ history.to_status }}</p>
+                                <p class="text-xs text-on-surface-variant">{{ formatDateTime(history.changed_at) }}</p>
+                                <p v-if="history.notes" class="mt-1 text-sm text-primary">{{ history.notes }}</p>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <template #footer>
+                    <AppButton variant="secondary" @click="auditHistoryModalOpen = false">Tutup</AppButton>
+                </template>
+            </AppModal>
+
             <AppCard v-if="status === 'verified'">
                 <template #header>
                     <h2 class="text-lg font-bold text-primary">Hasil Verifikasi</h2>
@@ -1156,20 +1280,6 @@ function setAllocatedAmount(memberRowId, value) {
                         </tbody>
                     </table>
                 </div>
-            </AppCard>
-
-            <AppCard>
-                <template #header>
-                    <h2 class="text-lg font-bold text-primary">Riwayat Status</h2>
-                </template>
-                <ol class="relative ml-3 space-y-4 border-l-2 border-outline-variant pl-6">
-                    <li v-for="(history, index) in [...loan.status_histories].reverse()" :key="`${history.to_status}-${index}`" class="relative">
-                        <span class="absolute -left-[37px] top-0 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">·</span>
-                        <p class="text-sm font-semibold text-primary">{{ history.from_status || 'awal' }} → {{ history.to_status }}</p>
-                        <p class="text-xs text-on-surface-variant">{{ formatDateTime(history.changed_at) }}</p>
-                        <p v-if="history.notes" class="mt-1 text-sm text-primary">{{ history.notes }}</p>
-                    </li>
-                </ol>
             </AppCard>
 
             <AppCard v-if="canShowVerifyForm">

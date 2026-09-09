@@ -183,6 +183,11 @@ final class LoanService
                 'principal_amount' => $principal,
                 'product_row_id' => $product->row_id,
                 'term_months' => $term,
+                'service_rate_total' => $serviceRateTotal,
+                'principal_frequency' => $principalFreq,
+                'interest_frequency' => $interestFreq,
+                'principal_grace_months' => $principalGraceMonths,
+                'interest_grace_months' => $interestGraceMonths,
                 'notes' => 'Proposal didaftarkan.',
                 'changed_by_user_id' => $userId,
                 'changed_at' => now(),
@@ -352,6 +357,13 @@ final class LoanService
                 }
             }
 
+            $termMonths = $this->optionalInteger($data, 'term_months', (int) $loan->term_months);
+            $serviceRateTotal = $this->optionalFloat($data, 'service_rate_total', (float) $loan->service_rate_total);
+            $principalFrequency = $data['principal_frequency'] ?? (string) $loan->principal_frequency;
+            $interestFrequency = $data['interest_frequency'] ?? (string) $loan->interest_frequency;
+            $principalGraceMonths = $this->optionalInteger($data, 'principal_grace_months', (int) $loan->principal_grace_months);
+            $interestGraceMonths = $this->optionalInteger($data, 'interest_grace_months', (int) $loan->interest_grace_months);
+
             $loan->update([
                 'verified_at' => $data['verified_at'],
                 'verification_notes' => $data['verification_notes'],
@@ -363,7 +375,12 @@ final class LoanService
                 'to_status' => 'verified',
                 'principal_amount' => $verificationAmount,
                 'product_row_id' => $loan->loan_product_row_id,
-                'term_months' => (int) $loan->term_months,
+                'term_months' => $termMonths,
+                'service_rate_total' => $serviceRateTotal,
+                'principal_frequency' => $principalFrequency,
+                'interest_frequency' => $interestFrequency,
+                'principal_grace_months' => $principalGraceMonths,
+                'interest_grace_months' => $interestGraceMonths,
                 'notes' => $data['verification_notes'],
                 'changed_by_user_id' => $userId,
                 'changed_at' => now(),
@@ -390,6 +407,16 @@ final class LoanService
 
             $totalAllocated = collect($data['beneficiaries'])->sum(fn ($row) => (float) $row['allocated_amount']);
             $allocatedPrincipal = (float) ($data['allocated_principal'] ?? $totalAllocated);
+            $verification = $loan->statusHistories()
+                ->where('to_status', 'verified')
+                ->orderByDesc('changed_at')
+                ->first();
+            $termMonths = $this->optionalInteger($data, 'term_months', (int) ($verification?->term_months ?? $loan->term_months));
+            $serviceRateTotal = $this->optionalFloat($data, 'service_rate_total', (float) ($verification?->service_rate_total ?? $loan->service_rate_total));
+            $principalFrequency = $data['principal_frequency'] ?? (string) ($verification?->principal_frequency ?? $loan->principal_frequency);
+            $interestFrequency = $data['interest_frequency'] ?? (string) ($verification?->interest_frequency ?? $loan->interest_frequency);
+            $principalGraceMonths = $this->optionalInteger($data, 'principal_grace_months', (int) ($verification?->principal_grace_months ?? $loan->principal_grace_months));
+            $interestGraceMonths = $this->optionalInteger($data, 'interest_grace_months', (int) ($verification?->interest_grace_months ?? $loan->interest_grace_months));
 
             $loan->update([
                 'approved_at' => $data['approved_at'],
@@ -407,7 +434,12 @@ final class LoanService
                 'to_status' => 'waiting',
                 'principal_amount' => $totalAllocated,
                 'product_row_id' => $loan->loan_product_row_id,
-                'term_months' => (int) $loan->term_months,
+                'term_months' => $termMonths,
+                'service_rate_total' => $serviceRateTotal,
+                'principal_frequency' => $principalFrequency,
+                'interest_frequency' => $interestFrequency,
+                'principal_grace_months' => $principalGraceMonths,
+                'interest_grace_months' => $interestGraceMonths,
                 'notes' => $data['allocation_notes'] ?? $defaultNotes,
                 'changed_by_user_id' => $userId,
                 'changed_at' => now(),
@@ -436,6 +468,11 @@ final class LoanService
                 'principal_amount' => $totalAllocated,
                 'product_row_id' => $loan->loan_product_row_id,
                 'term_months' => (int) $loan->term_months,
+                'service_rate_total' => (float) $loan->service_rate_total,
+                'principal_frequency' => $loan->principal_frequency,
+                'interest_frequency' => $loan->interest_frequency,
+                'principal_grace_months' => (int) $loan->principal_grace_months,
+                'interest_grace_months' => (int) $loan->interest_grace_months,
                 'notes' => $data['disbursement_notes'] ?? null,
                 'changed_by_user_id' => $userId,
                 'changed_at' => now(),
@@ -472,6 +509,20 @@ final class LoanService
             defaultCodes: self::DEFAULT_RECEIVABLE_CODES,
             label: 'receivable',
         );
+    }
+
+    private function optionalInteger(array $data, string $key, int $fallback): int
+    {
+        return array_key_exists($key, $data) && $data[$key] !== null && $data[$key] !== ''
+            ? (int) $data[$key]
+            : $fallback;
+    }
+
+    private function optionalFloat(array $data, string $key, float $fallback): float
+    {
+        return array_key_exists($key, $data) && $data[$key] !== null && $data[$key] !== ''
+            ? (float) $data[$key]
+            : $fallback;
     }
 
     private function resolveRevenueAccount(string $productCode): Account

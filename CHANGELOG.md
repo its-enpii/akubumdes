@@ -3,6 +3,15 @@
 Semua perubahan penting pada proyek **SIDBM Next** didokumentasikan dalam berkas ini.
 Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
+## [2026-09-08]
+
+### Added
+- **Riwayat Audit Parameter Pinjaman (Tahap P, V, W, Pencairan) & Modal Dialog:**
+  - Migrasi shard `loan_status_histories`: menambahkan kolom snapshot parameter lengkap (`service_rate_total`, `principal_frequency`, `interest_frequency`, `principal_grace_months`, `interest_grace_months`).
+  - `LoanService` otomatis merekam snapshot parameter pada setiap transisi tahap siklus pinjaman (Proposal / P, Verifikasi / V, Penetapan Alokasi / W, dan Pencairan / Aktif).
+  - `LegacyLoanLoader` membentuk riwayat audit bertahap untuk data impor legacy (P, V, W, pencairan) lengkap dengan snapshot parameter.
+  - UI `Show.vue`: menghapus card riwayat inline yang panjang, menggantinya dengan tombol ringkas "Riwayat & Audit Parameter" yang membuka `AppModal` (tabel perbandingan parameter side-by-side antar-tahap dan timeline tambahan).
+
 ## [2026-09-07]
 
 ### Added

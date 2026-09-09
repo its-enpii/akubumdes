@@ -166,18 +166,63 @@ final class LegacyLoanLoader
                     ->where('loan_row_id', $loanRowId)
                     ->exists();
                 if (! $hasHist) {
-                    $histId = $this->sequences->next('loan_status_histories');
-                    $db->table('loan_status_histories')->insert([
-                        'tenant_id' => $tenantId,
-                        'id' => $histId,
-                        'loan_row_id' => $loanRowId,
-                        'from_status' => null,
-                        'to_status' => $loan->status,
-                        'notes' => 'legacy import',
-                        'changed_by_user_id' => null,
-                        'changed_at' => $loan->disbursedAt ? $loan->disbursedAt.' 00:00:00' : $now,
-                        'created_at' => $now,
-                    ]);
+                    $stages = [
+                        [
+                            'from_status' => null,
+                            'to_status' => 'draft',
+                            'changed_at' => $loan->proposedAt ?? substr($now, 0, 10),
+                            'principal_amount' => $this->snapshotAmount($loan->snapshot, ['proposal'], $loan->principal),
+                            'notes' => 'Proposal legacy.',
+                        ],
+                        [
+                            'from_status' => 'draft',
+                            'to_status' => 'verified',
+                            'changed_at' => $loan->verifiedAt,
+                            'principal_amount' => $this->snapshotAmount($loan->snapshot, ['verifikasi'], $loan->principal),
+                            'notes' => $loan->verificationNotes ?? 'Verifikasi legacy.',
+                        ],
+                        [
+                            'from_status' => 'verified',
+                            'to_status' => 'waiting',
+                            'changed_at' => $loan->fundedAt,
+                            'principal_amount' => $this->snapshotAmount($loan->snapshot, ['alokasi'], $loan->principal),
+                            'notes' => 'Penetapan alokasi legacy.',
+                        ],
+                        [
+                            'from_status' => 'waiting',
+                            'to_status' => 'active',
+                            'changed_at' => $loan->disbursedAt,
+                            'principal_amount' => $this->snapshotAmount($loan->snapshot, ['alokasi'], $loan->principal),
+                            'notes' => 'Pencairan legacy.',
+                        ],
+                    ];
+
+                    foreach ($stages as $stage) {
+                        if ($stage['changed_at'] === null) {
+                            continue;
+                        }
+
+                        $histId = $this->sequences->next('loan_status_histories');
+                        $db->table('loan_status_histories')->insert([
+                            'tenant_id' => $tenantId,
+                            'id' => $histId,
+                            'loan_row_id' => $loanRowId,
+                            'from_status' => $stage['from_status'],
+                            'to_status' => $stage['to_status'],
+                            'principal_amount' => $stage['principal_amount'],
+                            'product_row_id' => $loan->productRowId,
+                            'term_months' => $loan->termMonths,
+                            'service_rate_total' => $loan->interestRate,
+                            'principal_frequency' => $loan->principalFrequency,
+                            'interest_frequency' => $loan->interestFrequency,
+                            'principal_grace_months' => $loan->principalGraceMonths,
+                            'interest_grace_months' => $loan->interestGraceMonths,
+                            'notes' => $stage['notes'],
+                            'changed_by_user_id' => null,
+                            'changed_at' => $stage['changed_at'].' 00:00:00',
+                            'created_at' => $now,
+                        ]);
+                    }
                 }
 
                 $db->table('legacy_record_mappings')->updateOrInsert(
@@ -675,5 +720,30 @@ final class LegacyLoanLoader
             ->pluck('row_id', 'id')
             ->map(fn ($v) => (int) $v)
             ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $snapshot
+     * @param  list<string>  $keys
+     */
+    private function snapshotAmount(array $snapshot, array $keys, string $fallback): ?string
+    {
+        foreach ($keys as $key) {
+            $value = $snapshot[$key] ?? null;
+            if ($value === null || trim((string) $value) === '') {
+                continue;
+            }
+
+            if (is_numeric($value)) {
+                return number_format((float) $value, 2, '.', '');
+            }
+
+            $normalized = str_replace([',', "\xc2\xa0", ' '], '.', (string) $value);
+            if (is_numeric($normalized)) {
+                return number_format((float) $normalized, 2, '.', '');
+            }
+        }
+
+        return $fallback;
     }
 }
