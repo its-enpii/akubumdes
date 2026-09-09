@@ -422,6 +422,12 @@ final class LoanService
                 'approved_at' => $data['approved_at'],
                 'funded_at' => $data['planned_disbursed_at'],
                 'principal_amount' => $totalAllocated,
+                'term_months' => $termMonths,
+                'service_rate_total' => $serviceRateTotal,
+                'principal_frequency' => $principalFrequency,
+                'interest_frequency' => $interestFrequency,
+                'principal_grace_months' => $principalGraceMonths,
+                'interest_grace_months' => $interestGraceMonths,
                 'status' => 'waiting',
             ]);
 

@@ -6,6 +6,10 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
 ## [2026-09-08]
 
 ### Added
+- **Form Verifikasi & Form Penetapan Alokasi Mendukung Parameter Lengkap:**
+  - Form Verifikasi pada `Show.vue` kini menyediakan input penyesuaian: rekomendasi jangka waktu, pros jasa total, sistem angsuran pokok & jasa, serta grace period.
+  - Form Penetapan Alokasi mengambil snapshot verifikasi terakhir sebagai default dan dapat disesuaikan sebelum disetujui.
+  - `LoanService::approve()` menyimpan parameter final yang disetujui ke record pinjaman dan langsung meregenerasi jadwal angsuran sesuai jangka, suku bunga, frekuensi, dan grace period yang disetujui.
 - **Riwayat Audit Parameter Pinjaman (Tahap P, V, W, Pencairan) & Modal Dialog:**
   - Migrasi shard `loan_status_histories`: menambahkan kolom snapshot parameter lengkap (`service_rate_total`, `principal_frequency`, `interest_frequency`, `principal_grace_months`, `interest_grace_months`).
   - `LoanService` otomatis merekam snapshot parameter pada setiap transisi tahap siklus pinjaman (Proposal / P, Verifikasi / V, Penetapan Alokasi / W, dan Pencairan / Aktif).

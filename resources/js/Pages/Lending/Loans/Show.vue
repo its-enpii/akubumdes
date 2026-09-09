@@ -243,14 +243,28 @@ const paymentRows = computed(() => {
 const verifyForm = useForm({
     verified_at: props.today,
     verification_amount: props.loan.proposed_amount ?? props.loan.principal_amount,
+    term_months: Number(props.loan.term_months ?? 0),
+    service_rate_total: Number(props.loan.service_rate_total ?? props.loan.service_rate ?? 0),
+    principal_frequency: props.loan.principal_frequency ?? 'monthly',
+    interest_frequency: props.loan.interest_frequency ?? 'monthly',
+    principal_grace_months: Number(props.loan.principal_grace_months ?? 0),
+    interest_grace_months: Number(props.loan.interest_grace_months ?? 0),
     verification_notes: props.loan.verification_notes ?? '',
     verified_amounts: Object.fromEntries((props.loan.beneficiaries ?? []).map((b) => [String(b.member_row_id), Number(b.verified_amount ?? b.proposed_amount ?? b.allocated_amount ?? 0)])),
 });
+
+const lastVerifiedHistory = [...(props.loan.status_histories ?? [])].reverse().find((history) => history.to_status === 'verified');
 
 const approveForm = useForm({
     approved_at: props.today,
     planned_disbursed_at: props.loan.funded_at ?? props.today,
     allocated_principal: Number(props.loan.proposed_amount ?? props.loan.principal_amount ?? 0),
+    term_months: Number(lastVerifiedHistory?.term_months ?? props.loan.term_months ?? 0),
+    service_rate_total: Number(lastVerifiedHistory?.service_rate_total ?? props.loan.service_rate_total ?? props.loan.service_rate ?? 0),
+    principal_frequency: lastVerifiedHistory?.principal_frequency ?? props.loan.principal_frequency ?? 'monthly',
+    interest_frequency: lastVerifiedHistory?.interest_frequency ?? props.loan.interest_frequency ?? 'monthly',
+    principal_grace_months: Number(lastVerifiedHistory?.principal_grace_months ?? props.loan.principal_grace_months ?? 0),
+    interest_grace_months: Number(lastVerifiedHistory?.interest_grace_months ?? props.loan.interest_grace_months ?? 0),
     allocation_notes: '',
     beneficiaries: props.loan.beneficiaries.map((b) => ({ member_row_id: b.member_row_id, name: b.name, allocated_amount: Number(b.allocated_amount ?? b.verified_amount ?? b.proposed_amount ?? 0) })),
 });
@@ -1292,6 +1306,14 @@ function setAllocatedAmount(memberRowId, value) {
                         <AppDatePicker v-model="verifyForm.verified_at" label="Tanggal Verifikasi" :max="today" :error="verifyForm.errors.verified_at" required />
                         <AppCurrencyInput v-model="verifyForm.verification_amount" @update:model-value="verifyTotalTouched = true" label="Nominal Verifikasi Total (opsional)" :min="0" :error="verifyForm.errors.verification_amount" hint="Kosongkan untuk konfirmasi plafon penuh." />
                     </div>
+                    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <AppInput v-model="verifyForm.term_months" label="Rekomendasi Jangka Waktu (bulan)" icon="schedule" type="number" min="1" max="120" :error="verifyForm.errors.term_months" />
+                        <AppCurrencyInput v-model="verifyForm.service_rate_total" label="Rekomendasi Pros Jasa Total (%)" icon="percent" :min="0" :max="100" :error="verifyForm.errors.service_rate_total" />
+                        <SmartSelect v-model="verifyForm.principal_frequency" label="Sistem Angs. Pokok" :options="frequencyOptions" :error="verifyForm.errors.principal_frequency" />
+                        <SmartSelect v-model="verifyForm.principal_grace_months" label="Grace Period Pokok" :options="graceOptions" :error="verifyForm.errors.principal_grace_months" />
+                        <SmartSelect v-model="verifyForm.interest_frequency" label="Sistem Angs. Jasa" :options="frequencyOptions" :error="verifyForm.errors.interest_frequency" />
+                        <SmartSelect v-model="verifyForm.interest_grace_months" label="Grace Period Jasa" :options="graceOptions" :error="verifyForm.errors.interest_grace_months" />
+                    </div>
                     <AppTextarea v-model="verifyForm.verification_notes" label="Catatan Verifikasi (opsional)" :error="verifyForm.errors.verification_notes" placeholder="Hasil pemeriksaan lapangan, kelengkapan dokumen, dll." />
                     <div class="flex justify-end">
                         <AppButton type="submit" :loading="verifyForm.processing">Simpan &amp; Lanjut Verifikasi</AppButton>
@@ -1309,6 +1331,14 @@ function setAllocatedAmount(memberRowId, value) {
                         <AppDatePicker v-model="approveForm.approved_at" label="Tanggal Penetapan" :max="today" :error="approveForm.errors.approved_at" required />
                         <AppDatePicker v-model="approveForm.planned_disbursed_at" label="Rencana Tanggal Cair" :min="approveForm.approved_at" :error="approveForm.errors.planned_disbursed_at" required />
                         <AppCurrencyInput v-model="approveForm.allocated_principal" @update:model-value="approveTotalTouched = true" label="Plafon Alokasi Kelompok" icon="payments" :min="0" :max="loan.proposed_amount ?? loan.principal_amount" required :error="approveForm.errors.allocated_principal" />
+                    </div>
+                    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <AppInput v-model="approveForm.term_months" label="Jangka Waktu Disetujui (bulan)" icon="schedule" type="number" min="1" max="120" required :error="approveForm.errors.term_months" />
+                        <AppCurrencyInput v-model="approveForm.service_rate_total" label="Pros Jasa Total Disetujui (%)" icon="percent" :min="0" :max="100" required :error="approveForm.errors.service_rate_total" />
+                        <SmartSelect v-model="approveForm.principal_frequency" label="Sistem Angs. Pokok Disetujui" :options="frequencyOptions" required :error="approveForm.errors.principal_frequency" />
+                        <SmartSelect v-model="approveForm.principal_grace_months" label="Grace Period Pokok" :options="graceOptions" required :error="approveForm.errors.principal_grace_months" />
+                        <SmartSelect v-model="approveForm.interest_frequency" label="Sistem Angs. Jasa Disetujui" :options="frequencyOptions" required :error="approveForm.errors.interest_frequency" />
+                        <SmartSelect v-model="approveForm.interest_grace_months" label="Grace Period Jasa" :options="graceOptions" required :error="approveForm.errors.interest_grace_months" />
                     </div>
                     <p v-if="approveTotal > approveForm.allocated_principal" class="text-sm text-error">Total alokasi per anggota ({{ currency(approveTotal) }}) melebihi plafon alokasi kelompok ({{ currency(approveForm.allocated_principal) }}).</p>
                     <AppTextarea v-model="approveForm.allocation_notes" label="Catatan Penetapan (opsional)" :error="approveForm.errors.allocation_notes" placeholder="Akan muncul di riwayat status. Kosongkan untuk catatan otomatis." />
