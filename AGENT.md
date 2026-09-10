@@ -48,6 +48,7 @@ Glob: resources/js/composables/*.js
 | Komponen | Fungsi |
 |---|---|
 | `SmartDataTable.vue` | Tabel data dengan sort, filter, paginasi |
+| `Reports/ReportTable.vue` | Tabel laporan domain dengan baris/cell slot tanpa paginasi |
 | `SmartSelect.vue` | Select dengan pencarian + remote option |
 | `CsvImportExport.vue` | Upload CSV + export |
 | `ReportPeriodFilter.vue` | Filter periode laporan |
@@ -201,4 +202,3 @@ Sebelum melakukan git commit dan git push ke remote repository, **WAJIB** memper
    1. git status / git diff --stat untuk inventarisasi semua berkas yang termodifikasi.
    2. Edit CHANGELOG.md pada bagian [Unreleased] atau header tanggal rilis terkait.
    3. Stage berkas CHANGELOG.md bersama perubahan lainnya (git add CHANGELOG.md), jalankan linter jika relevan, lalu commit dan push.
-
