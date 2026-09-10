@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 /**
- * Format angka dan nominal dalam gaya Indonesia untuk dokumen PDF pinjaman.
+ * Format angka dan nominal dalam gaya Indonesia untuk dokumen PDF.
  *
  * Mirip dengan helper legacy `App\Utils\Keuangan` di `sidbm`, di-port ke
  * arsitektur modern.

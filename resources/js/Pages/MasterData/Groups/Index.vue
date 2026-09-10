@@ -15,7 +15,7 @@ const { confirm: confirmAction } = useConfirm();
 async function confirmDelete(row) {
     if (!await confirmAction({
         title: 'Hapus Kelompok',
-        message: `Apakah Anda yakin ingin menghapus kelompok "${row.name}"? Penghapusan hanya berhasil jika kelompok belum pernah mengajukan pinjaman dan tidak memiliki anggota aktif.`,
+        message: `Apakah Anda yakin ingin menghapus kelompok "${row.name}"? Penghapusan hanya berhasil jika kelompok tidak memiliki anggota aktif.`,
         confirmText: 'Ya, Hapus',
         variant: 'danger',
     })) return;

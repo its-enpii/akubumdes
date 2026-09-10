@@ -8,19 +8,14 @@ use App\Assistant\EnpiiSessionResolver;
 use App\Assistant\Handlers\CreateJournalEntryHandler;
 use App\Assistant\Handlers\DownloadReportHandler;
 use App\Assistant\Handlers\GetAssetHandler;
-use App\Assistant\Handlers\GetLoanHandler;
-use App\Assistant\Handlers\GroupsWithLoansHandler;
 use App\Assistant\Handlers\ListAccountsHandler;
 use App\Assistant\Handlers\ListDueBillingHandler;
-use App\Assistant\Handlers\RecordInstallmentHandler;
 use App\Assistant\Handlers\ReverseJournalHandler;
 use App\Assistant\Handlers\SearchAssetsHandler;
 use App\Assistant\Handlers\SearchGroupsHandler;
 use App\Assistant\Handlers\SearchJournalsHandler;
-use App\Assistant\Handlers\SearchLoansHandler;
 use App\Assistant\Handlers\SearchMembersHandler;
 use App\Assistant\Handlers\SendBillingNoticesHandler;
-use App\Assistant\Handlers\SimulateLoanHandler;
 use App\Domain\Migration\Support\LegacyConnection;
 use App\Models\Platform\PersonalAccessToken;
 use App\Tenancy\TenantContext;
@@ -57,9 +52,6 @@ final class AppServiceProvider extends ServiceProvider
             $registry->registerMany([
                 $this->app->make(SearchMembersHandler::class),
                 $this->app->make(SearchGroupsHandler::class),
-                $this->app->make(GroupsWithLoansHandler::class),
-                $this->app->make(SearchLoansHandler::class),
-                $this->app->make(GetLoanHandler::class),
                 $this->app->make(ListAccountsHandler::class),
                 $this->app->make(SearchJournalsHandler::class),
                 $this->app->make(SearchAssetsHandler::class),
@@ -67,10 +59,8 @@ final class AppServiceProvider extends ServiceProvider
                 $this->app->make(ListDueBillingHandler::class),
                 $this->app->make(CreateJournalEntryHandler::class),
                 $this->app->make(ReverseJournalHandler::class),
-                $this->app->make(RecordInstallmentHandler::class),
                 $this->app->make(SendBillingNoticesHandler::class),
                 $this->app->make(DownloadReportHandler::class),
-                $this->app->make(SimulateLoanHandler::class),
             ]);
         });
     }

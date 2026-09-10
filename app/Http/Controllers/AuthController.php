@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -27,7 +28,7 @@ final class AuthController
                 return redirect()->route('regency.dashboard');
             }
 
-            return redirect()->route('dashboard');
+            return redirect()->to(Route::has('dashboard') ? route('dashboard') : route('login'));
         }
 
         return Inertia::render('Auth/Login');
@@ -98,7 +99,9 @@ final class AuthController
             }
         }
 
-        return redirect()->to($intended ?: route('dashboard'));
+        $fallback = Route::has('dashboard') ? route('dashboard') : route('login');
+
+        return redirect()->to($intended ?: $fallback);
     }
 
     public function logout(Request $request): RedirectResponse

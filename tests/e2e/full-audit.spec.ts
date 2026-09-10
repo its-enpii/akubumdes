@@ -419,11 +419,11 @@ test.describe('D7 — Tenant Onboarding', () => {
         expect(resp?.status() ?? 999).toBeLessThan(500);
     });
 
-    test('7.2 Template downloads (members/groups/active-loans/opening-balances)', async ({ page }) => {
+    test('7.2 Template downloads (members/groups/opening-balances)', async ({ page }) => {
         // 2026-08-15: route moved to per-tenant admin scope (superadmin only).
         // Login as superadmin so the auth+superadmin+tenant middleware passes.
         await loginAs(page, 'superadmin');
-        const types = ['members', 'groups', 'active-loans', 'opening-balances'];
+        const types = ['members', 'groups', 'opening-balances'];
         const results: string[] = [];
         for (const t of types) {
             const r = await page.request.get(`${BASE}/admin/tenants/1/onboarding/templates/${t}`);

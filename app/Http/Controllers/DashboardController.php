@@ -29,11 +29,6 @@ final class DashboardController
 
         $payload = $this->dashboard->build();
 
-        $pipelineKey = $this->resolvePipelineKey($request);
-        $pipelineModal = $pipelineKey !== null
-            ? $this->dashboard->loansByStatus($pipelineKey)
-            : null;
-
         $unpaidInvoice = null;
         $tenant = $membership?->tenant ?? $user?->tenant;
         if ($tenant !== null) {
@@ -65,19 +60,7 @@ final class DashboardController
         return Inertia::render('Dashboard', [
             'unitName' => $membership?->tenant?->name ?? $payload['unit_name'],
             ...$payload,
-            'pipeline_modal' => $pipelineModal,
-            'pipeline_modal_key' => $pipelineKey,
             'unpaid_invoice' => $unpaidInvoice,
         ]);
-    }
-
-    private function resolvePipelineKey(Request $request): ?string
-    {
-        $key = (string) $request->query('pipeline', '');
-        if ($key === '' || ! in_array($key, self::PIPELINE_MODAL_KEYS, true)) {
-            return null;
-        }
-
-        return $key;
     }
 }

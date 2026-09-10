@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Access;
 
 use App\Http\Requests\Accounting\JournalEntryRequest;
-use App\Http\Requests\Accounting\LoanInstallmentJournalRequest;
 use App\Http\Requests\Website\SitePageRequest;
 use App\Http\Requests\Website\SitePostRequest;
 use Tests\TestCase;
@@ -17,7 +16,6 @@ final class PermissionConfigTest extends TestCase
         $perms = config('permissions.permissions');
         self::assertIsArray($perms);
         self::assertContains('journals.create', $perms);
-        self::assertContains('installments.record', $perms);
         self::assertContains('messages.send', $perms);
         self::assertContains('assistant.use', $perms);
         self::assertContains('assets.view', $perms);
@@ -35,9 +33,7 @@ final class PermissionConfigTest extends TestCase
         $roles = config('permissions.roles');
         self::assertArrayHasKey('admin', $roles);
         self::assertSame(['*'], $roles['admin']['permissions']);
-        self::assertContains('installments.record', $roles['kasir']['permissions']);
         self::assertContains('assets.view', $roles['kasir']['permissions']);
-        self::assertNotContains('loans.approve', $roles['kasir']['permissions']);
         self::assertNotContains('period_close.manage', $roles['kasir']['permissions']);
         self::assertContains('reports.view', $roles['viewer']['permissions']);
     }
@@ -56,7 +52,6 @@ final class PermissionConfigTest extends TestCase
         }
 
         self::assertSame('journals.create', config('permissions.request_map.'.JournalEntryRequest::class));
-        self::assertSame('installments.record', config('permissions.request_map.'.LoanInstallmentJournalRequest::class));
         self::assertSame('website.manage', config('permissions.request_map.'.SitePostRequest::class));
         self::assertSame('website.manage', config('permissions.request_map.'.SitePageRequest::class));
         self::assertSame('journals.create', config('permissions.tool_map.create_journal_entry'));

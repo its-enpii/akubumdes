@@ -57,7 +57,6 @@ final class InitializeTenantSequences extends Command
                 'members',
                 'member_addresses',
                 'member_businesses',
-                'member_guarantors',
                 'groups',
                 'group_members',
                 'group_officers',
@@ -66,13 +65,6 @@ final class InitializeTenantSequences extends Command
                 'journal_entries',
                 'journal_lines',
                 'account_opening_balances',
-                'loan_products',
-                'loan_borrowers',
-                'loan_status_histories',
-                'loan_installments',
-                'loan_payments',
-                'loan_payment_allocations',
-                'loan_write_offs',
                 'budgets',
                 'budget_lines',
                 'asset_categories',
@@ -98,23 +90,6 @@ final class InitializeTenantSequences extends Command
 
                 if (! $this->option('dry-run')) {
                     $sequences->initializeAtLeast($table, $next);
-                }
-            }
-
-            if ($schema->hasTable('loans')) {
-                foreach (['member_loan', 'group_loan'] as $source) {
-                    $maxId = (int) $db->table('loans')
-                        ->where('tenant_id', $tenant->row_id)
-                        ->where('legacy_source', $source)
-                        ->max('id');
-                    $next = $maxId + 1;
-                    $sequenceName = "loans:{$source}";
-
-                    $this->line(sprintf('%-36s %d', $sequenceName, $next));
-
-                    if (! $this->option('dry-run')) {
-                        $sequences->initializeAtLeast($sequenceName, $next);
-                    }
                 }
             }
 

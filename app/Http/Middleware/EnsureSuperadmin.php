@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EnsureSuperadmin
@@ -20,7 +21,9 @@ final class EnsureSuperadmin
 
         if ($user->is_superadmin !== true) {
             // Tenant users: back to app. Superadmin-only accounts never hit this branch.
-            $fallback = $user->tenant_id !== null ? route('dashboard') : route('login');
+            $fallback = $user->tenant_id !== null && Route::has('dashboard')
+                ? route('dashboard')
+                : route('login');
 
             return redirect()
                 ->to($fallback)

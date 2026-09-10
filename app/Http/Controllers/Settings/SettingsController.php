@@ -154,7 +154,6 @@ final class SettingsController
         $data = $request->validated();
 
         $settings->set('whatsapp.template_billing', $data['template_billing'] ?? '');
-        $settings->set('whatsapp.template_installment', $data['template_installment'] ?? '');
         $gateway->setEnabled((bool) ($data['is_enabled'] ?? false));
 
         return $this->flashRedirect('Pengaturan WhatsApp berhasil disimpan.', 'whatsapp');
@@ -272,7 +271,6 @@ final class SettingsController
             'instance' => $gateway->getInstance(),
             'configured' => $gateway->isConfigured(),
             'template_billing' => (string) ($settings->get('whatsapp.template_billing', '') ?: ''),
-            'template_installment' => (string) ($settings->get('whatsapp.template_installment', '') ?: ''),
             'is_enabled' => $gateway->isEnabled(),
             'connection' => [
                 'status' => $state['status'] ?? 'unknown',

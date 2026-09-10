@@ -14,7 +14,6 @@ final class SignatureTemplateService
     public const REPORT_TYPES = [
         'default' => 'Umum (default)',
         'laporan_keuangan' => 'Laporan Keuangan',
-        'rekap_pinjaman' => 'Rekap Pinjaman',
         'perjanjian_kredit' => 'Perjanjian / SPK',
         'proposal' => 'Proposal',
         'kwitansi' => 'Kwitansi',

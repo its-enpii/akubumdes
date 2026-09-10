@@ -3,14 +3,10 @@ import { Head, Link } from '@inertiajs/vue3';
 import AppBadge from '../../../Components/AppBadge.vue';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
-import LoanHistoryTable from '../../../Components/LoanHistoryTable.vue';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout.vue';
 
 defineProps({
     institution: { type: Object, required: true },
-    loans: { type: Array, default: () => [] },
-    summary: { type: Object, required: true },
-    loan_note: { type: String, default: null },
 });
 </script>
 
@@ -70,17 +66,6 @@ defineProps({
                     </dl>
                 </AppCard>
 
-                <AppCard class="lg:col-span-3 overflow-hidden p-0">
-                    <div class="border-b border-outline-variant px-5 py-4">
-                        <h2 class="font-bold text-primary">Riwayat pinjaman</h2>
-                        <p v-if="loan_note" class="mt-1 text-xs text-on-surface-variant">{{ loan_note }}</p>
-                    </div>
-                    <LoanHistoryTable
-                        :loans="loans"
-                        empty-title="Belum ada riwayat pinjaman"
-                        empty-description="Lembaga lain belum terhubung ke modul pinjaman pada skema saat ini."
-                    />
-                </AppCard>
             </div>
         </div>
     </AuthenticatedLayout>

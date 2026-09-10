@@ -14,7 +14,6 @@ use App\Tenancy\Services\DefaultChartOfAccountsProvisioner;
 use App\Tenancy\Services\FiscalPeriodProvisioner;
 use App\Tenancy\Services\ShardConnectionManager;
 use App\Tenancy\Services\TenantGroupMasterDataProvisioner;
-use App\Tenancy\Services\TenantLoanProductProvisioner;
 use App\Tenancy\Services\TenantRegistrySynchronizer;
 use App\Tenancy\Services\TenantVillageProvisioner;
 use App\Tenancy\Services\TenantWorkbench;
@@ -32,7 +31,6 @@ final readonly class TenantRegistrationService
         private TenantRegistrySynchronizer $registry,
         private TenantVillageProvisioner $villages,
         private TenantGroupMasterDataProvisioner $groupMasterData,
-        private TenantLoanProductProvisioner $loanProducts,
         private DefaultChartOfAccountsProvisioner $coa,
         private FiscalPeriodProvisioner $fiscalPeriods,
         private PermissionChecker $permissions,
@@ -87,7 +85,6 @@ final readonly class TenantRegistrationService
 
             $this->groupMasterData->ensureDefaults();
             $this->villages->provision($tenant);
-            $this->loanProducts->ensureDefaults();
             $this->coa->ensureDefaults();
             $this->fiscalPeriods->ensureDefaults(1);
             $this->permissions->ensureSystemRoles();
@@ -126,7 +123,6 @@ final readonly class TenantRegistrationService
             $this->registry->sync($tenant);
             $this->groupMasterData->ensureDefaults();
             $this->villages->provision($tenant);
-            $this->loanProducts->ensureDefaults();
             $coa = $this->coa->ensureDefaults();
             $fiscal = $this->fiscalPeriods->ensureDefaults(1);
             $this->permissions->ensureSystemRoles();

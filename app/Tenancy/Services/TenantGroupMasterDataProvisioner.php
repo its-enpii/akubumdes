@@ -37,7 +37,7 @@ final readonly class TenantGroupMasterDataProvisioner
                 'developing' => 'Berkembang',
                 'ready' => 'Siap',
             ]);
-            GroupFunction::query()->whereIn('code', ['business', 'savings_loan', 'social', 'production'])->update(['is_active' => false]);
+            GroupFunction::query()->whereIn('code', ['business', 'social', 'production'])->update(['is_active' => false]);
             $this->ensure(GroupFunction::class, [
                 'channeling' => 'Channeling',
                 'executing' => 'Executing',

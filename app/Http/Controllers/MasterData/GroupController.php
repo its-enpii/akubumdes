@@ -7,7 +7,6 @@ namespace App\Http\Controllers\MasterData;
 use App\Domain\Access\Services\PermissionChecker;
 use App\Domain\Membership\Models\Group;
 use App\Domain\Membership\Models\Member;
-use App\Domain\Membership\Services\EntityLoanHistoryService;
 use App\Domain\Membership\Services\GroupService;
 use App\Domain\Membership\Services\MasterDataCsvService;
 use App\Domain\Membership\Services\MemberService;
@@ -75,7 +74,7 @@ final class GroupController
         return to_route('master-data.groups.index')->with('success', 'Kelompok berhasil ditambahkan.');
     }
 
-    public function show(Group $group, EntityLoanHistoryService $loanHistory): Response
+    public function show(Group $group): Response
     {
         $group->load([
             'village:row_id,name,code',
@@ -86,10 +85,6 @@ final class GroupController
             'activeMemberships.member.person',
             'activeOfficers.member.person',
         ]);
-
-        $loans = $loanHistory->forGroup((int) $group->row_id);
-        $activeLoans = collect($loans)->whereIn('status', ['active', 'disbursed'])->count();
-        $outstanding = collect($loans)->sum(fn (array $l): float => (float) ($l['principal_remaining'] ?? 0));
 
         $officers = [];
         foreach ($group->activeOfficers as $officer) {
@@ -128,12 +123,6 @@ final class GroupController
                 'officers' => $officers,
                 'members' => $members,
                 'members_count' => count($members),
-            ],
-            'loans' => $loans,
-            'summary' => [
-                'loan_count' => count($loans),
-                'active_loan_count' => $activeLoans,
-                'principal_remaining' => round((float) $outstanding, 2),
             ],
         ]);
     }
@@ -195,15 +184,6 @@ final class GroupController
 
         $tenantId = $group->tenant_id;
         $groupRowId = (int) $group->row_id;
-
-        $hasLoans = DB::connection('tenant')->table('loan_borrowers')
-            ->where('tenant_id', $tenantId)
-            ->where('group_row_id', $groupRowId)
-            ->exists();
-
-        if ($hasLoans) {
-            return back()->with('error', 'Kelompok tidak dapat dihapus karena memiliki riwayat pinjaman.');
-        }
 
         $hasMembers = DB::connection('tenant')->table('group_members')
             ->where('tenant_id', $tenantId)

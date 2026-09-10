@@ -7,7 +7,7 @@ namespace App\Support;
 use Carbon\CarbonImmutable;
 
 /**
- * Format tanggal dalam gaya Indonesia untuk dokumen PDF pinjaman.
+ * Format tanggal dalam gaya Indonesia untuk dokumen PDF.
  */
 final class IndonesianDate
 {

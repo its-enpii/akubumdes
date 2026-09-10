@@ -31,7 +31,6 @@ final class ReverseJournalHandler extends ToolHandlerBase
                 'account_query' => ['type' => 'string'],
                 'wrong_group_query' => ['type' => 'string'],
                 'correct_group_query' => ['type' => 'string'],
-                'correct_loan_id' => ['type' => 'integer'],
                 'reversal_date' => ['type' => 'string', 'format' => 'date'],
                 'reason' => ['type' => 'string', 'maxLength' => 500],
                 'repost' => ['type' => 'boolean', 'default' => false],

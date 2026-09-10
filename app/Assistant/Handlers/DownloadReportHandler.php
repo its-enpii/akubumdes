@@ -16,7 +16,7 @@ final class DownloadReportHandler extends ToolHandlerBase
 
     public function description(): string
     {
-        return 'Menghasilkan tombol/link direct download untuk laporan keuangan (Neraca, Laba Rugi, Arus Kas, Buku Besar, Jurnal, dll) dan laporan pinjaman (Portofolio, LPP, Kolektibilitas, dll) dalam format PDF atau Excel.';
+        return 'Menghasilkan tombol/link direct download untuk laporan keuangan (Neraca, Laba Rugi, Arus Kas, Buku Besar, Jurnal, dll) dalam format PDF atau Excel.';
     }
 
     public function jsonSchema(): array

@@ -29,7 +29,6 @@ const shortcutGroups = computed(() => [
         items: [
             { keys: [modifierKey.value, 'D'], description: 'Ke Halaman Dashboard' },
             { keys: [modifierKey.value, 'J'], description: 'Ke Halaman Jurnal Umum' },
-            { keys: [modifierKey.value, 'L'], description: 'Ke Halaman Pinjaman & Pembiayaan' },
             { keys: [modifierKey.value, 'M'], description: 'Ke Halaman Data Nasabah / Anggota' },
             { keys: [modifierKey.value, 'G'], description: 'Ke Halaman Data Kelompok' },
             { keys: [modifierKey.value, 'R'], description: 'Ke Halaman Laporan Keuangan' },

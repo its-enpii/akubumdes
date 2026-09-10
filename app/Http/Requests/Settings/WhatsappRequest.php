@@ -16,7 +16,6 @@ final class WhatsappRequest extends FormRequest
         return [
             'pairing_phone' => ['nullable', 'string', 'max:20'],
             'template_billing' => ['nullable', 'string', 'max:2000'],
-            'template_installment' => ['nullable', 'string', 'max:2000'],
             'is_enabled' => ['nullable', 'boolean'],
         ];
     }

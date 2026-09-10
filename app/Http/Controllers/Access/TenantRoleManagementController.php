@@ -76,7 +76,7 @@ final class TenantRoleManagementController
             'permissions' => $data['permissions'] ?? [],
         ]);
 
-        return to_route('access.roles.index')->with('success', 'Role kustom berhasil ditambahkan.');
+        return to_route('admin.access.roles.index')->with('success', 'Role kustom berhasil ditambahkan.');
     }
 
     public function edit(Role $role): Response
@@ -125,7 +125,7 @@ final class TenantRoleManagementController
 
         $role->update($updateData);
 
-        return to_route('access.roles.index')->with('success', 'Role berhasil diperbarui.');
+        return to_route('admin.access.roles.index')->with('success', 'Role berhasil diperbarui.');
     }
 
     public function destroy(Role $role): RedirectResponse
@@ -143,7 +143,7 @@ final class TenantRoleManagementController
 
         $role->delete();
 
-        return to_route('access.roles.index')->with('success', 'Role berhasil dihapus.');
+        return to_route('admin.access.roles.index')->with('success', 'Role berhasil dihapus.');
     }
 
     private function resolveRolePermissions(Role $role): array

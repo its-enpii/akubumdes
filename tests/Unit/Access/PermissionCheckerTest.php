@@ -27,7 +27,6 @@ final class PermissionCheckerTest extends TestCase
 
         $checker = new PermissionChecker(app(TenantContext::class));
         self::assertTrue($checker->allows($user, 'journals.create'));
-        self::assertTrue($checker->allows($user, 'loans.approve'));
         self::assertSame(['*'], $checker->listFor($user));
     }
 

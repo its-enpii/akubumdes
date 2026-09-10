@@ -3,15 +3,12 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import AppBadge from '../../../Components/AppBadge.vue';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
-import LoanHistoryTable from '../../../Components/LoanHistoryTable.vue';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout.vue';
 import { useCan } from '../../../composables/useCan';
 import { useConfirm } from '../../../composables/useConfirm';
 
 const props = defineProps({
     group: { type: Object, required: true },
-    loans: { type: Array, default: () => [] },
-    summary: { type: Object, required: true },
 });
 
 const { can } = useCan();
@@ -20,7 +17,7 @@ const { confirm: confirmAction } = useConfirm();
 async function confirmDelete() {
     if (!await confirmAction({
         title: 'Hapus Kelompok',
-        message: `Apakah Anda yakin ingin menghapus kelompok "${props.group.name}"? Penghapusan hanya berhasil jika kelompok belum pernah memiliki riwayat pinjaman dan tidak memiliki anggota aktif.`,
+        message: `Apakah Anda yakin ingin menghapus kelompok "${props.group.name}"? Penghapusan hanya berhasil jika kelompok tidak memiliki anggota aktif.`,
         confirmText: 'Ya, Hapus Kelompok',
         variant: 'danger',
     })) return;
@@ -28,10 +25,6 @@ async function confirmDelete() {
     router.delete(`/master-data/groups/${props.group.row_id}`);
 }
 
-const money = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 });
-function formatMoney(v) {
-    return money.format(Number(v || 0));
-}
 function formatDate(v) {
     if (!v) return '—';
     const d = new Date(v);
@@ -82,21 +75,10 @@ const positionLabels = {
                 </div>
             </header>
 
-            <div class="grid gap-3 sm:grid-cols-3">
-                <AppCard>
-                    <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Anggota aktif</p>
-                    <p class="mt-2 text-2xl font-bold text-primary">{{ group.members_count }}</p>
-                </AppCard>
-                <AppCard>
-                    <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Riwayat pinjaman</p>
-                    <p class="mt-2 text-2xl font-bold text-primary">{{ summary.loan_count }}</p>
-                    <p class="mt-1 text-xs text-on-surface-variant">{{ summary.active_loan_count }} aktif</p>
-                </AppCard>
-                <AppCard>
-                    <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Sisa pokok</p>
-                    <p class="mt-2 text-2xl font-bold text-primary">{{ formatMoney(summary.principal_remaining) }}</p>
-                </AppCard>
-            </div>
+            <AppCard>
+                <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Anggota aktif</p>
+                <p class="mt-2 text-2xl font-bold text-primary">{{ group.members_count }}</p>
+            </AppCard>
 
             <div class="grid gap-6 lg:grid-cols-5">
                 <div class="space-y-6 lg:col-span-2">
@@ -172,13 +154,6 @@ const positionLabels = {
                     </AppCard>
                 </div>
 
-                <AppCard class="lg:col-span-3 overflow-hidden p-0">
-                    <div class="border-b border-outline-variant px-5 py-4">
-                        <h2 class="font-bold text-primary">Riwayat pinjaman kelompok</h2>
-                        <p class="text-xs text-on-surface-variant">Klik nomor pinjaman untuk membuka detail.</p>
-                    </div>
-                    <LoanHistoryTable :loans="loans" empty-description="Kelompok ini belum memiliki pinjaman." />
-                </AppCard>
             </div>
         </div>
     </AuthenticatedLayout>

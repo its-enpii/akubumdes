@@ -41,7 +41,6 @@ final class DesktopStatusCommand extends Command
                 $registryCount = DB::connection('sqlite')->table('tenant_registry')->count();
                 $accountsCount = DB::connection('sqlite')->table('accounts')->count();
                 $membersCount = DB::connection('sqlite')->table('members')->count();
-                $loansCount = DB::connection('sqlite')->table('loans')->count();
                 $journalsCount = DB::connection('sqlite')->table('journal_entries')->count();
 
                 $this->newLine();
@@ -52,7 +51,6 @@ final class DesktopStatusCommand extends Command
                         ['Tenant Registry', $registryCount],
                         ['Accounts (COA)', $accountsCount],
                         ['Members', $membersCount],
-                        ['Loans', $loansCount],
                         ['Journal Entries', $journalsCount],
                     ]
                 );

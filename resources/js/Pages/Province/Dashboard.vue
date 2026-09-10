@@ -93,11 +93,8 @@ function applyFilter() {
 
                 <AppCard class="relative overflow-hidden">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-semibold text-on-surface-variant">Pinjaman Aktif (Pokok)</span>
                         <AppIcon name="credit_score" tone="info" :container-size="9" />
                     </div>
-                    <p class="mt-3 text-2xl font-bold text-primary">{{ money(metrics.summary.active_loan_principal) }}</p>
-                    <p class="mt-1 text-xs text-on-surface-variant">{{ metrics.summary.active_loans_count }} Pinjaman Berjalan</p>
                 </AppCard>
 
                 <AppCard class="relative overflow-hidden">
@@ -161,7 +158,6 @@ function applyFilter() {
                                 <th class="px-6 py-3">Nama Kabupaten</th>
                                 <th class="px-6 py-3 text-right">Jumlah Kecamatan</th>
                                 <th class="px-6 py-3 text-right">Kas & Bank</th>
-                                <th class="px-6 py-3 text-right">Pinjaman Aktif</th>
                                 <th class="px-6 py-3 text-right">Total Pokok</th>
                             </tr>
                         </thead>
@@ -170,7 +166,6 @@ function applyFilter() {
                                 <td class="px-6 py-3 font-bold text-primary">{{ reg.regency_name }}</td>
                                 <td class="px-6 py-3 text-right">{{ reg.kecamatans_count }}</td>
                                 <td class="px-6 py-3 text-right font-semibold text-primary">{{ money(reg.cash) }}</td>
-                                <td class="px-6 py-3 text-right">{{ reg.active_loans }}</td>
                                 <td class="px-6 py-3 text-right">{{ money(reg.active_principal) }}</td>
                             </tr>
                             <tr v-if="!metrics.regency_recap.length">

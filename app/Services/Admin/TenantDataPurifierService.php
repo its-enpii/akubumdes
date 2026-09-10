@@ -220,11 +220,11 @@ final readonly class TenantDataPurifierService
      * End training session and switch to Live/Production mode.
      * Optionally purge all training transactions.
      *
-     * @return array{deleted_entries: int, deleted_lines: int, deleted_installments: int}
+     * @return array{deleted_entries: int, deleted_lines: int}
      */
     public function endTraining(Tenant $tenant, bool $purgeTrainingData = false): array
     {
-        $deleted = ['deleted_entries' => 0, 'deleted_lines' => 0, 'deleted_installments' => 0];
+        $deleted = ['deleted_entries' => 0, 'deleted_lines' => 0];
 
         if ($purgeTrainingData) {
             $deleted = $this->resetTrainingTransactions($tenant);
@@ -242,12 +242,12 @@ final readonly class TenantDataPurifierService
      * Purges specific journal entries and their associated rows cleanly.
      *
      * @param  array<int>  $entryRowIds
-     * @return array{deleted_entries: int, deleted_lines: int, deleted_installments: int}
+     * @return array{deleted_entries: int, deleted_lines: int}
      */
     public function purge(Tenant $tenant, array $entryRowIds, bool $includeReversalPairs = true): array
     {
         if (empty($entryRowIds)) {
-            return ['deleted_entries' => 0, 'deleted_lines' => 0, 'deleted_installments' => 0];
+            return ['deleted_entries' => 0, 'deleted_lines' => 0];
         }
 
         $tenantId = $tenant->row_id;

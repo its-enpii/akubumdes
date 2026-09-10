@@ -44,13 +44,10 @@ final class DashboardTest extends TestCase
                 ->component('Dashboard')
                 ->where('cards.0.key', 'cash')
                 ->where('cards.0.value', 0)
-                ->has('pipeline', 4)
-                ->where('pipeline.0.count', 0)
                 ->where('recent_journals', [])
                 ->where('upcoming_due', [])
                 ->where('counts.members', 0)
                 ->where('counts.groups', 0)
-                ->where('counts.active_loans', 0)
                 ->missing('auth.user.password')
                 ->missing('auth.user.remember_token'));
     }

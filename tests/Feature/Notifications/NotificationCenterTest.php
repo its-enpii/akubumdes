@@ -50,7 +50,7 @@ final class NotificationCenterTest extends TestCase
             ]);
     }
 
-    public function test_notifications_include_actor_attribution_for_journal_and_loans(): void
+    public function test_notifications_include_actor_attribution_for_journal_activity(): void
     {
         $user = $this->createTenantMember();
 

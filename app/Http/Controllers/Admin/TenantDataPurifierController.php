@@ -48,8 +48,6 @@ final class TenantDataPurifierController extends Controller
                 ['value' => 'manual', 'label' => 'Jurnal umum'],
                 ['value' => 'asset_purchase', 'label' => 'Pembelian Aset'],
                 ['value' => 'journal_reversal', 'label' => 'Reversal'],
-                ['value' => 'loan_write_off', 'label' => 'Penghapusan'],
-                ['value' => 'loan_reschedule_close', 'label' => 'Reschedule'],
                 ['value' => 'profit_allocation', 'label' => 'Alokasi laba'],
                 ['value' => 'legacy_transaksi', 'label' => 'Legacy Migrasi'],
             ],

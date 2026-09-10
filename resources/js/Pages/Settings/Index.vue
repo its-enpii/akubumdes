@@ -239,7 +239,7 @@ function applySignatureStarter() {
         <div class="mx-auto max-w-7xl space-y-6">
             <header>
                 <h1 class="text-2xl font-bold text-primary sm:text-3xl">Pengaturan</h1>
-                <p class="mt-1 text-on-surface-variant">Konfigurasi lembaga, pinjaman, logo, WhatsApp, dan tanda tangan.</p>
+                <p class="mt-1 text-on-surface-variant">Konfigurasi lembaga, logo, WhatsApp, dan tanda tangan.</p>
             </header>
 
 

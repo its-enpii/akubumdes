@@ -32,14 +32,13 @@
 </div>
 
 <div style="margin-bottom: 15px;">
-    <div class="font-bold" style="font-size: 11px; margin-bottom: 6px;">II. REKAPITULASI DANA BERGULIR & KINERJA PER KECAMATAN</div>
+    <div class="font-bold" style="font-size: 11px; margin-bottom: 6px;">II. REKAPITULASI KINERJA PER KECAMATAN</div>
     <table class="t l r b" style="font-size: 10px;">
         <thead>
             <tr class="bg-gray">
                 <th class="b r" style="width: 30px;">No</th>
                 <th class="b r" style="text-align: left;">Kecamatan</th>
                 <th class="b r text-right" style="width: 100px;">Kas & Setara (Rp)</th>
-                <th class="b r text-right" style="width: 60px;">Pinjaman Aktif</th>
                 <th class="b r text-right" style="width: 110px;">Alokasi Pokok (Rp)</th>
                 <th class="b text-right" style="width: 60px;">Kelompok</th>
             </tr>
@@ -50,7 +49,6 @@
                     <td class="b r text-center">{{ $idx + 1 }}</td>
                     <td class="b r font-bold">{{ $kec['name'] }}</td>
                     <td class="b r text-right">{{ number_format($kec['cash'], 2, ',', '.') }}</td>
-                    <td class="b r text-right">{{ number_format($kec['active_loans']) }}</td>
                     <td class="b r text-right">{{ number_format($kec['active_principal'], 2, ',', '.') }}</td>
                     <td class="b text-right">{{ number_format($kec['groups_count']) }}</td>
                 </tr>

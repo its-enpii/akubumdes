@@ -146,7 +146,7 @@ final class TenantUserManagementController
         $this->syncUserRole($user, $data['role'] ?? null);
         $this->syncMemberLink($user, $data['role'] ?? null, $data['member_row_id'] ?? null);
 
-        return to_route('access.users.index')->with('success', 'Pengguna berhasil ditambahkan.');
+        return to_route('admin.access.users.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
     public function edit(User $user): Response
@@ -217,7 +217,7 @@ final class TenantUserManagementController
             $this->syncMemberLink($user, $data['role'] ?: null, $data['member_row_id'] ?? null);
         }
 
-        return to_route('access.users.index')->with('success', 'Pengguna berhasil diperbarui.');
+        return to_route('admin.access.users.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     public function resetPassword(Request $request, User $user): RedirectResponse
@@ -270,7 +270,7 @@ final class TenantUserManagementController
             $user->delete();
         });
 
-        return to_route('access.users.index')->with('success', 'Pengguna berhasil dihapus.');
+        return to_route('admin.access.users.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 
     private function syncUserRole(User $user, ?string $roleCode): void

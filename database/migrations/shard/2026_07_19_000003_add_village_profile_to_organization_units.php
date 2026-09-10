@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('village_secretary_name', 180)->nullable()->after('village_head_nip');
             $table->string('village_secretary_phone', 20)->nullable()->after('village_secretary_name');
             $table->string('village_council_name', 180)->nullable()->after('village_secretary_phone');
-            $table->string('installment_schedule', 100)->nullable()->after('village_council_name');
             $table->foreign(['tenant_id', 'village_naming_id'], 'fk_org_units_village_naming')
                 ->references(['tenant_id', 'row_id'])
                 ->on('village_namings')
@@ -44,7 +43,6 @@ return new class extends Migration
                 'village_secretary_name',
                 'village_secretary_phone',
                 'village_council_name',
-                'installment_schedule',
             ]);
         });
     }

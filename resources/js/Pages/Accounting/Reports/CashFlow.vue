@@ -144,7 +144,7 @@ function formatMoney(v) {
                 </div>
                 <p class="border-t border-outline-variant/40 px-4 py-3 text-xs text-on-surface-variant">
                     Klasifikasi dari lawan akun kas di tiap jurnal (operasi / investasi / pendanaan).
-                    Sumber pinjaman digabung ke operasi. Bukan salinan tabel mapping legacy.
+                    Sumber pendanaan non-operasi digabung sesuai klasifikasi arus kas.
                     <span v-if="cash_accounts.length">
                         · Kas:
                         <template v-for="(a, i) in cash_accounts" :key="a.row_id">

@@ -106,7 +106,7 @@ const faqs = [
     },
     {
         q: 'Apakah data lama dari format Excel atau database Access dapat dipindahkan?',
-        a: 'Tersedia modul Import Wizard dan migrasi data pintar yang memudahkan pengurus memasukkan data master desa, kelompok pemanfaat, data anggota, serta riwayat saldo pinjaman lama secara cepat tanpa harus input manual satu per satu.',
+        a: 'Tersedia modul Import Wizard dan migrasi data pintar yang memudahkan pengurus memasukkan data master desa, data anggota, serta saldo awal akun secara cepat tanpa harus input manual satu per satu.',
     },
     {
         q: 'Bagaimana cara BUMDesma mendaftarkan unit atau berkonsultasi implementasi?',
@@ -450,7 +450,7 @@ onUnmounted(() => {
                             </h1>
 
                             <p class="hero-anim-desc text-base sm:text-lg text-on-surface-variant max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                                Solusi terintegrasi untuk pengelolaan pinjaman bergulir, pembukuan akuntansi standar SAK Entitas Privat, penerbitan kuitansi WhatsApp, dan pelaporan konsolidasi Pemerintah Kabupaten secara real-time.
+                                Solusi terintegrasi untuk pembukuan akuntansi standar SAK Entitas Privat, penerbitan kuitansi WhatsApp, dan pelaporan konsolidasi Pemerintah Kabupaten secara real-time.
                             </p>
 
                             <!-- CTA Buttons -->

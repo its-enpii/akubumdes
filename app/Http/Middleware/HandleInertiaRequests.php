@@ -127,8 +127,6 @@ final class HandleInertiaRequests extends Middleware
                 'members.manage',
                 'groups.view',
                 'groups.manage',
-                'loans.view',
-                'loans.propose',
                 'reports.view',
             ];
         }

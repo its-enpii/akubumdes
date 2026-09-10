@@ -55,7 +55,6 @@ final class JournalBrowseController
                 ['value' => 'manual', 'label' => 'Jurnal umum'],
                 ['value' => 'asset_purchase', 'label' => 'Pembelian Aset'],
                 ['value' => 'journal_reversal', 'label' => 'Reversal'],
-                ['value' => 'loan_reschedule_close', 'label' => 'Reschedule'],
                 ['value' => 'profit_allocation', 'label' => 'Alokasi laba'],
             ],
             'can_reverse' => $this->permissions->allows($request->user(), 'journals.create'),

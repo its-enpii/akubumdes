@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use App\Domain\Accounting\Services\Reports\RegencyConsolidatedReportService;
 use App\Services\RegencyGeoService;
 use PHPUnit\Framework\TestCase;
 
@@ -36,25 +35,6 @@ final class RegencyGeoServiceTest extends TestCase
         $this->assertNotEquals($dist1, $dist2);
         $this->assertIsFloat($dist1['lat']);
         $this->assertIsFloat($dist1['lng']);
-    }
-
-    public function test_evaluates_npl_levels(): void
-    {
-        $sehat = RegencyConsolidatedReportService::evaluateNpl(3.5);
-        $this->assertSame('Sehat (≤ 5%)', $sehat['status']);
-        $this->assertSame('success', $sehat['tone']);
-
-        $cukup = RegencyConsolidatedReportService::evaluateNpl(8.0);
-        $this->assertSame('Cukup Sehat (5–10%)', $cukup['status']);
-        $this->assertSame('primary', $cukup['tone']);
-
-        $kurang = RegencyConsolidatedReportService::evaluateNpl(18.2);
-        $this->assertSame('Kurang Sehat (10–25%)', $kurang['status']);
-        $this->assertSame('warning', $kurang['tone']);
-
-        $tidakSehat = RegencyConsolidatedReportService::evaluateNpl(32.0);
-        $this->assertSame('Tidak Sehat (> 25%)', $tidakSehat['status']);
-        $this->assertSame('error', $tidakSehat['tone']);
     }
 
     public function test_resolves_saved_coordinate_with_zoom(): void

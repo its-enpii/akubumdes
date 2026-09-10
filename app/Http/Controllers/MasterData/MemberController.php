@@ -7,7 +7,6 @@ namespace App\Http\Controllers\MasterData;
 use App\Domain\Access\Services\PermissionChecker;
 use App\Domain\Membership\Models\Member;
 use App\Domain\Membership\Models\Person;
-use App\Domain\Membership\Services\EntityLoanHistoryService;
 use App\Domain\Membership\Services\MasterDataCsvService;
 use App\Domain\Membership\Services\MemberService;
 use App\Http\Requests\MasterData\MemberRequest;
@@ -84,7 +83,7 @@ final class MemberController
         return to_route('master-data.members.index')->with('success', 'Anggota berhasil ditambahkan.');
     }
 
-    public function show(Member $member, EntityLoanHistoryService $loanHistory): Response
+    public function show(Member $member): Response
     {
         $member->load([
             'person',
@@ -94,10 +93,6 @@ final class MemberController
             'guarantor.person',
             'groupMemberships' => fn ($q) => $q->where('status', 'active')->whereNull('left_at')->with('group:row_id,id,code,name,status'),
         ]);
-
-        $loans = $loanHistory->forMember((int) $member->row_id);
-        $activeLoans = collect($loans)->whereIn('status', ['active', 'disbursed'])->count();
-        $outstanding = collect($loans)->sum(fn (array $l): float => (float) ($l['principal_remaining'] ?? 0));
 
         return Inertia::render('MasterData/Members/Show', [
             'member' => [
@@ -116,12 +111,6 @@ final class MemberController
                     ->filter()
                     ->values()
                     ->all(),
-            ],
-            'loans' => $loans,
-            'summary' => [
-                'loan_count' => count($loans),
-                'active_loan_count' => $activeLoans,
-                'principal_remaining' => round((float) $outstanding, 2),
             ],
         ]);
     }
@@ -205,33 +194,6 @@ final class MemberController
 
         if ($hasGroup) {
             return back()->with('error', 'Anggota tidak dapat dihapus karena masih terdaftar di dalam kelompok.');
-        }
-
-        $hasBeneficiary = DB::connection('tenant')->table('loan_beneficiaries')
-            ->where('tenant_id', $tenantId)
-            ->where('member_row_id', $memberId)
-            ->exists();
-
-        if ($hasBeneficiary) {
-            return back()->with('error', 'Anggota tidak dapat dihapus karena memiliki riwayat pemanfaat pinjaman.');
-        }
-
-        $hasBorrower = DB::connection('tenant')->table('loan_borrowers')
-            ->where('tenant_id', $tenantId)
-            ->where('member_row_id', $memberId)
-            ->exists();
-
-        if ($hasBorrower) {
-            return back()->with('error', 'Anggota tidak dapat dihapus karena memiliki riwayat pinjaman perorangan.');
-        }
-
-        $hasCommittee = DB::connection('tenant')->table('loan_committee')
-            ->where('tenant_id', $tenantId)
-            ->where('member_row_id', $memberId)
-            ->exists();
-
-        if ($hasCommittee) {
-            return back()->with('error', 'Anggota tidak dapat dihapus karena tercatat sebagai pengurus proposal pinjaman.');
         }
 
         $hasOfficer = DB::connection('tenant')->table('group_officers')

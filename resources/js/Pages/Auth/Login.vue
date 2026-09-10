@@ -249,7 +249,7 @@ onMounted(() => {
                     </h2>
 
                     <p class="brand-text text-sm leading-relaxed text-primary-fixed-dim">
-                        Sistem manajemen pinjaman bergulir, otomatisasi pembukuan jurnal akuntansi, dan integrasi pengawasan Dinas PMD Kabupaten dalam satu pintu.
+                        Sistem pembukuan jurnal akuntansi, otomatisasi kuitansi WhatsApp, dan integrasi pengawasan Dinas PMD Kabupaten dalam satu pintu.
                     </p>
                 </div>
             </div>

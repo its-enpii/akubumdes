@@ -529,7 +529,7 @@ function logout() {
                 @click="openSearch"
             >
                 <AppIcon name="search" class="text-on-surface-variant" />
-                <span class="min-w-0 flex-1 truncate">Cari anggota, kelompok, pinjaman...</span>
+                                <span class="min-w-0 flex-1 truncate">Cari anggota atau kelompok...</span>
                 <kbd class="hidden rounded-md border border-outline-variant bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-on-surface-variant sm:inline">Ctrl K</kbd>
             </button>
             <p v-if="props.unitName" class="ml-6 hidden items-center gap-2 text-sm font-bold text-primary xl:flex"><AppIcon name="location_on" class="text-secondary" />{{ props.unitName }}</p>
@@ -634,7 +634,7 @@ function logout() {
                                 ref="searchInput"
                                 v-model="searchQ"
                                 type="search"
-                                placeholder="Cari anggota, kelompok, pinjaman..."
+                                placeholder="Cari anggota atau kelompok..."
                                 aria-label="Kata kunci pencarian"
                                 class="h-14 min-w-0 flex-1 border-0 bg-transparent text-base text-primary placeholder:text-on-surface-variant focus:outline-none focus:ring-0"
                                 autocomplete="off"

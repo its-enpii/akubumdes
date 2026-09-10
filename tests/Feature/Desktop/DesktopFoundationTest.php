@@ -33,7 +33,6 @@ final class DesktopFoundationTest extends TestCase
             $this->assertTrue(Schema::connection('sqlite')->hasTable('tenant_registry'));
             $this->assertTrue(Schema::connection('sqlite')->hasTable('accounts'));
             $this->assertTrue(Schema::connection('sqlite')->hasTable('members'));
-            $this->assertTrue(Schema::connection('sqlite')->hasTable('loans'));
             $this->assertTrue(Schema::connection('sqlite')->hasTable('journal_entries'));
         } finally {
             if (File::exists($tempSqlite)) {
