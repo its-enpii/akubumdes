@@ -158,7 +158,6 @@ function applyFilter() {
                                 <th class="px-6 py-3">Nama Kabupaten</th>
                                 <th class="px-6 py-3 text-right">Jumlah Kecamatan</th>
                                 <th class="px-6 py-3 text-right">Kas & Bank</th>
-                                <th class="px-6 py-3 text-right">Total Pokok</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-outline-variant">
@@ -166,10 +165,9 @@ function applyFilter() {
                                 <td class="px-6 py-3 font-bold text-primary">{{ reg.regency_name }}</td>
                                 <td class="px-6 py-3 text-right">{{ reg.kecamatans_count }}</td>
                                 <td class="px-6 py-3 text-right font-semibold text-primary">{{ money(reg.cash) }}</td>
-                                <td class="px-6 py-3 text-right">{{ money(reg.active_principal) }}</td>
                             </tr>
                             <tr v-if="!metrics.regency_recap.length">
-                                <td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">
+                                <td colspan="3" class="px-6 py-8 text-center text-on-surface-variant">
                                     Belum ada data kabupaten terdaftar pada provinsi ini.
                                 </td>
                             </tr>

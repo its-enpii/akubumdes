@@ -49,7 +49,7 @@ final class TenantAccessManagementTest extends TestCase
 
     public function test_tenant_admin_can_view_users_list(): void
     {
-        $response = $this->actingAs($this->tenantAdmin)->get('/admin/access/users');
+        $response = $this->actingAs($this->tenantAdmin)->get('/access/users');
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
@@ -66,7 +66,7 @@ final class TenantAccessManagementTest extends TestCase
             'permissions' => ['journals.view', 'journals.create'],
         ]);
 
-        $response = $this->actingAs($this->tenantAdmin)->post('/admin/access/users', [
+        $response = $this->actingAs($this->tenantAdmin)->post('/access/users', [
             'name' => 'Staf Baru',
             'username' => 'staf_baru',
             'email' => 'staf_baru@example.test',
@@ -78,7 +78,7 @@ final class TenantAccessManagementTest extends TestCase
         ]);
 
         $this->initializeTenantContext();
-        $response->assertRedirect('/admin/access/users');
+        $response->assertRedirect('/access/users');
 
         $createdUser = User::query()->where('username', 'staf_baru')->first();
         $this->assertNotNull($createdUser);
@@ -121,7 +121,7 @@ final class TenantAccessManagementTest extends TestCase
             'role_row_id' => $role1->row_id,
         ]);
 
-        $response = $this->actingAs($this->tenantAdmin)->put("/admin/access/users/{$user->row_id}", [
+        $response = $this->actingAs($this->tenantAdmin)->put("/access/users/{$user->row_id}", [
             'name' => 'Updated User Name',
             'username' => 'testuser_edit_updated',
             'email' => 'updated_email@example.test',
@@ -131,7 +131,7 @@ final class TenantAccessManagementTest extends TestCase
         ]);
 
         $this->initializeTenantContext();
-        $response->assertRedirect('/admin/access/users');
+        $response->assertRedirect('/access/users');
 
         $fresh = $user->fresh();
         $this->assertSame('Updated User Name', $fresh->name);
@@ -145,7 +145,7 @@ final class TenantAccessManagementTest extends TestCase
 
     public function test_tenant_admin_cannot_delete_own_account(): void
     {
-        $response = $this->actingAs($this->tenantAdmin)->delete("/admin/access/users/{$this->tenantAdmin->row_id}");
+        $response = $this->actingAs($this->tenantAdmin)->delete("/access/users/{$this->tenantAdmin->row_id}");
 
         $response->assertSessionHas('error');
         $this->assertNotNull(User::query()->find($this->tenantAdmin->row_id));
@@ -153,7 +153,7 @@ final class TenantAccessManagementTest extends TestCase
 
     public function test_tenant_admin_can_view_roles_list(): void
     {
-        $response = $this->actingAs($this->tenantAdmin)->get('/admin/access/roles');
+        $response = $this->actingAs($this->tenantAdmin)->get('/access/roles');
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
@@ -170,7 +170,7 @@ final class TenantAccessManagementTest extends TestCase
         $this->assertNotNull($adminRole);
 
         // Attempt to update locked admin role
-        $updateResponse = $this->actingAs($this->tenantAdmin)->put("/admin/access/roles/{$adminRole->row_id}", [
+        $updateResponse = $this->actingAs($this->tenantAdmin)->put("/access/roles/{$adminRole->row_id}", [
             'name' => 'Hacked Admin',
             'code' => 'admin',
             'permissions' => [],
@@ -179,7 +179,7 @@ final class TenantAccessManagementTest extends TestCase
         $this->assertSame('admin', $adminRole->fresh()->code);
 
         // Attempt to delete locked admin role
-        $deleteResponse = $this->delete("/admin/access/roles/{$adminRole->row_id}");
+        $deleteResponse = $this->delete("/access/roles/{$adminRole->row_id}");
         $deleteResponse->assertSessionHas('error');
         $this->assertNotNull($adminRole->fresh());
     }
@@ -187,14 +187,14 @@ final class TenantAccessManagementTest extends TestCase
     public function test_tenant_admin_can_create_and_manage_custom_roles(): void
     {
         // 1. Create custom role
-        $createResponse = $this->actingAs($this->tenantAdmin)->post('/admin/access/roles', [
+        $createResponse = $this->actingAs($this->tenantAdmin)->post('/access/roles', [
             'name' => 'Verifikator Anggota',
             'code' => 'verifikator_anggota',
             'description' => 'Khusus verifikasi data anggota',
             'permissions' => ['members.view', 'members.manage'],
         ]);
         $this->initializeTenantContext();
-        $createResponse->assertRedirect('/admin/access/roles');
+        $createResponse->assertRedirect('/access/roles');
 
         $this->initializeTenantContext();
         $role = Role::query()->where('code', 'verifikator_anggota')->first();
@@ -202,20 +202,20 @@ final class TenantAccessManagementTest extends TestCase
         $this->assertSame(['members.view', 'members.manage'], $role->permissions);
 
         // 2. Update custom role
-        $updateResponse = $this->actingAs($this->tenantAdmin)->put("/admin/access/roles/{$role->row_id}", [
+        $updateResponse = $this->actingAs($this->tenantAdmin)->put("/access/roles/{$role->row_id}", [
             'name' => 'Verifikator & Surveyor',
             'code' => 'verifikator_anggota',
             'description' => 'Update deskripsi',
         ]);
-        $updateResponse->assertRedirect('/admin/access/roles');
+        $updateResponse->assertRedirect('/access/roles');
 
         $this->initializeTenantContext();
         $freshRole = $role->fresh();
         $this->assertSame('Verifikator & Surveyor', $freshRole->name);
 
         // 3. Delete custom role (when unused)
-        $deleteResponse = $this->actingAs($this->tenantAdmin)->delete("/admin/access/roles/{$role->row_id}");
-        $deleteResponse->assertRedirect('/admin/access/roles');
+        $deleteResponse = $this->actingAs($this->tenantAdmin)->delete("/access/roles/{$role->row_id}");
+        $deleteResponse->assertRedirect('/access/roles');
 
         $this->initializeTenantContext();
         $this->assertNull(Role::query()->where('code', 'verifikator_anggota')->first());
@@ -235,7 +235,7 @@ final class TenantAccessManagementTest extends TestCase
             'role_row_id' => $role->row_id,
         ]);
 
-        $response = $this->actingAs($this->tenantAdmin)->delete("/admin/access/roles/{$role->row_id}");
+        $response = $this->actingAs($this->tenantAdmin)->delete("/access/roles/{$role->row_id}");
         $response->assertSessionHas('error');
         $this->assertNotNull($role->fresh());
     }

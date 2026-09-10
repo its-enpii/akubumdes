@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\MasterData;
 
 use App\Domain\Access\Services\PermissionChecker;
+use App\Domain\Membership\Models\Member;
+use App\Domain\Membership\Services\MemberService;
 use App\Models\Tenant\OrganizationUnit;
 use App\Models\User;
 use App\Tenancy\Middleware\ResolveTenant;
@@ -177,5 +179,24 @@ final class MemberIdentityPhotoTest extends TestCase
             File::ensureDirectoryExists(dirname($database));
             File::put($database, '');
         }
+    }
+
+    private function createMember(): Member
+    {
+        return app(MemberService::class)->create([
+            'nik' => '3273010203040001',
+            'name' => 'Budi Anggota',
+            'gender' => 'L',
+            'birth_place' => 'Bandung',
+            'birth_date' => '1990-01-02',
+            'phone' => '081234567890',
+            'family_card_number' => '3273010203040004',
+            'address' => 'Jalan Desa',
+            'village_id' => $this->village->row_id,
+            'registered_at' => '2026-07-19',
+            'status' => 'active',
+            'has_guarantor' => false,
+            'has_business' => false,
+        ], (int) $this->user->row_id);
     }
 }

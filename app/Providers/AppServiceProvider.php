@@ -9,13 +9,11 @@ use App\Assistant\Handlers\CreateJournalEntryHandler;
 use App\Assistant\Handlers\DownloadReportHandler;
 use App\Assistant\Handlers\GetAssetHandler;
 use App\Assistant\Handlers\ListAccountsHandler;
-use App\Assistant\Handlers\ListDueBillingHandler;
 use App\Assistant\Handlers\ReverseJournalHandler;
 use App\Assistant\Handlers\SearchAssetsHandler;
 use App\Assistant\Handlers\SearchGroupsHandler;
 use App\Assistant\Handlers\SearchJournalsHandler;
 use App\Assistant\Handlers\SearchMembersHandler;
-use App\Assistant\Handlers\SendBillingNoticesHandler;
 use App\Domain\Migration\Support\LegacyConnection;
 use App\Models\Platform\PersonalAccessToken;
 use App\Tenancy\TenantContext;
@@ -56,10 +54,8 @@ final class AppServiceProvider extends ServiceProvider
                 $this->app->make(SearchJournalsHandler::class),
                 $this->app->make(SearchAssetsHandler::class),
                 $this->app->make(GetAssetHandler::class),
-                $this->app->make(ListDueBillingHandler::class),
                 $this->app->make(CreateJournalEntryHandler::class),
                 $this->app->make(ReverseJournalHandler::class),
-                $this->app->make(SendBillingNoticesHandler::class),
                 $this->app->make(DownloadReportHandler::class),
             ]);
         });

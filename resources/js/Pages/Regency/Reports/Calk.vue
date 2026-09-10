@@ -129,7 +129,6 @@ watch(selectedTenant, () => {
                                 <th class="px-6 py-3">Kode</th>
                                 <th class="px-6 py-3">Nama Kecamatan</th>
                                 <th class="px-6 py-3 text-right">Kas & Bank</th>
-                                <th class="px-6 py-3 text-right">Sisa Pokok</th>
                                 <th class="px-6 py-3 text-right">Kelompok</th>
                                 <th class="px-6 py-3 text-right">Anggota</th>
                             </tr>
@@ -139,7 +138,6 @@ watch(selectedTenant, () => {
                                 <td class="px-6 py-3 font-mono text-xs">{{ kec.district_code || kec.code }}</td>
                                 <td class="px-6 py-3 font-bold text-primary">{{ kec.name }}</td>
                                 <td class="px-6 py-3 text-right font-semibold">{{ money(kec.cash) }}</td>
-                                <td class="px-6 py-3 text-right">{{ money(kec.active_principal) }}</td>
                                 <td class="px-6 py-3 text-right">{{ kec.groups_count }}</td>
                                 <td class="px-6 py-3 text-right">{{ kec.members_count }}</td>
                             </tr>

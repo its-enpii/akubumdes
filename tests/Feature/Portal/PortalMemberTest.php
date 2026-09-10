@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Portal;
 
 use App\Domain\Access\Services\PermissionChecker;
+use App\Domain\Membership\Models\Group;
 use App\Domain\Membership\Models\GroupMember;
 use App\Domain\Membership\Models\GroupOfficer;
 use App\Domain\Membership\Models\Member;

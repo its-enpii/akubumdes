@@ -39,7 +39,6 @@
                 <th class="b r" style="width: 30px;">No</th>
                 <th class="b r" style="text-align: left;">Kecamatan</th>
                 <th class="b r text-right" style="width: 100px;">Kas & Setara (Rp)</th>
-                <th class="b r text-right" style="width: 110px;">Alokasi Pokok (Rp)</th>
                 <th class="b text-right" style="width: 60px;">Kelompok</th>
             </tr>
         </thead>
@@ -49,7 +48,6 @@
                     <td class="b r text-center">{{ $idx + 1 }}</td>
                     <td class="b r font-bold">{{ $kec['name'] }}</td>
                     <td class="b r text-right">{{ number_format($kec['cash'], 2, ',', '.') }}</td>
-                    <td class="b r text-right">{{ number_format($kec['active_principal'], 2, ',', '.') }}</td>
                     <td class="b text-right">{{ number_format($kec['groups_count']) }}</td>
                 </tr>
             @endforeach
