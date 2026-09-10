@@ -8,11 +8,6 @@ import { loginAs, noErr, recordTest, BASE } from './_helpers';
 //
 // Expected output counts (diambil dari Tahap 0 discovery):
 //   - 26.635 transaksi, 8.794 saldo, 1.409 anggota, 1.420 kelompok
-//   - 1.721 pinjaman_kelompok, 4.894 pinjaman_anggota
-//   - 22.486 rencana_angsuran, 14.670 real_angsuran
-//
-// Tenant `local` awalnya KOSONG (0 members, 0 loans, 0 journals, 0 groups)
-// sehingga delta sebelum/sesudah dapat dibandingkan.
 
 test.describe.configure({ mode: 'serial' });
 test.setTimeout(900_000); // 15 menit wall clock — cover 26k+ jurnal insertion
@@ -60,7 +55,6 @@ test.describe('Tahap 4 — Migrasi Live kecamatan_id 76 via GUI', () => {
         await page.waitForTimeout(300);
 
         // 3) Aktifkan "Lompati Rekonsiliasi" — recon step mismatch (3-row diff) tidak
-        //    menggugurkan step lanjutan (membership, lending, dsb).
         const skipReconcileSwitch = page
             .locator('label:has-text("Lompati Rekonsiliasi")')
             .locator('input[role="switch"]')

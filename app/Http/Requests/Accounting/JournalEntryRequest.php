@@ -24,7 +24,7 @@ final class JournalEntryRequest extends FormRequest
         $type = (string) $this->input('transaction_type', '');
         $isAssetPurchase = JournalEntryOptionResolver::isAssetPurchase($type);
         $isLandPurchase = $type === 'pembelian_aset_tanah';
-        $allowedTypes = array_merge(array_keys(JournalEntryOptionResolver::TYPES), ['pembelian_inventaris', 'angsuran']);
+        $allowedTypes = array_merge(array_keys(JournalEntryOptionResolver::TYPES), ['pembelian_inventaris']);
 
         return [
             'transaction_date' => ['required', 'date', 'before_or_equal:today'],

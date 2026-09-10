@@ -37,15 +37,10 @@ use App\Http\Controllers\ChangelogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DesktopClientController;
 use App\Http\Controllers\ImpersonationController;
-use App\Http\Controllers\Lending\LoanController;
-use App\Http\Controllers\Lending\LoanDocumentController;
-use App\Http\Controllers\Lending\LoanReportController;
-use App\Http\Controllers\Lending\LoanSimulationController;
 use App\Http\Controllers\MasterData\GroupController;
 use App\Http\Controllers\MasterData\MemberController;
 use App\Http\Controllers\MasterData\OtherInstitutionController;
 use App\Http\Controllers\MasterData\VillageController;
-use App\Http\Controllers\Notifications\BillingNoticeController;
 use App\Http\Controllers\Notifications\NotificationCenterController;
 use App\Http\Controllers\Portal\PortalMemberController;
 use App\Http\Controllers\ProfileController;
@@ -293,7 +288,6 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
             Route::post('/onboarding/opening-balances', [TenantOnboardingImportController::class, 'saveOpeningBalances'])->name('onboarding.opening-balances');
             Route::post('/onboarding/opening-balances/manual', [TenantOnboardingImportController::class, 'saveManualOpening'])->name('onboarding.opening-balances.manual');
             Route::post('/onboarding/aggregate-journal', [TenantOnboardingImportController::class, 'saveAggregateJournal'])->name('onboarding.aggregate-journal');
-            Route::post('/onboarding/active-loans', [TenantOnboardingImportController::class, 'importActiveLoans'])->name('onboarding.active-loans');
             Route::get('/onboarding/templates/{type}', [TenantOnboardingImportController::class, 'downloadTemplate'])->name('onboarding.templates');
 
             // Data Purifier & Training Reset Ã¢â‚¬â€ superadmin only, per-tenant.
@@ -302,7 +296,6 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
             Route::post('/data-purifier/end-training', [TenantDataPurifierController::class, 'endTraining'])->name('data-purifier.end-training');
             Route::post('/data-purifier/purge', [TenantDataPurifierController::class, 'purge'])->name('data-purifier.purge');
             Route::post('/data-purifier/reset-training', [TenantDataPurifierController::class, 'resetTraining'])->name('data-purifier.reset-training');
-        });
     });
 });
 
@@ -426,67 +419,6 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
         Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
     });
 
-    // Lending
-    Route::get('/lending/proposals', [LoanController::class, 'index'])->name('lending.proposals.index');
-    Route::get('/lending/proposals/create', [LoanController::class, 'create'])->name('lending.proposals.create');
-    Route::post('/lending/proposals', [LoanController::class, 'store'])->name('lending.proposals.store');
-    Route::get('/lending/proposals/{proposal}', [LoanController::class, 'show'])->name('lending.proposals.show');
-    Route::get('/lending/proposals/{proposal}/edit', [LoanController::class, 'edit'])->name('lending.proposals.edit');
-    Route::put('/lending/proposals/{proposal}', [LoanController::class, 'update'])->name('lending.proposals.update');
-    Route::post('/lending/proposals/{proposal}/submit', [LoanController::class, 'submit'])->name('lending.proposals.submit');
-    Route::post('/lending/proposals/{proposal}/approve', [LoanController::class, 'approve'])->name('lending.proposals.approve');
-    Route::post('/lending/proposals/{proposal}/reject', [LoanController::class, 'reject'])->name('lending.proposals.reject');
-
-    Route::get('/lending/simulation', [LoanSimulationController::class, 'index'])->name('lending.simulation.index');
-    Route::post('/lending/simulation/calculate', [LoanSimulationController::class, 'calculate'])->name('lending.simulation.calculate');
-    Route::get('/lending/simulation/pdf', [LoanSimulationController::class, 'pdf'])->name('lending.simulation.pdf');
-
-    Route::get('/lending/loans', [LoanController::class, 'index'])->name('lending.loans.index');
-    Route::get('/lending/loans/create', [LoanController::class, 'create'])->name('lending.loans.create');
-    Route::post('/lending/loans', [LoanController::class, 'store'])->name('lending.loans.store');
-    Route::get('/lending/loans/pdf', [LoanController::class, 'exportPdf'])->name('lending.loans.pdf');
-    Route::get('/lending/loans/{loan}', [LoanController::class, 'show'])->name('lending.loans.show');
-    Route::get('/lending/loans/{loan}/card', [LoanController::class, 'card'])->name('lending.loans.card');
-    Route::get('/lending/loans/{loan}/card/reprint', [LoanController::class, 'cardReprint'])->name('lending.loans.card.reprint');
-    Route::get('/lending/loans/{loan}/edit', [LoanController::class, 'edit'])->name('lending.loans.edit');
-    Route::get('/lending/loans/{loan}/documents/{type}', [LoanDocumentController::class, 'document'])
-        ->where('type', '[a-z_]+')
-        ->name('lending.loans.documents.print');
-    Route::put('/lending/loans/{loan}', [LoanController::class, 'update'])->name('lending.loans.update');
-    Route::delete('/lending/loans/{loan}', [LoanController::class, 'destroy'])->name('lending.loans.destroy');
-    Route::delete('/lending/proposals/{proposal}', [LoanController::class, 'destroy'])->name('lending.proposals.destroy');
-    Route::delete('/lending/loans/{loan}/beneficiaries/{member}', [LoanController::class, 'removeBeneficiary'])->name('lending.loans.beneficiaries.destroy');
-    Route::patch('/lending/loans/{loan}/verify', [LoanController::class, 'verify'])->name('lending.loans.verify');
-    Route::patch('/lending/loans/{loan}/approve', [LoanController::class, 'approve'])->name('lending.loans.approve');
-    Route::patch('/lending/loans/{loan}/disburse', [LoanController::class, 'disburse'])->name('lending.loans.disburse');
-    Route::post('/lending/loans/{loan}/disburse', [LoanController::class, 'disburse'])->name('lending.loans.disburse.post');
-    Route::patch('/lending/loans/{loan}/revert', [LoanController::class, 'revert'])->name('lending.loans.revert');
-    Route::patch('/lending/loans/{loan}/committee', [LoanController::class, 'setCommittee'])->name('lending.loans.committee');
-    Route::post('/lending/loans/{loan}/reschedule', [LoanController::class, 'reschedule'])->name('lending.loans.reschedule');
-    Route::post('/lending/loans/{loan}/cancel-reschedule', [LoanController::class, 'cancelReschedule'])->name('lending.loans.cancel-reschedule');
-    Route::post('/lending/loans/{loan}/write-off', [LoanController::class, 'writeOff'])->name('lending.loans.write-off');
-    Route::post('/lending/loans/{loan}/beneficiaries/{member}/write-off', [LoanController::class, 'writeOffBeneficiary'])
-        ->whereNumber('member')
-        ->name('lending.loans.beneficiaries.write-off');
-    Route::patch('/lending/loans/{loan}/complete', [LoanController::class, 'complete'])->name('lending.loans.complete');
-
-    Route::get('/lending/payments/create', [LoanController::class, 'create'])->name('lending.payments.create');
-    Route::post('/lending/payments', [LoanController::class, 'store'])->name('lending.payments.store');
-
-    Route::prefix('lending/reports')->name('lending.reports.')->group(function (): void {
-        Route::get('/portfolio', [LoanReportController::class, 'portfolio'])->name('portfolio');
-        Route::get('/portfolio/pdf', [LoanReportController::class, 'portfolioPdf'])->name('portfolio.pdf');
-        Route::get('/schedule-vs-actual', [LoanReportController::class, 'scheduleVsActual'])->name('schedule-vs-actual');
-        Route::get('/schedule-vs-actual/pdf', [LoanReportController::class, 'scheduleVsActualPdf'])->name('schedule-vs-actual.pdf');
-        Route::get('/lpp-desa', [LoanReportController::class, 'lppDesa'])->name('lpp-desa');
-        Route::get('/lpp-desa/pdf', [LoanReportController::class, 'lppDesaPdf'])->name('lpp-desa.pdf');
-        Route::get('/lpp-kelompok', [LoanReportController::class, 'lppKelompok'])->name('lpp-kelompok');
-        Route::get('/lpp-kelompok/pdf', [LoanReportController::class, 'lppKelompokPdf'])->name('lpp-kelompok.pdf');
-        Route::get('/kolek-desa', [LoanReportController::class, 'kolekDesa'])->name('kolek-desa');
-        Route::get('/kolek-desa/pdf', [LoanReportController::class, 'kolekDesaPdf'])->name('kolek-desa.pdf');
-        Route::get('/cadangan-penghapusan', [LoanReportController::class, 'cadanganPenghapusan'])->name('cadangan-penghapusan');
-        Route::get('/cadangan-penghapusan/pdf', [LoanReportController::class, 'cadanganPenghapusanPdf'])->name('cadangan-penghapusan.pdf');
-    });
 
     // Accounting
     Route::redirect('/assets', '/accounting/assets', 301);
@@ -510,12 +442,6 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
         Route::get('/journal-entries', [JournalBrowseController::class, 'index'])->name('journal-entries.index');
         Route::get('/journal-entries/create', [JournalEntryController::class, 'create'])->name('journal-entries.create');
         Route::post('/journal-entries', [JournalEntryController::class, 'store'])->name('journal-entries.store');
-        Route::get('/journal-entries/installment', [JournalEntryController::class, 'installment'])->name('journal-entries.installment');
-        Route::post('/journal-entries/installment', [JournalEntryController::class, 'storeInstallment'])->name('journal-entries.installment.store');
-        Route::get('/journal-entries/{entry}/installment-receipt', [JournalEntryController::class, 'installmentReceipt'])->name('journal-entries.installment.receipt');
-        Route::get('/loans/{loan}/group-detail', [JournalEntryController::class, 'loanGroupDetail'])->name('loans.group-detail');
-        Route::get('/loans/{loan}/installment-history', [JournalEntryController::class, 'loanInstallmentHistory'])->name('loans.installment-history');
-        Route::get('/loans/{loan}/member-options', [JournalEntryController::class, 'groupMemberOptions'])->name('loans.member-options');
 
         Route::get('/chart-of-accounts', [ChartOfAccountsController::class, 'index'])->name('chart-of-accounts.index');
         Route::get('/accounts', [ChartOfAccountsController::class, 'index'])->name('accounts.index');
@@ -572,8 +498,6 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
             Route::get('/general-ledger', [ReportController::class, 'generalLedger'])->name('general-ledger');
             Route::get('/general-ledger/pdf', [ReportController::class, 'generalLedgerPdf'])->name('general-ledger.pdf');
             Route::get('/general-ledger/excel', [ReportController::class, 'generalLedgerExcel'])->name('general-ledger.excel');
-            Route::get('/financial-health', [ReportController::class, 'financialHealth'])->name('financial-health');
-            Route::get('/financial-health/pdf', [ReportController::class, 'financialHealthPdf'])->name('financial-health.pdf');
             Route::get('/assets/fixed/pdf', [ReportController::class, 'fixedAssetsPdf'])->name('assets.fixed.pdf');
             Route::get('/assets/fixed/excel', [ReportController::class, 'fixedAssetsExcel'])->name('assets.fixed.excel');
             Route::get('/assets/intangible/pdf', [ReportController::class, 'intangibleAssetsPdf'])->name('assets.intangible.pdf');
@@ -627,8 +551,6 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
     Route::prefix('settings')->name('settings.')->group(function (): void {
         Route::get('/', [SettingsController::class, 'index'])->name('index');
         Route::put('/identity', [SettingsController::class, 'updateIdentity'])->name('identity.update');
-        Route::put('/lending-system', [SettingsController::class, 'updateLendingSystem'])->name('lending-system.update');
-        Route::post('/lending-system/sync-rounding', [SettingsController::class, 'syncRounding'])->name('lending-system.sync-rounding');
         Route::post('/logo', [SettingsController::class, 'updateLogo'])->name('logo.update');
         Route::delete('/logo', [SettingsController::class, 'destroyLogo'])->name('logo.destroy');
         Route::put('/whatsapp', [SettingsController::class, 'updateWhatsapp'])->name('whatsapp.update');
@@ -659,9 +581,6 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
     // Notifications (Center & Billing Notice)
     Route::get('/api/notifications', [NotificationCenterController::class, 'index'])->name('notifications.feed');
     Route::post('/api/notifications/mark-read', [NotificationCenterController::class, 'markRead'])->name('notifications.mark-read');
-    Route::prefix('notifications')->name('notifications.')->group(function (): void {
-        Route::get('/billing', [BillingNoticeController::class, 'index'])->name('billing');
-        Route::post('/billing/send', [BillingNoticeController::class, 'send'])->name('billing.send');
     });
 
     // WhatsApp Gateway API routes

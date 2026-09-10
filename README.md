@@ -24,12 +24,10 @@ Aplikasi pembaruan **SIDBM (Sistem Informasi Dana Bergulir Masyarakat / BUMDesma
 2. **Multi-Tenant Sharding Engine**:
    - Skalabilitas hingga 500+ tenant tanpa menggunakan nama tabel dinamis legacy (`transaksi_1`, `anggota_1`).
    - Isolasi data berbasis `tenant_id` + komposit Foreign Key + Shard Connection Manager.
-3. **100% Paritas Laporan Legacy SIDBM ( SA K EP / PP No. 11/2021)**:
-   - **10 Laporan Akuntansi Core**: Neraca, Laba Rugi, Buku Besar, Arus Kas, Perubahan Ekuitas, CALK, Neraca Saldo, Jurnal Transaksi, Bukti Kas (BKM/BKK/BM), Kuitansi Angsuran.
-   - **6 Laporan Piutang & Kolektibilitas**: Portofolio Aging (per Desa/Kelompok), Rencana vs Realisasi, LPP Rekap Desa, LPP Rincian Kelompok, Kolektibilitas Desa, Cadangan Penghapusan Piutang (CKPN).
-   - **3 Analisis Kinerja & Aset**: Penilaian Tingkat Kesehatan Usaha, Rekap Aset Tetap, Rekap Aset Tak Berwujud.
+3. **Pelaporan Keuangan Core**:
+   - **9 Laporan Akuntansi Core**: Neraca, Laba Rugi, Buku Besar, Arus Kas, Perubahan Ekuitas, CALK, Neraca Saldo, Jurnal Transaksi, dan Bukti Kas (BKM/BKK/BM).
+   - **3 Analisis Kinerja & Aset**: Rekap Aset Tetap, Rekap Aset Tak Berwujud, dan Paket LPJ Tahunan.
    - **5 Dokumen Paket LPJ Tahunan**: Cover Buku LPJ, Surat Pengantar, Berita Acara Pengesahan, MoU Kerjasama Antar Desa, Annual LPJ Pack Hub.
-   - **37 Dokumen Perguliran Pinjaman**: Form Komite, SPK, Rekomendasi Kredit, Surat Kuasa, Tanggung Renteng, Jadwal Angsuran, Kartu Pinjaman.
 4. **Portal Pengawasan & Konsolidasi Keuangan Kabupaten (Regency Supervisor)**:
    - Dashboard supervisi kabupaten dan laporan konsolidasi multi-kecamatan real-time (Neraca, Laba Rugi, Buku Besar, Arus Kas, CALK, streaming PDF).
 5. **Otomatisasi SaaS Billing & Multi Payment Gateway (Duitku & Tripay)**:

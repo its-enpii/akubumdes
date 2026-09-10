@@ -165,18 +165,6 @@ test.describe('Scenario 1: Happy Path — Full CRUD & Core Workflows', () => {
         await expect(page.locator('h1')).toBeVisible();
     });
 
-    test('1.09 Lending — browse loans list', async ({ page }) => {
-        await loginAs(page, 'dev');
-        await page.goto(`${BASE}/lending/loans`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-    });
-
-    test('1.10 Lending — open create loan form, verify dropdowns load', async ({ page }) => {
-        await loginAs(page, 'dev');
-        await page.goto(`${BASE}/lending/loans/create`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-    });
-
     test('1.11 Accounting — browse chart of accounts', async ({ page }) => {
         await loginAs(page, 'dev');
         await page.goto(`${BASE}/accounting/chart-of-accounts`, { waitUntil: 'domcontentloaded' });
@@ -229,21 +217,6 @@ test.describe('Scenario 1: Happy Path — Full CRUD & Core Workflows', () => {
         await loginAs(page, 'dev');
         await page.goto(`${BASE}/accounting/assets`, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('h1, main')).toBeVisible();
-    });
-
-    test('1.20 Settings — browse all tabs (Identity, Lending, Logo, WA, Signatures)', async ({ page }) => {
-        await loginAs(page, 'dev');
-        await page.goto(`${BASE}/settings`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        const tabKeys = ['Sistem Pinjaman', 'Logo Lembaga', 'WhatsApp Gateway', 'Tanda Tangan', 'Identitas Lembaga'];
-        for (const tabText of tabKeys) {
-            const tab = page.locator(`button:has-text("${tabText}")`).first();
-            if (await tab.isVisible({ timeout: 2000 }).catch(() => false)) {
-                await tab.click();
-                await page.waitForTimeout(300);
-            }
-        }
     });
 
     test('1.21 Profile — browse tabs (Personal, Account, Photo)', async ({ page }) => {

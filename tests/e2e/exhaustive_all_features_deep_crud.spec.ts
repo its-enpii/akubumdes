@@ -110,32 +110,6 @@ test.describe('DEEP EXHAUSTIVE ALL FEATURES AUDIT — FULL ACTION WORKFLOWS', ()
         await selectSmartOption(page, 'Pilih desa');
     });
 
-    test('3. Lending — Proposal Submission, Installment Calculation & SPK Document', async ({ page }) => {
-        await loginAs(page, 'dev');
-        await page.goto(`${BASE}/lending/loans/create`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        await selectSmartOption(page, 'Pilih kelompok');
-
-        const amountIn = page.getByLabel('Jumlah Pinjaman').first();
-        if (await amountIn.isVisible().catch(() => false)) await amountIn.fill('20000000');
-
-        const rateIn = page.getByLabel('Bunga').first();
-        if (await rateIn.isVisible().catch(() => false)) await rateIn.fill('1.5');
-
-        const tenorIn = page.getByLabel('Jangka Waktu').first();
-        if (await tenorIn.isVisible().catch(() => false)) await tenorIn.fill('12');
-
-        const saveBtn = page.locator('button:has-text("Simpan"), button:has-text("Ajukan")').first();
-        if (await saveBtn.isVisible().catch(() => false)) {
-            await saveBtn.click();
-            await page.waitForTimeout(2000);
-        }
-
-        await page.goto(`${BASE}/lending/loans`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-    });
-
     test('4. Accounting — COA, Cash In/Out Journal Posting & Period Close', async ({ page }) => {
         await loginAs(page, 'dev');
 
@@ -202,24 +176,6 @@ test.describe('DEEP EXHAUSTIVE ALL FEATURES AUDIT — FULL ACTION WORKFLOWS', ()
                 await page.waitForTimeout(1500);
             }
         }
-    });
-
-    test('7. Settings & Profile — Identity, Lending Rules, Signatures & WA Gateway', async ({ page }) => {
-        await loginAs(page, 'dev');
-
-        await page.goto(`${BASE}/settings`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        for (const tabText of ['Identitas Lembaga', 'Sistem Pinjaman', 'WhatsApp Gateway', 'Tanda Tangan']) {
-            const tab = page.locator(`button:has-text("${tabText}")`).first();
-            if (await tab.isVisible().catch(() => false)) {
-                await tab.click();
-                await page.waitForTimeout(300);
-            }
-        }
-
-        await page.goto(`${BASE}/profile`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toContainText('Profil');
     });
 
     test('8. Tenant Onboarding — Import Wizard File Upload Surface', async ({ page }) => {

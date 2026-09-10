@@ -105,20 +105,7 @@ function resetTenantFilter() {
                         <AppIcon name="account_balance" tone="success" :container-size="9" />
                     </div>
                     <p class="mt-3 text-2xl font-bold text-primary">{{ money(metrics.summary.total_assets) }}</p>
-                    <p class="mt-1 text-xs text-on-surface-variant">Kas, Bank, Piutang, & Investasi Gabungan</p>
-                </AppCard>
-
-                <!-- Rasio NPL Rata-rata Kabupaten -->
-                <AppCard class="relative overflow-hidden">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-semibold text-on-surface-variant">Rasio NPL Rata-rata</span>
-                        <AppIcon name="health_and_safety" :tone="metrics.summary.npl_tone || 'success'" :container-size="9" />
-                    </div>
-                    <div class="mt-3 flex items-center justify-between gap-2">
-                        <p class="text-2xl font-bold text-primary">{{ Number(metrics.summary.avg_npl_ratio || 0).toFixed(1) }}%</p>
-                        <AppBadge :tone="metrics.summary.npl_tone || 'success'">{{ metrics.summary.npl_status }}</AppBadge>
-                    </div>
-                    <p class="mt-1 text-xs text-on-surface-variant">Tunggakan Pokok: {{ money(metrics.summary.total_tunggakan_pokok) }}</p>
+                    <p class="mt-1 text-xs text-on-surface-variant">Kas, Bank, & Investasi Gabungan</p>
                 </AppCard>
 
                 <!-- Laba Bersih YTD -->
@@ -128,7 +115,7 @@ function resetTenantFilter() {
                         <AppIcon name="account_balance_wallet" tone="primary" :container-size="9" />
                     </div>
                     <p class="mt-3 text-2xl font-bold text-primary">{{ money(metrics.summary.total_cash) }}</p>
-                    <p class="mt-1 text-xs text-on-surface-variant">{{ metrics.summary.active_loans_count }} Pinjaman Aktif Berjalan</p>
+                    <p class="mt-1 text-xs text-on-surface-variant">Total kas dan bank pada posisi terakhir.</p>
                 </AppCard>
             </div>
 
@@ -203,9 +190,6 @@ function resetTenantFilter() {
                                 <th class="px-6 py-3 text-right">Perputaran Dana</th>
                                 <th class="px-6 py-3 text-right">Total Aset</th>
                                 <th class="px-6 py-3 text-right">Kas & Bank</th>
-                                <th class="px-6 py-3 text-right">Pinjaman Aktif</th>
-                                <th class="px-6 py-3 text-right">Sisa Pokok</th>
-                                <th class="px-6 py-3 text-right">NPL</th>
                                 <th class="px-6 py-3 text-right">Kelompok</th>
                                 <th class="px-6 py-3 text-right">Anggota</th>
                                 <th class="px-6 py-3 text-center">Aksi</th>
@@ -224,16 +208,6 @@ function resetTenantFilter() {
                                 <td class="px-6 py-3 text-right text-on-surface-variant">{{ money(kec.turnover) }}</td>
                                 <td class="px-6 py-3 text-right text-on-surface-variant">{{ money(kec.total_assets) }}</td>
                                 <td class="px-6 py-3 text-right font-semibold text-primary">{{ money(kec.cash) }}</td>
-                                <td class="px-6 py-3 text-right">{{ kec.active_loans }}</td>
-                                <td class="px-6 py-3 text-right">{{ money(kec.active_principal) }}</td>
-                                <td class="px-6 py-3 text-right">
-                                    <span
-                                        class="font-mono text-xs font-medium"
-                                        :class="kec.npl_ratio > 10 ? 'text-error' : (kec.npl_ratio > 5 ? 'text-tertiary' : 'text-secondary')"
-                                    >
-                                        {{ Number(kec.npl_ratio || 0).toFixed(1) }}%
-                                    </span>
-                                </td>
                                 <td class="px-6 py-3 text-right">{{ kec.groups_count }}</td>
                                 <td class="px-6 py-3 text-right">{{ kec.members_count }}</td>
                                 <td class="px-6 py-3 text-center">

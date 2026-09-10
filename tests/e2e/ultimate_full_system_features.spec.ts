@@ -37,57 +37,6 @@ async function selectSmartOption(page: Page, triggerLabel: string) {
 test.describe('ULTIMATE COMPLETE SYSTEM FEATURES AUDIT', () => {
     test.describe.configure({ mode: 'serial' });
 
-    test('1. Perguliran Pinjaman — Proposal Submission & Browsing Tabs', async ({ page }) => {
-        await loginAs(page, 'dev');
-
-        await page.goto(`${BASE}/lending/loans?tab=proposal`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        await page.goto(`${BASE}/lending/loans?tab=verifikasi`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        await page.goto(`${BASE}/lending/loans?tab=waiting`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        await page.goto(`${BASE}/lending/loans?tab=aktif`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        await page.goto(`${BASE}/lending/loans?tab=lunas`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-    });
-
-    test('2. Perguliran Pinjaman — Create Proposal & Submit New Loan Form', async ({ page }) => {
-        await loginAs(page, 'dev');
-        await page.goto(`${BASE}/lending/loans/create`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        await selectSmartOption(page, 'Pilih kelompok');
-
-        const amountIn = page.getByLabel('Jumlah Pinjaman').first();
-        if (await amountIn.isVisible().catch(() => false)) await amountIn.fill('10000000');
-
-        const rateIn = page.getByLabel('Bunga').first();
-        if (await rateIn.isVisible().catch(() => false)) await rateIn.fill('1.2');
-
-        const tenorIn = page.getByLabel('Jangka Waktu').first();
-        if (await tenorIn.isVisible().catch(() => false)) await tenorIn.fill('12');
-
-        const saveBtn = page.locator('button:has-text("Simpan"), button:has-text("Ajukan")').first();
-        if (await saveBtn.isVisible().catch(() => false)) {
-            await saveBtn.click();
-            await page.waitForTimeout(2000);
-        }
-    });
-
-    test('3. Angsuran Pinjaman — Installment Journal Form & Printable Receipt', async ({ page }) => {
-        await loginAs(page, 'dev');
-
-        await page.goto(`${BASE}/accounting/journal-entries/installment`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1').first()).toBeVisible();
-
-        await selectSmartOption(page, 'Pilih pinjaman');
-    });
-
     test('4. Jurnal Umum — General Journal Entry Form & Cash Evidence Print', async ({ page }) => {
         await loginAs(page, 'dev');
 

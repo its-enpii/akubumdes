@@ -274,15 +274,11 @@ final class CashFlowService
     private function lineLabel(string $sourceType, string $entryDesc, array $counterLabels): string
     {
         $sourceLabels = [
-            'loan_installment' => 'Penerimaan angsuran',
-            'loan' => 'Pencairan pinjaman',
-            'loan_write_off' => 'Penghapusan piutang',
-            'loan_reschedule_close' => 'Reschedule pinjaman',
             'journal_reversal' => 'Reversal jurnal',
             'manual' => 'Jurnal umum',
         ];
 
-        if (isset($sourceLabels[$sourceType]) && in_array($sourceType, ['loan_installment', 'loan', 'loan_write_off', 'loan_reschedule_close'], true)) {
+        if (isset($sourceLabels[$sourceType])) {
             return $sourceLabels[$sourceType];
         }
 
@@ -322,16 +318,11 @@ final class CashFlowService
 
     private function classifyCounter(string $code, string $type, string $sourceType): string
     {
-        // Lending core = operating for BUMDesma/LKD
-        if (in_array($sourceType, ['loan_installment', 'loan', 'loan_write_off', 'loan_reschedule_close'], true)) {
-            return 'operating';
-        }
-
         if (in_array($type, ['revenue', 'expense'], true)) {
             return 'operating';
         }
 
-        // Piutang / persediaan lancar non-kas → operasi
+        // Persediaan lancar non-kas → operasi
         if ($type === 'asset' && (str_starts_with($code, '1.1.03') || str_starts_with($code, '1.1.02') || str_starts_with($code, '1.1.04'))) {
             return 'operating';
         }

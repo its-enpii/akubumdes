@@ -20,7 +20,6 @@ final class VillageRequest extends OrganizationUnitRequest
             'village_secretary_name' => ['nullable', 'string', 'max:180'],
             'village_secretary_phone' => ['nullable', 'string', 'max:20'],
             'village_council_name' => ['nullable', 'string', 'max:180'],
-            'installment_schedule' => ['nullable', 'string', 'max:100'],
             'village_naming_id' => [
                 'required',
                 'integer',
@@ -44,7 +43,6 @@ final class VillageRequest extends OrganizationUnitRequest
             'village_secretary_name' => 'nama sekretaris desa',
             'village_secretary_phone' => 'telepon sekretaris desa',
             'village_council_name' => 'nama BPD',
-            'installment_schedule' => 'jadwal angsuran',
             'village_naming_id' => 'jenis penamaan desa',
         ];
     }

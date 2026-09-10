@@ -6,10 +6,6 @@ use App\Http\Controllers\Api\Desktop\DesktopSyncController;
 use App\Http\Controllers\Api\Holding\HoldingReportController;
 use App\Http\Controllers\Api\Holding\HoldingTenantController;
 use App\Http\Controllers\Api\Mobile\MobileAuthController;
-use App\Http\Controllers\Api\Mobile\MobileCollectionController;
-use App\Http\Controllers\Api\Mobile\MobileExecutiveController;
-use App\Http\Controllers\Api\Mobile\MobileSyncController;
-use App\Http\Controllers\Api\Mobile\MobileVerificationController;
 use App\Http\Controllers\Assistant\AssistantToolController;
 use Illuminate\Support\Facades\Route;
 
@@ -122,34 +118,5 @@ Route::prefix('v1/mobile')->name('api.v1.mobile.')->group(function (): void {
     Route::middleware(['auth:sanctum', 'tenant'])->group(function (): void {
         Route::get('/auth/me', [MobileAuthController::class, 'me'])->name('auth.me');
         Route::post('/auth/logout', [MobileAuthController::class, 'logout'])->name('auth.logout');
-
-        // Collection & Field Installments
-        Route::prefix('collection')->name('collection.')->group(function (): void {
-            Route::get('/loans', [MobileCollectionController::class, 'index'])->name('loans.index');
-            Route::get('/loans/{loan}', [MobileCollectionController::class, 'show'])->name('loans.show');
-            Route::post('/loans/{loan}/pay', [MobileCollectionController::class, 'pay'])->name('loans.pay');
-        });
-
-        // Mobile offline synchronization
-        Route::prefix('sync')->name('sync.')->group(function (): void {
-            Route::get('/collection', [MobileSyncController::class, 'collection'])->name('collection');
-            Route::post('/push', [MobileSyncController::class, 'push'])->name('push');
-        });
-
-        // Verification & Field Survey
-        Route::prefix('verification')->name('verification.')->group(function (): void {
-            Route::get('/proposals', [MobileVerificationController::class, 'index'])->name('proposals.index');
-            Route::get('/proposals/{loan}', [MobileVerificationController::class, 'show'])->name('proposals.show');
-            Route::post('/proposals/{loan}/verify', [MobileVerificationController::class, 'verify'])->name('proposals.verify');
-        });
-
-        // Executive & Approval
-        Route::prefix('executive')->name('executive.')->group(function (): void {
-            Route::get('/summary', [MobileExecutiveController::class, 'summary'])->name('summary');
-            Route::get('/approvals', [MobileExecutiveController::class, 'approvals'])->name('approvals.index');
-            Route::get('/approvals/{loan}', [MobileExecutiveController::class, 'showApproval'])->name('approvals.show');
-            Route::post('/approvals/{loan}/approve', [MobileExecutiveController::class, 'approve'])->name('approvals.approve');
-            Route::post('/approvals/{loan}/reject', [MobileExecutiveController::class, 'reject'])->name('approvals.reject');
-        });
     });
 });

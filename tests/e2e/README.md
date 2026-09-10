@@ -49,7 +49,6 @@ seed a few via the running app first if you want full coverage.
 ## Coverage
 - `tests/e2e/smoke.spec.ts`
   - login flow lands an authenticated user
-  - loan proposal form enables officer dropdowns after picking a group
   - `AppCurrencyInput` formats `4500000` → `4.500.000` on blur
   - group form search excludes already-selected members (skips when no members exist)
 

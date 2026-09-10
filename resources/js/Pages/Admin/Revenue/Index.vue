@@ -124,7 +124,7 @@ watch([status, planId, perPage], () => {
 
                 <AppCard>
                     <div class="flex items-center justify-between">
-                        <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Total Piutang Belum Bayar</p>
+                        <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Total Tagihan Belum Bayar</p>
                         <AppIcon name="account_balance_wallet" tone="primary" container-size="8" container-shape="pill" />
                     </div>
                     <p class="mt-2 text-2xl font-extrabold" :class="summary.total_outstanding > 0 ? 'text-error' : 'text-primary'">

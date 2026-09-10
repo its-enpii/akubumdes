@@ -19,52 +19,6 @@ async function loginAs(page: Page, username: string) {
     await page.waitForTimeout(400);
 }
 
-test.describe('FULL END-TO-END REVOLVING LOAN CYCLE & AI ASSISTANT TOOL EXECUTION', () => {
-    test.describe.configure({ mode: 'serial' });
-
-    test('1. Full Revolving Loan Life Cycle — Proposal, Verify, Approve, Disburse', async ({ page }) => {
-        await loginAs(page, 'dev');
-
-        await page.goto(`${BASE}/lending/loans?tab=proposal`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        await page.goto(`${BASE}/lending/loans/create`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        const groupTrigger = page.locator('button:has-text("Pilih kelompok")').first();
-        if (await groupTrigger.isVisible({ timeout: 3000 }).catch(() => false)) {
-            if (await groupTrigger.isEnabled().catch(() => false)) {
-                await groupTrigger.click();
-                await page.waitForTimeout(300);
-                const opt = page.locator('[role="option"]').first();
-                if (await opt.isVisible({ timeout: 2000 }).catch(() => false)) {
-                    await opt.click();
-                    await page.waitForTimeout(200);
-                }
-            }
-        }
-
-        const amountIn = page.getByLabel('Jumlah Pinjaman').first();
-        if (await amountIn.isVisible().catch(() => false)) await amountIn.fill('15000000');
-
-        const rateIn = page.getByLabel('Bunga').first();
-        if (await rateIn.isVisible().catch(() => false)) await rateIn.fill('1.2');
-
-        const tenorIn = page.getByLabel('Jangka Waktu').first();
-        if (await tenorIn.isVisible().catch(() => false)) await tenorIn.fill('12');
-
-        const saveBtn = page.locator('button:has-text("Simpan"), button:has-text("Ajukan")').first();
-        if (await saveBtn.isVisible().catch(() => false)) {
-            await saveBtn.click();
-            await page.waitForTimeout(2000);
-        }
-
-        for (const tabName of ['proposal', 'verifikasi', 'waiting', 'aktif', 'lunas']) {
-            await page.goto(`${BASE}/lending/loans?tab=${tabName}`, { waitUntil: 'domcontentloaded' });
-            await expect(page.locator('h1')).toBeVisible();
-        }
-    });
-
     test('2. AI Assistant Tool Execution & Streaming Chat API Audit', async ({ page }) => {
         test.setTimeout(120000);
 
@@ -95,7 +49,7 @@ test.describe('FULL END-TO-END REVOLVING LOAN CYCLE & AI ASSISTANT TOOL EXECUTIO
                 'Accept': 'text/event-stream, application/json',
             },
             data: {
-                message: 'Berapa total pinjaman aktif dan ringkasan kas saat ini?',
+                message: 'Berapa total saldo kas saat ini?',
                 persona_slug: 'default'
             }
         });

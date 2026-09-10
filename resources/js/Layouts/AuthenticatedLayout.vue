@@ -272,9 +272,6 @@ const sections = [
                     },
                 ],
             },
-            { label: 'Register Proposal', icon: 'assignment_add', href: '/lending/loans/create', exact: true },
-            { label: 'Tahapan Perguliran', icon: 'sync_alt', href: '/lending/loans', exclude: '/lending/loans/create' },
-            { label: 'Simulasi Pinjaman', icon: 'calculate', href: '/lending/simulation' },
         ],
     },
     {
@@ -288,7 +285,6 @@ const sections = [
                     { label: 'Daftar Jurnal', href: '/accounting/journals' },
                     { label: 'Daftar Inventaris', href: '/accounting/assets' },
                     { label: 'Jurnal Umum', href: '/accounting/journal-entries/create' },
-                    { label: 'Jurnal Angsuran', href: '/accounting/journal-entries/installment' },
                 ],
             },
             { label: 'Bagan Akun', icon: 'account_tree', href: '/accounting/chart-of-accounts' },
@@ -308,8 +304,6 @@ const sections = [
                 icon: 'assessment',
                 children: [
                     { label: 'Ringkasan Laporan', href: '/accounting/reports', exact: true },
-                    { label: 'Portofolio Pinjaman', href: '/lending/reports/portfolio' },
-                    { label: 'Rencana vs Realisasi', href: '/lending/reports/schedule-vs-actual' },
                     { label: 'Jurnal Transaksi', href: '/accounting/reports/journals' },
                     { label: 'Neraca Saldo', href: '/accounting/reports/trial-balance' },
                     { label: 'Neraca', href: '/accounting/reports/balance-sheet' },

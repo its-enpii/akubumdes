@@ -44,8 +44,6 @@ const form = useForm({
 });
 
 const globalForm = useForm({
-    template_billing: props.global.template_billing ?? '',
-    template_installment: props.global.template_installment ?? '',
     is_enabled: props.global.is_enabled ?? false,
     rotation_mode: props.global.rotation_mode ?? 'round_robin',
 });
@@ -387,11 +385,6 @@ const qrTone = computed(() => statusTone(qrStatus.value));
                     </div>
 
                     <AppRadioGroup v-model="globalForm.rotation_mode" label="Strategi Rotasi Nomor" :options="rotationOptions" />
-
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <AppTextarea v-model="globalForm.template_billing" label="Pesan Tagihan" :rows="5" hint="Placeholder: {nama}, {angsuran_ke}, {total}, {tanggal}, {pinjaman}" />
-                        <AppTextarea v-model="globalForm.template_installment" label="Pesan Angsuran" :rows="5" hint="Placeholder: {nama}, {penyetor}, {angsuran_ke}, {total}" />
-                    </div>
 
                     <div class="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3">
                         <div>

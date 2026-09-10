@@ -138,7 +138,7 @@ function tooltipStyle(h) {
             :viewBox="`0 0 ${W} ${H}`"
             class="h-full min-h-[14rem] w-full select-none"
             role="img"
-            aria-label="Tren pencairan dan penerimaan angsuran 6 bulan"
+            aria-label="Tren aktivitas keuangan 6 bulan"
         >
             <g>
                 <line

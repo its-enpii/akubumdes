@@ -82,27 +82,6 @@ final class DownloadReportToolTest extends TestCase
         self::assertStringContainsString('Unduh Laba Rugi (EXCEL)', $res['action_button']);
     }
 
-    public function test_download_lending_portfolio_pdf_forces_direct_download(): void
-    {
-        /** @var AssistantToolService $tools */
-        $tools = app(AssistantToolService::class);
-
-        $res = $tools->downloadReport([
-            'report_type' => 'portfolio',
-            'format' => 'pdf',
-            'year' => 2026,
-        ]);
-
-        self::assertTrue($res['ok']);
-        self::assertSame('portfolio', $res['report_type']);
-        self::assertSame('Portofolio', $res['short_name']);
-        parse_str(parse_url($res['download_url'], PHP_URL_QUERY) ?? '', $query);
-        self::assertSame('2026-12-31', $query['as_of']);
-        self::assertArrayNotHasKey('month', $query);
-        self::assertArrayNotHasKey('year', $query);
-        self::assertStringContainsString('Unduh Portofolio (PDF)', $res['action_button']);
-    }
-
     public function test_download_journals_pdf_uses_controller_period_contract(): void
     {
         /** @var AssistantToolService $tools */
@@ -144,25 +123,6 @@ final class DownloadReportToolTest extends TestCase
         self::assertSame('42', $query['account']);
         self::assertSame('1', $query['download']);
         self::assertArrayNotHasKey('account_id', $query);
-    }
-
-    public function test_download_lending_schedule_pdf_uses_controller_period_contract(): void
-    {
-        /** @var AssistantToolService $tools */
-        $tools = app(AssistantToolService::class);
-
-        $res = $tools->downloadReport([
-            'report_type' => 'schedule_vs_actual',
-            'format' => 'pdf',
-            'month' => 7,
-            'year' => 2026,
-        ]);
-
-        self::assertTrue($res['ok']);
-        parse_str(parse_url($res['download_url'], PHP_URL_QUERY) ?? '', $query);
-        self::assertSame('7', $query['month']);
-        self::assertSame('2026', $query['year']);
-        self::assertSame('1', $query['download']);
     }
 
     public function test_download_calk_falls_back_to_pdf_download(): void

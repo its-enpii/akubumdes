@@ -83,8 +83,8 @@ final class CalkService
             'policies' => [
                 'Basis pencatatan adalah akrual dengan jurnal berpasangan (debit = kredit).',
                 'Saldo bulanan merupakan projection dari jurnal posted, bukan sumber kebenaran terpisah.',
-                'Piutang pinjaman diukur sebesar sisa pokok (due − paid) pada jadwal angsuran.',
-                'Pendapatan jasa diakui saat diterima/dicatat pada jurnal angsuran.',
+                'Neraca disusun dari saldo akun yang dihasilkan jurnal yang telah diposting.',
+                'Pendapatan diakui berdasarkan jurnal transaksi yang telah diposting.',
                 'Aset kas meliputi akun dengan kode awalan 1.1.01.',
             ],
         ];

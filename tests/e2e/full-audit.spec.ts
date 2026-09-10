@@ -296,80 +296,8 @@ test.describe('D3 — Master Data (dev)', () => {
     });
 });
 
-test.describe('D4 — Lending', () => {
     test.beforeEach(async ({ page }) => { await loginAs(page, 'dev'); });
 
-    test('4.1 Loans tabs render (proposal/verifikasi/waiting/aktif/lunas)', async ({ page }) => {
-        const tabs = ['proposal', 'verifikasi', 'waiting', 'aktif', 'lunas'];
-        const results: string[] = [];
-        for (const t of tabs) {
-            const r = await page.request.get(`${BASE}/lending/loans?tab=${t}`).catch(() => null);
-            results.push(`${t}=${r?.status() ?? 'fail'}`);
-        }
-        const allOk = results.every((s) => /=[23]\d\d$/.test(s));
-        recordTest('lending', '4.1 Loans tabs', {
-            input: 'GET /lending/loans?tab={5}',
-            expected: 'all status 2xx/3xx',
-            actual: results.join(', '),
-            status: allOk ? 'PASS' : 'FAIL',
-        });
-        expect(allOk).toBeTruthy();
-    });
-
-    test('4.2 Loans create form loads', async ({ page }) => {
-        const resp = await gotoNoErr(page, `${BASE}/lending/loans/create`);
-        recordTest('lending', '4.2 Loans create form', {
-            input: 'GET /lending/loans/create',
-            expected: 'status < 500, form visible',
-            actual: `status=${resp?.status() ?? '?'}`,
-            status: resp && resp.status() < 500 ? 'PASS' : 'FAIL',
-        });
-        expect(resp?.status() ?? 999).toBeLessThan(500);
-    });
-
-    test('4.3 Lending reports: portfolio', async ({ page }) => {
-        const r = await page.request.get(`${BASE}/lending/reports/portfolio`);
-        recordTest('lending', '4.3 Lending portfolio', {
-            input: 'GET /lending/reports/portfolio',
-            expected: 'status < 500',
-            actual: `status=${r.status()}`,
-            status: r.status() < 500 ? 'PASS' : 'FAIL',
-        });
-        expect(r.status()).toBeLessThan(500);
-    });
-
-    test('4.4 Lending reports: lpp-desa', async ({ page }) => {
-        const r = await page.request.get(`${BASE}/lending/reports/lpp-desa`);
-        recordTest('lending', '4.4 Lending lpp-desa', {
-            input: 'GET /lending/reports/lpp-desa',
-            expected: 'status < 500',
-            actual: `status=${r.status()}`,
-            status: r.status() < 500 ? 'PASS' : 'FAIL',
-        });
-        expect(r.status()).toBeLessThan(500);
-    });
-
-    test('4.5 Lending reports: kolek-desa', async ({ page }) => {
-        const r = await page.request.get(`${BASE}/lending/reports/kolek-desa`);
-        recordTest('lending', '4.5 Lending kolek-desa', {
-            input: 'GET /lending/reports/kolek-desa',
-            expected: 'status < 500',
-            actual: `status=${r.status()}`,
-            status: r.status() < 500 ? 'PASS' : 'FAIL',
-        });
-        expect(r.status()).toBeLessThan(500);
-    });
-
-    test('4.6 Lending reports: cadangan-penghapusan', async ({ page }) => {
-        const r = await page.request.get(`${BASE}/lending/reports/cadangan-penghapusan`);
-        recordTest('lending', '4.6 Lending CKPN', {
-            input: 'GET /lending/reports/cadangan-penghapusan',
-            expected: 'status < 500',
-            actual: `status=${r.status()}`,
-            status: r.status() < 500 ? 'PASS' : 'FAIL',
-        });
-        expect(r.status()).toBeLessThan(500);
-    });
 });
 
 test.describe('D5 — Accounting', () => {

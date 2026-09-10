@@ -108,11 +108,11 @@ watch(selectedTenant, () => {
                     </div>
                     <div class="flex gap-3">
                         <span class="font-bold text-primary">3.</span>
-                        <p><strong>Pinjaman Bergulir:</strong> Dicatat sebesar nilai pokok pinjaman yang disalurkan kepada kelompok pemanfaat, dikurangi cadangan penyisihan penghapusan pinjaman ragu-ragu jika ada.</p>
+                        <p><strong>Aset Lainnya:</strong> Dicatat berdasarkan akun terkait dan dikurangi penyisihan kerugian aset sesuai kebijakan akuntansi.</p>
                     </div>
                     <div class="flex gap-3">
                         <span class="font-bold text-primary">4.</span>
-                        <p><strong>Pendapatan Jasa Pinjaman:</strong> Diakui saat angsuran diterima atau pada saat jatuh tempo tagihan sesuai jadwal pengembalian kelompok.</p>
+                        <p><strong>Pendapatan Operasional:</strong> Diakui berdasarkan transaksi yang telah diposting pada periode berjalan.</p>
                     </div>
                 </div>
             </AppCard>

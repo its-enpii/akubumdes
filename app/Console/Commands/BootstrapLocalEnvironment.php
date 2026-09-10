@@ -12,7 +12,6 @@ use App\Tenancy\Services\DefaultChartOfAccountsProvisioner;
 use App\Tenancy\Services\FiscalPeriodProvisioner;
 use App\Tenancy\Services\ShardConnectionManager;
 use App\Tenancy\Services\TenantGroupMasterDataProvisioner;
-use App\Tenancy\Services\TenantLoanProductProvisioner;
 use App\Tenancy\Services\TenantRegistrySynchronizer;
 use App\Tenancy\TenantContext;
 use Illuminate\Console\Command;
@@ -37,7 +36,6 @@ final class BootstrapLocalEnvironment extends Command
         TenantRegistrySynchronizer $registry,
         TenantContext $context,
         TenantGroupMasterDataProvisioner $groupMasterData,
-        TenantLoanProductProvisioner $loanProducts,
     ): int {
         if (! app()->environment(['local', 'testing'])) {
             throw new RuntimeException('sidbm:bootstrap-local is restricted to local/testing.');
@@ -81,9 +79,8 @@ final class BootstrapLocalEnvironment extends Command
             $this->info("Fiscal periods: opened {$created} month(s).");
 
             $groupMasterData->ensureDefaults();
-            $loanProducts->ensureDefaults();
             app(PermissionChecker::class)->ensureSystemRoles();
-            $this->info('Master data + loan products + roles ready.');
+            $this->info('Master data + roles ready.');
         } finally {
             $context->clear();
             $connections->disconnect();

@@ -16,7 +16,7 @@
             Pada hari ini, <b>{{ $date_formatted }}</b>, bertempat di Kantor {{ $identity['legal_name'] }} Kecamatan {{ $identity['district_name'] }}, telah diselenggarakan Musyawarah Antar Desa (MAD) Laporan Pertanggungjawaban Tahunan Periode Tahun Buku <b>{{ $year }}</b> yang dihadiri oleh Pengelola/Direksi, Badan Pengawas, Kepala Desa, dan perwakilan tokoh masyarakat desa se-Kecamatan {{ $identity['district_name'] }}.
         </p>
         <p>
-            Setelah melakukan pemeriksaan, klarifikasi, dan pembahasan terhadap seluruh berkas pembukuan, laporan posisi keuangan, arus kas, laba rugi, perkembangan piutang, dan catatan atas laporan keuangan (CALK), para pihak menyepakati dan menetapkan hal-hal sebagai berikut:
+            Setelah melakukan pemeriksaan, klarifikasi, dan pembahasan terhadap seluruh berkas pembukuan, laporan posisi keuangan, arus kas, laba rugi, dan catatan atas laporan keuangan (CALK), para pihak menyepakati dan menetapkan hal-hal sebagai berikut:
         </p>
         <ol style="margin-left: 20px;">
             <li>Menerima dan mengesahkan seluruh Laporan Keuangan dan Kinerja Usaha Periode Tahun Buku {{ $year }}.</li>

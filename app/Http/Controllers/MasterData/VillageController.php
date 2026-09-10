@@ -40,7 +40,7 @@ final class VillageController
                     'row_id', 'code', 'name', 'address', 'phone', 'is_active',
                     'village_head_name', 'village_head_phone', 'village_head_nip',
                     'village_secretary_name', 'village_secretary_phone',
-                    'village_council_name', 'installment_schedule', 'village_naming_id',
+                    'village_council_name', 'village_naming_id',
                 ]),
                 'village_naming' => $village->villageNaming?->only(['village_name', 'village_head_name']),
             ]);
@@ -64,7 +64,7 @@ final class VillageController
                 'row_id', 'code', 'name', 'address', 'phone', 'is_active',
                 'village_head_name', 'village_head_phone', 'village_head_nip',
                 'village_secretary_name', 'village_secretary_phone',
-                'village_council_name', 'installment_schedule', 'village_naming_id',
+                'village_council_name', 'village_naming_id',
             ]),
             'villageNamings' => VillageNaming::query()->active()
                 ->orderBy('village_name')

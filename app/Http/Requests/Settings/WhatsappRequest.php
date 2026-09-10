@@ -25,8 +25,6 @@ final class WhatsappRequest extends FormRequest
     {
         return [
             'pairing_phone' => 'nomor WhatsApp',
-            'template_billing' => 'pesan tagihan',
-            'template_installment' => 'pesan angsuran',
             'is_enabled' => 'Aktif',
         ];
     }

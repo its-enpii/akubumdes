@@ -1,6 +1,5 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
 import AppInput from '../../../Components/AppInput.vue';
@@ -18,24 +17,7 @@ const form = useForm({
     village_secretary_name: props.village.village_secretary_name || '',
     village_secretary_phone: props.village.village_secretary_phone || '',
     village_council_name: props.village.village_council_name || '',
-    installment_schedule: props.village.installment_schedule ?? 'follow_disbursement',
     village_naming_id: props.village.village_naming_id || '',
-});
-const installmentOptions = [
-    { value: 'follow_disbursement', label: 'Mengikuti tanggal cair' },
-    ...Array.from({ length: 31 }, (_, index) => ({
-        value: String(index + 1),
-        label: `Tanggal ${index + 1}`,
-    })),
-];
-const currentInstallment = computed({
-    get: () => {
-        const value = String(form.installment_schedule || '');
-        if (!/^\d+$/.test(value)) return value;
-        const number = Number(value);
-        return number >= 1 && number <= 31 ? String(number) : value;
-    },
-    set: (value) => { form.installment_schedule = value; },
 });
 
 function submit() {
@@ -83,7 +65,6 @@ function submit() {
                             <AppInput v-model="form.village_secretary_name" label="Nama Sekdes" icon="person" :error="form.errors.village_secretary_name" />
                             <AppInput v-model="form.village_secretary_phone" label="HP Sekdes" icon="phone" type="tel" :error="form.errors.village_secretary_phone" />
                             <AppInput v-model="form.village_council_name" label="Nama Ketua/LPMD/BPD" icon="groups" :error="form.errors.village_council_name" />
-                            <SmartSelect v-model="currentInstallment" label="Jadwal Angsuran Desa" :options="installmentOptions" placeholder="Pilih jadwal angsuran" required :error="form.errors.installment_schedule" />
                         </div>
                     </section>
 

@@ -475,7 +475,7 @@ function submitResetTraining() {
                         <p class="text-sm font-semibold text-error">Peringatan: Penghapusan Permanen (Hard Delete)</p>
                         <p class="mt-1 text-xs text-on-surface-variant">
                             Sebanyak <span class="font-bold text-primary">{{ selectedRowIds.length }} transaksi</span>
-                            akan <strong>dihapus bersih dari basis data</strong> (termasuk baris jurnal dan catatan angsuran).
+                            akan <strong>dihapus bersih dari basis data</strong> (termasuk baris jurnal).
                             Transaksi ini tidak akan muncul lagi di buku besar maupun laporan keuangan.
                         </p>
                     </div>

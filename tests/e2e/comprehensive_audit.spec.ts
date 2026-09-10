@@ -254,69 +254,6 @@ test.describe('7. Institutions', () => {
     });
 });
 
-/* ---- SECTION 8: LOANS ---- */
-test.describe('8. Loans', () => {
-    test.describe.configure({ mode: 'serial' });
-    test.beforeEach(async ({ page }) => { await loginAs(page, 'dev'); });
-
-    test('8.1 Proposal tab', async ({ page }) => {
-        await go(page, '/lending/loans?tab=proposal'); await noErr(page); await h1(page);
-    });
-    test('8.2 Verifikasi tab', async ({ page }) => {
-        await go(page, '/lending/loans?tab=verifikasi'); await noErr(page);
-    });
-    test('8.3 Waiting tab', async ({ page }) => {
-        await go(page, '/lending/loans?tab=waiting'); await noErr(page);
-    });
-    test('8.4 Aktif tab', async ({ page }) => {
-        await go(page, '/lending/loans?tab=aktif'); await noErr(page);
-    });
-    test('8.5 Lunas tab', async ({ page }) => {
-        await go(page, '/lending/loans?tab=lunas'); await noErr(page);
-    });
-    test('8.6 Create form', async ({ page }) => {
-        await go(page, '/lending/loans/create'); await noErr(page); await h1(page);
-    });
-    test('8.7 Search aktif tab', async ({ page }) => {
-        await go(page, '/lending/loans?tab=aktif');
-        const s = page.locator('input[placeholder*="Cari"], input[type="search"]').first();
-        if (await s.isVisible({ timeout: 3000 }).catch(() => false)) {
-            await s.fill('test'); await page.waitForTimeout(1000); await noErr(page);
-        }
-    });
-    test('8.8 Detail view', async ({ page }) => {
-        await go(page, '/lending/loans?tab=aktif');
-        const link = page.locator('a[href*="/lending/loans/"]').first();
-        if (await link.isVisible({ timeout: 5000 }).catch(() => false)) {
-            await link.click(); await page.waitForTimeout(1000); await noErr(page);
-        }
-    });
-});
-
-/* ---- SECTION 9: LENDING REPORTS ---- */
-test.describe('9. Lending Reports', () => {
-    test.beforeEach(async ({ page }) => { await loginAs(page, 'dev'); });
-
-    test('9.1 Portfolio', async ({ page }) => {
-        await go(page, '/lending/reports/portfolio'); await noErr(page); await h1(page);
-    });
-    test('9.2 Schedule vs Actual', async ({ page }) => {
-        await go(page, '/lending/reports/schedule-vs-actual'); await noErr(page);
-    });
-    test('9.3 LPP Desa', async ({ page }) => {
-        await go(page, '/lending/reports/lpp-desa'); await noErr(page);
-    });
-    test('9.4 LPP Kelompok', async ({ page }) => {
-        await go(page, '/lending/reports/lpp-kelompok'); await noErr(page);
-    });
-    test('9.5 Kolektibilitas', async ({ page }) => {
-        await go(page, '/lending/reports/kolek-desa'); await noErr(page);
-    });
-    test('9.6 CKPN', async ({ page }) => {
-        await go(page, '/lending/reports/cadangan-penghapusan'); await noErr(page);
-    });
-});
-
 /* ---- SECTION 10-14: ACCOUNTING ---- */
 test.describe('10. Accounting COA', () => {
     test.beforeEach(async ({ page }) => { await loginAs(page, 'dev'); });
@@ -402,7 +339,7 @@ test.describe('18. Settings', () => {
     });
     test('18.2 Switch tabs', async ({ page }) => {
         await go(page, '/settings'); await noErr(page);
-        for (const t of ['Sistem Pinjaman', 'Logo Lembaga', 'WhatsApp Gateway', 'Tanda Tangan']) {
+        for (const t of ['Logo Lembaga', 'WhatsApp Gateway', 'Tanda Tangan']) {
             const btn = page.locator('button:has-text("' + t + '")').first();
             if (await btn.isVisible({ timeout: 2000 }).catch(() => false)) {
                 await btn.click(); await page.waitForTimeout(300); await noErr(page);

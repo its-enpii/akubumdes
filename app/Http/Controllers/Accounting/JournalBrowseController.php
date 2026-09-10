@@ -52,12 +52,9 @@ final class JournalBrowseController
             ...$payload,
             'sourceOptions' => [
                 ['value' => 'all', 'label' => 'Semua sumber'],
-                ['value' => 'loan_installment', 'label' => 'Angsuran'],
-                ['value' => 'loan', 'label' => 'Pencairan'],
                 ['value' => 'manual', 'label' => 'Jurnal umum'],
                 ['value' => 'asset_purchase', 'label' => 'Pembelian Aset'],
                 ['value' => 'journal_reversal', 'label' => 'Reversal'],
-                ['value' => 'loan_write_off', 'label' => 'Penghapusan'],
                 ['value' => 'loan_reschedule_close', 'label' => 'Reschedule'],
                 ['value' => 'profit_allocation', 'label' => 'Alokasi laba'],
             ],
@@ -231,7 +228,7 @@ final class JournalBrowseController
 
         $rules = [
             'transaction_date' => ['required', 'date', 'before_or_equal:today'],
-            'transaction_type' => ['required', 'string', 'in:'.implode(',', array_merge(array_keys(JournalEntryOptionResolver::TYPES), ['pembelian_inventaris', 'angsuran']))],
+            'transaction_type' => ['required', 'string', 'in:'.implode(',', array_merge(array_keys(JournalEntryOptionResolver::TYPES), ['pembelian_inventaris']))],
             'description' => [$isInventory ? 'nullable' : 'required', 'string', 'max:500'],
             'reference' => ['nullable', 'string', 'max:100'],
             'amount' => ['required', 'numeric', 'min:1'],

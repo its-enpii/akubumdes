@@ -99,26 +99,6 @@ final class LegacyConnection
         return $this->suffixedTable('kelompok', $suffix);
     }
 
-    public function pinjamanKelompokTable(string|int $suffix): string
-    {
-        return $this->suffixedTable('pinjaman_kelompok', $suffix);
-    }
-
-    public function pinjamanAnggotaTable(string|int $suffix): string
-    {
-        return $this->suffixedTable('pinjaman_anggota', $suffix);
-    }
-
-    public function rencanaAngsuranTable(string|int $suffix): string
-    {
-        return $this->suffixedTable('rencana_angsuran', $suffix);
-    }
-
-    public function realAngsuranTable(string|int $suffix): string
-    {
-        return $this->suffixedTable('real_angsuran', $suffix);
-    }
-
     /**
      * @return list<object{COLUMN_NAME: string, DATA_TYPE: string, IS_NULLABLE: string, COLUMN_KEY: string}>
      */

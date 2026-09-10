@@ -46,8 +46,6 @@ final class TenantDataPurifierController extends Controller
             'sourceOptions' => [
                 ['value' => 'all', 'label' => 'Semua sumber'],
                 ['value' => 'manual', 'label' => 'Jurnal umum'],
-                ['value' => 'loan_installment', 'label' => 'Angsuran'],
-                ['value' => 'loan', 'label' => 'Pencairan'],
                 ['value' => 'asset_purchase', 'label' => 'Pembelian Aset'],
                 ['value' => 'journal_reversal', 'label' => 'Reversal'],
                 ['value' => 'loan_write_off', 'label' => 'Penghapusan'],
@@ -129,10 +127,9 @@ final class TenantDataPurifierController extends Controller
         return back()->with(
             'success',
             sprintf(
-                'Data transaksi berhasil dihapus permanen: %d jurnal, %d baris jurnal, %d catatan angsuran.',
+                'Data transaksi berhasil dihapus permanen: %d jurnal dan %d baris jurnal.',
                 $result['deleted_entries'],
                 $result['deleted_lines'],
-                $result['deleted_installments'],
             ),
         );
     }

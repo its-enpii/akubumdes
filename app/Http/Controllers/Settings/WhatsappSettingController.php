@@ -6,13 +6,11 @@ namespace App\Http\Controllers\Settings;
 
 use App\Domain\Access\Services\PermissionChecker;
 use App\Domain\Notifications\Models\WhatsappInstance;
-use App\Domain\Notifications\Services\WhatsappNotificationService;
 use App\Http\Requests\Settings\WhatsappInstanceRequest;
 use App\Services\TenantSettingService;
 use App\Services\WhatsappGatewayService;
 use App\Tenancy\Services\TenantSequenceService;
 use App\Tenancy\TenantContext;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -46,14 +44,8 @@ final class WhatsappSettingController
                 'enabled' => $this->gateway->isEnabled(),
                 'configured' => $this->gateway->isConfigured(),
                 'rotation_mode' => $this->gateway->getRotationMode(),
-                'template_billing' => (string) ($this->settings->get('whatsapp.template_billing', '') ?: ''),
-                'template_installment' => (string) ($this->settings->get('whatsapp.template_installment', '') ?: ''),
             ];
             $payload['baseUrl'] = rtrim((string) config('services.wa_gateway.base_url', ''), '/');
-        }
-
-        if ($canSend) {
-            $payload += $this->resolveBillingPayload($request);
         }
 
         return Inertia::render('Settings/Whatsapp/Hub', $payload);
@@ -158,14 +150,10 @@ final class WhatsappSettingController
         $this->authorizeSettings($request);
 
         $validated = $request->validate([
-            'template_billing' => ['nullable', 'string', 'max:2000'],
-            'template_installment' => ['nullable', 'string', 'max:2000'],
             'is_enabled' => ['nullable', 'boolean'],
             'rotation_mode' => ['nullable', 'string', 'in:round_robin,default_only'],
         ]);
 
-        $this->settings->set('whatsapp.template_billing', $validated['template_billing'] ?? '');
-        $this->settings->set('whatsapp.template_installment', $validated['template_installment'] ?? '');
         $this->gateway->setEnabled((bool) ($validated['is_enabled'] ?? false));
 
         if (array_key_exists('rotation_mode', $validated) && is_string($validated['rotation_mode'])) {
@@ -208,55 +196,6 @@ final class WhatsappSettingController
             ])
             ->values()
             ->all();
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function resolveBillingPayload(Request $request): array
-    {
-        $due = $this->resolveDueDate($request);
-        $items = app(WhatsappNotificationService::class)->dueOn($due);
-        $state = $this->gateway->isConfigured()
-            ? $this->gateway->connectionState()
-            : [
-                'success' => false,
-                'status' => 'unconfigured',
-                'message' => 'Gateway WhatsApp belum dikonfigurasi.',
-                'state' => null,
-                'instance' => $this->gateway->getInstance(),
-            ];
-
-        return [
-            'due_date' => $due->toDateString(),
-            'items' => $items,
-            'billing_gateway' => [
-                'enabled' => $this->gateway->isEnabled(),
-                'configured' => $this->gateway->isConfigured(),
-                'instance' => $this->gateway->getInstance(),
-                'state' => $state['state'] ?? null,
-                'status_message' => $state['message'] ?? null,
-            ],
-            'totals' => [
-                'count' => count($items),
-                'amount' => array_sum(array_column($items, 'amount')),
-                'with_phone' => count(array_filter($items, fn (array $item): bool => $item['can_send'])),
-            ],
-        ];
-    }
-
-    private function resolveDueDate(Request $request): CarbonImmutable
-    {
-        $raw = $request->query('due_date');
-        if (is_string($raw) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw)) {
-            try {
-                return CarbonImmutable::createFromFormat('Y-m-d', $raw)->startOfDay();
-            } catch (\Throwable) {
-                // fall through
-            }
-        }
-
-        return CarbonImmutable::today();
     }
 
     private function instancesTableExists(): bool

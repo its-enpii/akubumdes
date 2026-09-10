@@ -170,28 +170,6 @@ final class TenantOnboardingImportController extends Controller
         ));
     }
 
-    public function importActiveLoans(Tenant $tenant, Request $request, TenantOnboardingService $service): RedirectResponse
-    {
-        $request->validate([
-            'file' => ['required', 'file', 'mimes:csv,txt', 'max:10240'],
-        ]);
-
-        $userId = (int) $request->user()->row_id;
-        $result = $service->importActiveLoans($request->file('file'), $userId);
-
-        $msg = sprintf('Berhasil mengimpor %d pinjaman aktif.', $result['imported']);
-        if ($result['skipped'] > 0) {
-            $msg .= sprintf(' (%d dilewati)', $result['skipped']);
-        }
-
-        $redirect = redirect()->back()->with('success', $msg);
-        if ($result['errors'] !== []) {
-            $redirect->with('warning', 'Beberapa baris memiliki kesalahan: '.implode(' | ', array_slice($result['errors'], 0, 5)));
-        }
-
-        return $redirect;
-    }
-
     public function downloadTemplate(Tenant $tenant, string $type, TenantOnboardingService $service): StreamedResponse
     {
         return $service->downloadCsvTemplate($type);

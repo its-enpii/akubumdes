@@ -183,36 +183,6 @@ test.describe('HUMAN-LIKE E2E REAL AUDIT - ALL FEATURES & WORKFLOWS', () => {
         await expect(page.locator('h1')).toBeVisible();
     });
 
-    test('8. Human Interaction — Lending New Loan Proposal Submission', async ({ page }) => {
-        await loginAs(page, 'dev');
-        await page.goto(`${BASE}/lending/loans/create`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-
-        await selectSmartOption(page, 'Pilih kelompok');
-
-        const amountInput = page.getByLabel('Jumlah Pinjaman').first();
-        if (await amountInput.isVisible().catch(() => false)) {
-            await amountInput.fill('15000000');
-        }
-
-        const rateInput = page.getByLabel('Bunga').first();
-        if (await rateInput.isVisible().catch(() => false)) {
-            await rateInput.fill('1.2');
-        }
-
-        const saveBtn = page.locator('button:has-text("Simpan"), button:has-text("Ajukan")').first();
-        if (await saveBtn.isVisible().catch(() => false)) {
-            await saveBtn.click();
-            await page.waitForTimeout(2000);
-        }
-    });
-
-    test('9. Human Interaction — Lending Reports & NPF Portfolio Audit', async ({ page }) => {
-        await loginAs(page, 'dev');
-        await page.goto(`${BASE}/lending/reports`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-    });
-
     test('10. Human Interaction — Accounting Chart of Accounts Creation', async ({ page }) => {
         await loginAs(page, 'dev');
         await page.goto(`${BASE}/accounting/chart-of-accounts`, { waitUntil: 'domcontentloaded' });
@@ -258,7 +228,7 @@ test.describe('HUMAN-LIKE E2E REAL AUDIT - ALL FEATURES & WORKFLOWS', () => {
         await page.goto(`${BASE}/settings`, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('h1')).toBeVisible();
 
-        for (const tabName of ['Identitas Lembaga', 'Sistem Pinjaman', 'WhatsApp Gateway', 'Tanda Tangan']) {
+        for (const tabName of ['Identitas Lembaga', 'WhatsApp Gateway', 'Tanda Tangan']) {
             const tabBtn = page.locator(`button:has-text("${tabName}")`).first();
             if (await tabBtn.isVisible().catch(() => false)) {
                 await tabBtn.click();

@@ -110,8 +110,6 @@ final class WhatsappManagementTest extends TestCase
     public function test_can_update_global_whatsapp_settings(): void
     {
         $this->actingAs($this->user)->put('/settings/whatsapp/global', [
-            'template_billing' => 'Template tagihan khusus',
-            'template_installment' => 'Template angsuran khusus',
             'is_enabled' => true,
             'rotation_mode' => 'round_robin',
         ])->assertRedirect('/settings/whatsapp');

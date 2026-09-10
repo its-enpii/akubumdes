@@ -161,7 +161,7 @@ final class JournalBrowseService
                 'reversal' => $reversedOf[$rowId] ?? null,
                 'can_reverse' => $canReverse,
                 'can_edit' => $canEdit,
-                'receipt_url' => $this->receiptUrl($rowId, (string) ($e->source_type ?? ''), (string) ($e->description ?? '')),
+                'receipt_url' => null,
                 'cash_evidence_kind' => $this->cashEvidenceKind($sideCodes[$rowId] ?? ['debit' => null, 'credit' => null]),
                 'cash_evidence_url' => '/accounting/journals/'.$rowId.'/cash-evidence',
             ];
@@ -191,19 +191,6 @@ final class JournalBrowseService
         }
 
         return $fallback;
-    }
-
-    private function receiptUrl(int $rowId, string $sourceType, string $description): ?string
-    {
-        if ($sourceType === 'loan_installment') {
-            return '/accounting/journal-entries/'.$rowId.'/installment-receipt';
-        }
-        // Migrated angsuran journals keep source_type=legacy_transaksi
-        if ($sourceType === 'legacy_transaksi' && preg_match('/\bAngs\.?\b/iu', $description) === 1) {
-            return '/accounting/journal-entries/'.$rowId.'/installment-receipt';
-        }
-
-        return null;
     }
 
     /**

@@ -190,26 +190,12 @@ final class TenantRoleManagementController
                 ],
             ],
             [
-                'category' => 'lending',
-                'label' => 'Pinjaman (SIDBM)',
-                'icon' => 'account_balance',
-                'permissions' => [
-                    ['key' => 'loans.view', 'label' => 'Lihat Pinjaman & Laporan', 'description' => 'Melihat tahapan perguliran dan laporan pinjaman'],
-                    ['key' => 'loans.propose', 'label' => 'Input Proposal', 'description' => 'Mendaftarkan proposal pinjaman baru'],
-                    ['key' => 'loans.verify', 'label' => 'Verifikasi Pinjaman', 'description' => 'Melakukan verifikasi berkas dan lapangan'],
-                    ['key' => 'loans.approve', 'label' => 'Penetapan Alokasi', 'description' => 'Menetapkan persetujuan alokasi pinjaman'],
-                    ['key' => 'loans.disburse', 'label' => 'Pencairan Pinjaman', 'description' => 'Mencatat pencairan dana pinjaman ke kelompok'],
-                    ['key' => 'loans.manage', 'label' => 'Kelola & Reschedule', 'description' => 'Edit proposal, reschedule, dan penghapusan piutang'],
-                ],
-            ],
-            [
                 'category' => 'accounting',
                 'label' => 'Akuntansi & Keuangan',
                 'icon' => 'receipt_long',
                 'permissions' => [
                     ['key' => 'journals.view', 'label' => 'Lihat Jurnal & Akun', 'description' => 'Melihat daftar jurnal dan bagan akun (COA)'],
                     ['key' => 'journals.create', 'label' => 'Input Jurnal Umum', 'description' => 'Membuat dan memposting jurnal umum/pembuka'],
-                    ['key' => 'installments.record', 'label' => 'Catat Angsuran', 'description' => 'Mencatat pembayaran angsuran pinjaman'],
                     ['key' => 'assets.view', 'label' => 'Lihat Inventaris', 'description' => 'Melihat daftar inventaris barang dan aset'],
                     ['key' => 'assets.manage', 'label' => 'Kelola Inventaris', 'description' => 'Tambah, ubah, dan hapus aset inventaris'],
                     ['key' => 'period_close.view', 'label' => 'Lihat Tutup Buku', 'description' => 'Melihat status periode dan tutup buku'],

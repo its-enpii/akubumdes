@@ -152,9 +152,6 @@ const form = useForm({
     skip_coa: false,
     skip_accounting: false,
     skip_membership: false,
-    skip_lending: false,
-    skip_payment_progress: false,
-    skip_reconcile: false,
     skip_sequences: false,
     continue_on_error: false,
     no_fail_fast: false,
@@ -268,9 +265,6 @@ const retryRun = (run) => {
     form.skip_coa = Boolean(opts.skip_coa);
     form.skip_accounting = Boolean(opts.skip_accounting);
     form.skip_membership = Boolean(opts.skip_membership);
-    form.skip_lending = Boolean(opts.skip_lending);
-    form.skip_payment_progress = Boolean(opts.skip_payment_progress);
-    form.skip_reconcile = Boolean(opts.skip_reconcile);
     form.skip_sequences = Boolean(opts.skip_sequences);
 
     submitCutover();
@@ -560,9 +554,6 @@ const getStepStatusVariant = (status) => {
                                             <AppSwitch v-model="form.skip_coa" label="Lompati Bagan Akun (COA)" description="Skip COA Import" />
                                             <AppSwitch v-model="form.skip_accounting" label="Lompati Jurnal Akuntansi" description="Skip Accounting Jurnal" />
                                             <AppSwitch v-model="form.skip_membership" label="Lompati Keanggotaan" description="Skip Keanggotaan" />
-                                            <AppSwitch v-model="form.skip_lending" label="Lompati Data Pinjaman" description="Skip Pinjaman" />
-                                            <AppSwitch v-model="form.skip_payment_progress" label="Lompati Progress Angsuran" description="Skip Progress Angsuran" />
-                                            <AppSwitch v-model="form.skip_reconcile" label="Lompati Rekonsiliasi" description="Skip Rekonsiliasi" />
                                             <AppSwitch v-model="form.skip_sequences" label="Lompati Sequences" description="Skip Sequences" />
                                         </div>
                                     </div>

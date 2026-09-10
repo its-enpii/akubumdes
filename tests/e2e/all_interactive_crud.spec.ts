@@ -59,11 +59,6 @@ test.describe('2. Interactive Master Data & Operational Suite', () => {
         await expect(page.locator('h1')).toBeVisible();
     });
 
-    test('2.3. Lending - Loans List', async ({ page }) => {
-        await page.goto(`${BASE}/lending/loans`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-    });
-
     test('2.4. Accounting - Chart of Accounts List', async ({ page }) => {
         await page.goto(`${BASE}/accounting/chart-of-accounts`, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('h1')).toBeVisible();

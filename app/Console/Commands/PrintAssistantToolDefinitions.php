@@ -47,48 +47,6 @@ final class PrintAssistantToolDefinitions extends Command
                 ],
             ],
             [
-                'name' => 'groups_with_loans',
-                'description' => 'Daftar kelompok yang punya pinjaman workable (active/disbursed/ongoing/approved/funded) + ringkasan tanggungan. 1 query, bukan loop. Pakai ini untuk cek tanggungan banyak kelompok sekaligus.',
-                'requires_confirmation' => false,
-                'endpoint_url' => $base.'/api/assistant/tools/groups_with_loans',
-                'json_schema' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'query' => ['type' => 'string', 'description' => 'Filter nama/kode kelompok (min 2 char)'],
-                        'include_inactive_groups' => ['type' => 'boolean', 'description' => 'Default true. Set false untuk skip kelompok non-aktif.'],
-                    ],
-                ],
-            ],
-            [
-                'name' => 'search_loans',
-                'description' => 'Cari pinjaman by kelompok, anggota, atau nomor. Prefer status active/disbursed. Tiap item memuat next_installment (pokok/jasa sisa).',
-                'requires_confirmation' => false,
-                'endpoint_url' => $base.'/api/assistant/tools/search_loans',
-                'json_schema' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'group_query' => ['type' => 'string'],
-                        'member_query' => ['type' => 'string'],
-                        'loan_number' => ['type' => 'string'],
-                        'loan_row_id' => ['type' => 'integer'],
-                        'status' => ['type' => 'string', 'description' => 'Opsional filter status exact'],
-                    ],
-                ],
-            ],
-            [
-                'name' => 'get_loan',
-                'description' => 'Detail pinjaman + sisa pokok + next_installment + anggota kelompok.',
-                'requires_confirmation' => false,
-                'endpoint_url' => $base.'/api/assistant/tools/get_loan',
-                'json_schema' => [
-                    'type' => 'object',
-                    'required' => ['loan_row_id'],
-                    'properties' => [
-                        'loan_row_id' => ['type' => 'integer'],
-                    ],
-                ],
-            ],
-            [
                 'name' => 'list_accounts',
                 'description' => 'Daftar akun postable. Filter code_prefix, query nama (Bank Jateng, Kas Tunai), atau cash_only.',
                 'requires_confirmation' => false,
@@ -132,20 +90,8 @@ final class PrintAssistantToolDefinitions extends Command
                 ],
             ],
             [
-                'name' => 'list_due_billing',
-                'description' => 'Daftar tagihan angsuran jatuh tempo pada tanggal.',
-                'requires_confirmation' => false,
-                'endpoint_url' => $base.'/api/assistant/tools/list_due_billing',
-                'json_schema' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'due_date' => ['type' => 'string', 'description' => 'Y-m-d, default hari ini'],
-                    ],
-                ],
-            ],
-            [
                 'name' => 'search_journals',
-                'description' => 'Cari jurnal posted (koreksi/duplikat/angsuran salah). Filter tgl, amount, type, account_query, group_query (nama di desc/loan), recent. Item angsuran memuat loan+split pokok/jasa. possible_duplicate_of jika fingerprint sama.',
+                'description' => 'Cari jurnal posted untuk koreksi/duplikat. Filter tanggal, nominal, tipe transaksi, akun, deskripsi, dan periode terakhir.',
                 'requires_confirmation' => false,
                 'endpoint_url' => $base.'/api/assistant/tools/search_journals',
                 'json_schema' => [
@@ -157,12 +103,8 @@ final class PrintAssistantToolDefinitions extends Command
                         'date_to' => ['type' => 'string'],
                         'amount' => ['type' => 'number'],
                         'transaction_type' => ['type' => 'string'],
-                        'source_type' => ['type' => 'string', 'description' => 'loan_installment untuk angsuran'],
                         'query' => ['type' => 'string', 'description' => 'Cari di description'],
                         'account_query' => ['type' => 'string', 'description' => 'Nama/kode akun di lines'],
-                        'group_query' => ['type' => 'string', 'description' => 'Filter nama kelompok di deskripsi/loan'],
-                        'wrong_group_query' => ['type' => 'string'],
-                        'installments_only' => ['type' => 'boolean'],
                         'recent' => ['type' => 'boolean', 'description' => 'true = 2 hari terakhir'],
                         'created_by_user_id' => ['type' => 'integer'],
                         'exclude_reversed' => ['type' => 'boolean'],
@@ -202,7 +144,7 @@ final class PrintAssistantToolDefinitions extends Command
                                 'pembelian_aset_peralatan',
                                 'pembelian_inventaris',
                                 'penyusutan_inventaris',
-                                'cadangan_kerugian_piutang',
+                                'cadangan_kerugian_aset',
                             ],
                             'description' => 'Beli: pembelian_aset_* per jenis (tanah/gedung/kendaraan/peralatan). Legacy pembelian_inventaris masih diterima. Setor bank=pemindahan_saldo. Boleh kosong — server infer.',
                         ],
@@ -222,7 +164,7 @@ final class PrintAssistantToolDefinitions extends Command
             ],
             [
                 'name' => 'reverse_journal',
-                'description' => 'Rencana/batalkan jurnal posted. Default PREVIEW; post dengan confirm=true. Salah bank: correct_bank_account_query. Salah angsuran kelompok: wrong_group+correct_group/loan + repost. Duplikat: reverse tanpa repost. Multi → needs_clarification.',
+                'description' => 'Rencana/batalkan jurnal posted. Default PREVIEW; post dengan confirm=true. Salah bank dapat dikoreksi dengan repost. Duplikat: reverse tanpa repost. Multi → needs_clarification.',
                 'requires_confirmation' => true,
                 'endpoint_url' => $base.'/api/assistant/tools/reverse_journal',
                 'json_schema' => [
@@ -235,18 +177,10 @@ final class PrintAssistantToolDefinitions extends Command
                         'transaction_date' => ['type' => 'string', 'description' => 'Filter cari jurnal salah'],
                         'amount' => ['type' => 'number'],
                         'wrong_account_query' => ['type' => 'string', 'description' => 'Akun yang salah (mis. Bank Ops)'],
-                        'wrong_group_query' => ['type' => 'string', 'description' => 'Kelompok yang salah ter-input angsuran'],
                         'account_query' => ['type' => 'string'],
                         'query' => ['type' => 'string'],
                         'transaction_type' => ['type' => 'string'],
                         'recent' => ['type' => 'boolean'],
-                        'repost' => ['type' => 'boolean', 'description' => 'true = post entri/angsuran pengganti setelah reverse'],
-                        'repost_installment' => ['type' => 'boolean'],
-                        'correct_group_query' => ['type' => 'string', 'description' => 'Kelompok yang benar untuk angsuran'],
-                        'correct_loan_id' => ['type' => 'integer'],
-                        'correct_loan_row_id' => ['type' => 'integer'],
-                        'correct_member_query' => ['type' => 'string'],
-                        'member_query' => ['type' => 'string'],
                         'correct_bank_account_query' => ['type' => 'string', 'description' => 'Akun bank yang benar (mis. SPP)'],
                         'correct_account_query' => ['type' => 'string'],
                         'correct_debit_account_row_id' => ['type' => 'integer'],
@@ -259,59 +193,8 @@ final class PrintAssistantToolDefinitions extends Command
                 ],
             ],
             [
-                'name' => 'record_installment',
-                'description' => 'Rencana/catat angsuran. Default PREVIEW: pecahan pokok/jasa, sisa tagihan, kelebihan/kurang + options. Post hanya confirm=true. Kelebihan: allocation_choice=apply_excess_to_principal|cap_to_due|cancel. Ambiguitas → needs_clarification.',
-                'requires_confirmation' => true,
-                'endpoint_url' => $base.'/api/assistant/tools/record_installment',
-                'json_schema' => [
-                    'type' => 'object',
-                    'required' => ['transaction_date'],
-                    'properties' => [
-                        'confirm' => ['type' => 'boolean', 'description' => 'omit=preview; true=post'],
-                        'allocation_choice' => [
-                            'type' => 'string',
-                            'description' => 'apply_excess_to_principal | cap_to_due | cancel',
-                        ],
-                        'transaction_date' => ['type' => 'string', 'description' => 'YYYY-MM-DD'],
-                        'loan_id' => ['type' => 'integer', 'description' => 'loans.row_id — opsional jika ada group/member query'],
-                        'loan_row_id' => ['type' => 'integer'],
-                        'group_query' => ['type' => 'string'],
-                        'member_query' => ['type' => 'string', 'description' => 'Nama penyetor'],
-                        'total_amount' => ['type' => 'number', 'description' => 'Total bayar; dipecah pokok+jasa dari jadwal'],
-                        'amount' => ['type' => 'number', 'description' => 'Alias total_amount'],
-                        'installment_number' => ['type' => 'integer'],
-                        'principal_amount' => ['type' => 'number'],
-                        'interest_amount' => ['type' => 'number'],
-                        'penalty_amount' => ['type' => 'number'],
-                        'cash_account_row_id' => ['type' => 'integer'],
-                        'cash_account_query' => ['type' => 'string', 'description' => 'Default Kas Tunai'],
-                        'description' => ['type' => 'string'],
-                        'reference' => ['type' => 'integer', 'description' => 'member_row_id penyetor'],
-                        'member_row_id' => ['type' => 'integer'],
-                    ],
-                ],
-            ],
-            [
-                'name' => 'send_billing_notices',
-                'description' => 'Rencana/kirim WA tagihan. Default PREVIEW; kirim dengan confirm=true.',
-                'requires_confirmation' => true,
-                'endpoint_url' => $base.'/api/assistant/tools/send_billing_notices',
-                'json_schema' => [
-                    'type' => 'object',
-                    'required' => ['due_date', 'installment_row_ids'],
-                    'properties' => [
-                        'confirm' => ['type' => 'boolean'],
-                        'due_date' => ['type' => 'string'],
-                        'installment_row_ids' => [
-                            'type' => 'array',
-                            'items' => ['type' => 'integer'],
-                        ],
-                    ],
-                ],
-            ],
-            [
                 'name' => 'download_report',
-                'description' => 'Menghasilkan tombol/link direct download untuk laporan keuangan (Neraca, Laba Rugi, Arus Kas, Buku Besar, Jurnal, dll) dan laporan pinjaman (Portofolio, LPP, Kolektibilitas, dll) dalam format PDF atau Excel.',
+                'description' => 'Menghasilkan tombol/link direct download untuk laporan keuangan (Neraca, Laba Rugi, Arus Kas, Buku Besar, Jurnal, dll) dalam format PDF atau Excel.',
                 'requires_confirmation' => false,
                 'endpoint_url' => $base.'/api/assistant/tools/download_report',
                 'json_schema' => [
@@ -320,7 +203,7 @@ final class PrintAssistantToolDefinitions extends Command
                     'properties' => [
                         'report_type' => [
                             'type' => 'string',
-                            'description' => 'balance_sheet, income_statement, cash_flow, trial_balance, equity_change, calk, general_ledger, journals, financial_health, fixed_assets, portfolio, schedule_vs_actual, lpp_desa, lpp_kelompok, kolek_desa, cadangan_penghapusan, members, groups',
+                            'description' => 'balance_sheet, income_statement, cash_flow, trial_balance, equity_change, calk, general_ledger, journals, fixed_assets, members, groups',
                         ],
                         'format' => [
                             'type' => 'string',

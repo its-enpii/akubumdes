@@ -29,10 +29,9 @@ const activeTab = ref('balances');
 const wizardTabs = [
     { key: 'balances', label: '1. Saldo Awal Keuangan (Neraca)' },
     { key: 'masterdata', label: '2. Impor Anggota & Kelompok' },
-    { key: 'loans', label: '3. Impor Pinjaman Aktif & Angsuran' },
-    { key: 'templates', label: '4. Template File Excel/CSV' },
-    { key: 'manual-opening', label: '5. Saldo Awal Manual per Tahun' },
-    { key: 'aggregate-journal', label: '6. Jurnal Agregat Mid-Year' },
+    { key: 'templates', label: '3. Template File Excel/CSV' },
+    { key: 'manual-opening', label: '4. Saldo Awal Manual per Tahun' },
+    { key: 'aggregate-journal', label: '5. Jurnal Agregat Mid-Year' },
 ];
 
 // ============================================================
@@ -221,7 +220,6 @@ const submitAggregateJournal = () => {
 
 const memberFileForm = useForm({ file: null });
 const groupFileForm = useForm({ file: null });
-const loanFileForm = useForm({ file: null });
 
 const uploadMembers = () => {
     if (!memberFileForm.file) return;
@@ -239,13 +237,6 @@ const uploadGroups = () => {
     });
 };
 
-const uploadLoans = () => {
-    if (!loanFileForm.file) return;
-    loanFileForm.post(`${baseUrl.value}/onboarding/active-loans`, {
-        preserveScroll: true,
-        onSuccess: () => loanFileForm.reset(),
-    });
-};
 </script>
 
 <template>
@@ -262,7 +253,7 @@ const uploadLoans = () => {
                         </span>
                         <h1 class="mt-2 text-2xl font-bold">Migrasi Data & Saldo Awal Mandiri</h1>
                         <p class="mt-1 max-w-2xl text-sm text-on-primary-container">
-                            Impor neraca keuangan awal, daftar kelompok, keanggotaan, dan portofolio pinjaman aktif beserta akumulasi angsurannya.
+                            Impor neraca keuangan awal, daftar kelompok, keanggotaan, saldo awal manual, dan jurnal agregat.
                         </p>
                     </div>
                 </div>
@@ -441,49 +432,6 @@ const uploadLoans = () => {
                 </AppCard>
             </div>
 
-            <!-- TAB 3: Impor Pinjaman Aktif -->
-            <div v-if="activeTab === 'loans'" class="space-y-6">
-                <AppCard>
-                    <template #header>
-                        <h2 class="text-lg font-semibold text-primary">Impor Portofolio Pinjaman Aktif & Akumulasi Realisasi Angsuran</h2>
-                    </template>
-                    <div class="space-y-4 text-xs text-on-surface-variant">
-                        <p>
-                            Fitur ini digunakan untuk mengimpor pinjaman berjalan beserta <strong>akumulasi pokok & bunga yang sudah terbayar</strong> sampai hari ini. Sistem akan secara otomatis mengalokasikan angsuran FIFO pada jadwal bulanan dan menghitung sisa tagihan berjalan.
-                        </p>
-
-                        <div class="rounded-lg bg-secondary-container p-4 border border-secondary text-on-secondary-container">
-                            <h4 class="font-bold text-sm">?? Alokasi Otomatis Angsuran Terbayar:</h4>
-                            <ul class="list-disc pl-5 mt-1 space-y-1">
-                                <li>Nilai <code class="font-mono font-bold">akumulasi_pokok_dibayar</code> dan <code class="font-mono font-bold">akumulasi_bunga_dibayar</code> diisi total akumulasi pembayaran hingga saat migrasi.</li>
-                                <li>Sistem membagi jadwal angsuran 1..N bulan dan mengisi status <span class="font-bold text-secondary">Lunas (Paid)</span> untuk bulan-bulan yang sudah tercukupi.</li>
-                                <li>Sisa pokok & sisa bunga yang belum terbayar akan otomatis masuk ke tagihan berjalan.</li>
-                            </ul>
-                        </div>
-
-                        <form @submit.prevent="uploadLoans" class="space-y-4 pt-2">
-                            <div>
-                                <label class="block text-xs font-semibold text-on-surface mb-1">Pilih File CSV Pinjaman Aktif & Angsuran:</label>
-                                <input
-                                    type="file"
-                                    accept=".csv"
-                                    @change="e => loanFileForm.file = e.target.files[0]"
-                                    class="block w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-primary hover:file:bg-primary-fixed"
-                                />
-                            </div>
-                            <div class="flex justify-between items-center pt-2">
-                                <a :href="`${baseUrl}/onboarding/templates/pinjaman-aktif`" class="text-xs text-secondary hover:underline font-semibold">
-                                    ?? Download Format Template CSV Pinjaman Aktif (.csv)
-                                </a>
-                                <AppButton type="submit" variant="primary" size="sm" :disabled="!loanFileForm.file || loanFileForm.processing">
-                                    Upload & Impor Pinjaman Aktif
-                                </AppButton>
-                            </div>
-                        </form>
-                    </div>
-                </AppCard>
-            </div>
-
             <!-- TAB 4: Download Seluruh Template -->
             <div v-if="activeTab === 'templates'" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <AppCard class="hover:border-primary transition-colors">
@@ -502,12 +450,6 @@ const uploadLoans = () => {
                     <h3 class="font-bold text-sm text-primary">3. Template Kelompok</h3>
                     <p class="text-xs text-on-surface-variant mt-1">Format nama kelompok, alamat, desa, pengurus.</p>
                     <a :href="`${baseUrl}/onboarding/templates/kelompok`" class="mt-4 inline-block text-xs font-semibold text-secondary">?? Download CSV Template</a>
-                </AppCard>
-
-                <AppCard class="hover:border-primary transition-colors">
-                    <h3 class="font-bold text-sm text-primary">4. Template Pinjaman Aktif & Angsuran</h3>
-                    <p class="text-xs text-on-surface-variant mt-1">Format portofolio pinjaman berjalan & akumulasi angsuran.</p>
-                    <a :href="`${baseUrl}/onboarding/templates/pinjaman-aktif`" class="mt-4 inline-block text-xs font-semibold text-secondary">?? Download CSV Template</a>
                 </AppCard>
 
                 <AppCard class="hover:border-primary transition-colors">
@@ -656,7 +598,7 @@ const uploadLoans = () => {
                                 <p class="font-bold">Cara Pakai:</p>
                                 <ol class="list-decimal pl-5 mt-1 space-y-1">
                                     <li>Set <code>transaction_date</code> = tanggal join (mis. 2026-06-01).</li>
-                                    <li>Tambah baris untuk setiap akun yang berubah (Kas debit, Piutang/Modal/Pendapatan credit, dll).</li>
+                                    <li>Tambah baris untuk setiap akun yang berubah (Kas debit, Modal/Pendapatan credit, dll).</li>
                                     <li>Total Debit HARUS = Total Kredit.</li>
                                     <li>Submit — jurnal akan di-post lewat <code>JournalPostingService</code> (validasi period open otomatis).</li>
                                 </ol>
@@ -776,5 +718,3 @@ const uploadLoans = () => {
         </div>
     </AuthenticatedLayout>
 </template>
-
-

@@ -12,12 +12,7 @@ use App\Domain\Accounting\Services\JournalPostingService;
 use App\Domain\Accounting\Services\JournalReversalService;
 use App\Domain\Assets\Models\Asset;
 use App\Domain\Assets\Services\AssetService;
-use App\Domain\Lending\Models\Loan;
-use App\Domain\Lending\Models\LoanProduct;
-use App\Domain\Lending\Services\LoanService;
-use App\Domain\Lending\Services\LoanSimulationService;
 use App\Domain\Membership\Models\Member;
-use App\Domain\Notifications\Services\WhatsappNotificationService;
 use App\Http\Requests\Accounting\JournalEntryRequest;
 use App\Models\User;
 use App\Tenancy\TenantContext;
@@ -41,18 +36,8 @@ final class AssistantToolService
         private readonly TenantContext $context,
         private readonly JournalPostingService $journalPosting,
         private readonly JournalReversalService $journalReversal,
-        private readonly LoanService $loans,
-        private readonly LoanSimulationService $loanSimulator,
-        private readonly WhatsappNotificationService $notices,
     ) {}
 
-    /**
-     * Run a tool by name. Used by ToolHandler classes (one per tool) and
-     * by the legacy AssistantToolController — kept as the single entry point.
-     *
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     */
     public function dispatch(string $tool, array $params, User $actor): array
     {
         $required = config('permissions.tool_map.'.$tool);
@@ -63,20 +48,13 @@ final class AssistantToolService
         return match ($tool) {
             'search_members' => $this->searchMembers($params),
             'search_groups' => $this->searchGroups($params),
-            'groups_with_loans' => $this->groupsWithLoans($params),
-            'search_loans' => $this->searchLoans($params),
-            'get_loan' => $this->getLoan($params),
             'list_accounts' => $this->listAccounts($params),
             'search_journals' => $this->searchJournals($params),
             'search_assets' => $this->searchAssets($params),
             'get_asset' => $this->getAsset($params),
-            'list_due_billing' => $this->listDueBilling($params),
             'create_journal_entry' => $this->createJournalEntry($params, $actor),
             'reverse_journal' => $this->reverseJournal($params, $actor),
-            'record_installment' => $this->recordInstallment($params, $actor),
-            'send_billing_notices' => $this->sendBillingNotices($params),
             'download_report' => $this->downloadReport($params),
-            'simulate_loan' => $this->simulateLoan($params),
             default => throw new RuntimeException("Unknown tool: {$tool}"),
         };
     }
@@ -85,34 +63,23 @@ final class AssistantToolService
      * Same as dispatch() but without permission check — used by Sidbm
      * handlers where permissions are already enforced upstream.
      *
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     */
     public function execute(string $tool, array $params, User $actor): array
     {
         return match ($tool) {
             'search_members' => $this->searchMembers($params),
             'search_groups' => $this->searchGroups($params),
-            'groups_with_loans' => $this->groupsWithLoans($params),
-            'search_loans' => $this->searchLoans($params),
-            'get_loan' => $this->getLoan($params),
             'list_accounts' => $this->listAccounts($params),
             'search_journals' => $this->searchJournals($params),
             'search_assets' => $this->searchAssets($params),
             'get_asset' => $this->getAsset($params),
-            'list_due_billing' => $this->listDueBilling($params),
             'create_journal_entry' => $this->createJournalEntry($params, $actor),
             'reverse_journal' => $this->reverseJournal($params, $actor),
-            'record_installment' => $this->recordInstallment($params, $actor),
-            'send_billing_notices' => $this->sendBillingNotices($params),
             'download_report' => $this->downloadReport($params),
-            'simulate_loan' => $this->simulateLoan($params),
             default => throw new RuntimeException("Unknown tool: {$tool}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
      * @return array{items: list<array<string, mixed>>, match_count: int, needs_clarification: bool}
      */
     public function searchAssets(array $params): array
@@ -175,9 +142,6 @@ final class AssistantToolService
     }
 
     /**
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     */
     public function getAsset(array $params): array
     {
         $rowId = (int) ($params['asset_row_id'] ?? $params['row_id'] ?? 0);
@@ -201,6 +165,7 @@ final class AssistantToolService
 
     /**
      * @param  array<string, mixed>  $params
+     * @return array<string, mixed>
      * @return array{items: list<array<string, mixed>>, match_count: int, needs_clarification: bool}
      */
     public function searchMembers(array $params): array
@@ -265,11 +230,6 @@ final class AssistantToolService
 
         return $this->withMatchMeta($items);
     }
-
-    /**
-     * @param  array<string, mixed>  $params
-     * @return array{items: list<array<string, mixed>>, match_count: int, needs_clarification: bool}
-     */
     public function searchGroups(array $params): array
     {
         $q = trim((string) ($params['query'] ?? ''));
@@ -302,368 +262,6 @@ final class AssistantToolService
         return $this->withMatchMeta($items);
     }
 
-    /**
-     * List groups with workable-loan summary in one shot.
-     * Loan-status filter follows searchLoans() workable set (active/disbursed/ongoing/approved/funded).
-     * Group status untouched unless include_inactive_groups=false.
-     *
-     * @param  array<string, mixed>  $params
-     * @return array{items: list<array<string, mixed>>, match_count: int, needs_clarification: bool}
-     */
-    public function groupsWithLoans(array $params): array
-    {
-        $q = trim((string) ($params['query'] ?? $params['name'] ?? ''));
-        $includeInactive = filter_var($params['include_inactive_groups'] ?? true, FILTER_VALIDATE_BOOLEAN);
-        $workable = ['active', 'disbursed', 'ongoing', 'approved', 'funded'];
-        $tenantId = $this->context->id();
-
-        $base = DB::connection('tenant')
-            ->table('groups as g')
-            ->where('g.tenant_id', $tenantId)
-            ->whereNull('g.deleted_at');
-
-        if (! $includeInactive) {
-            $base->where('g.status', 'active');
-        }
-
-        if (mb_strlen($q) >= 2) {
-            $base->where(function ($w) use ($q): void {
-                $w->where('g.name', 'like', '%'.$q.'%')->orWhere('g.code', 'like', '%'.$q.'%');
-            });
-        }
-
-        // Aggregate workable loans per group + member count with any loan.
-        $rows = $base
-            ->leftJoin('loan_borrowers as lb', function ($join) use ($tenantId): void {
-                $join->on('lb.group_row_id', '=', 'g.row_id')->where('lb.tenant_id', '=', $tenantId);
-            })
-            ->leftJoin('loans as l', function ($join) use ($tenantId, $workable): void {
-                $join->on('l.row_id', '=', 'lb.loan_row_id')
-                    ->where('l.tenant_id', '=', $tenantId)
-                    ->whereIn('l.status', $workable);
-            })
-            ->leftJoin('loan_installments as li', function ($join) use ($tenantId): void {
-                $join->on('li.loan_row_id', '=', 'l.row_id')
-                    ->where('li.tenant_id', '=', $tenantId)
-                    ->where('li.component', 'principal');
-            })
-            ->selectRaw('
-                g.row_id as group_row_id, g.code, g.name, g.status, g.phone,
-                COUNT(DISTINCT l.row_id) as active_loan_count,
-                COALESCE(SUM(l.principal_amount), 0) as principal_total,
-                COALESCE(SUM(li.principal_paid), 0) as principal_paid_total
-            ')
-            ->groupBy('g.row_id', 'g.code', 'g.name', 'g.status', 'g.phone')
-            ->havingRaw('COUNT(DISTINCT l.row_id) > 0')
-            ->orderByDesc('active_loan_count')
-            ->orderBy('g.name')
-            ->limit(50)
-            ->get();
-
-        // Members with loan (distinct per group) — one extra cheap query, not per-group.
-        $memberLoanCounts = [];
-        if ($rows->isNotEmpty()) {
-            $groupIds = $rows->pluck('group_row_id')->all();
-            $memberLoanCounts = DB::connection('tenant')
-                ->table('loan_borrowers as lb')
-                ->join('loans as l', function ($join) use ($tenantId, $workable): void {
-                    $join->on('l.row_id', '=', 'lb.loan_row_id')
-                        ->where('l.tenant_id', '=', $tenantId)
-                        ->whereIn('l.status', $workable);
-                })
-                ->where('lb.tenant_id', $tenantId)
-                ->whereIn('lb.group_row_id', $groupIds)
-                ->selectRaw('lb.group_row_id, COUNT(DISTINCT lb.member_row_id) as members_with_loan')
-                ->groupBy('lb.group_row_id')
-                ->pluck('members_with_loan', 'lb.group_row_id')
-                ->all();
-        }
-
-        $items = $rows->map(function ($r) use ($memberLoanCounts): array {
-            $paid = (float) $r->principal_paid_total;
-            $total = (float) $r->principal_total;
-
-            return [
-                'group_row_id' => (int) $r->group_row_id,
-                'code' => (string) ($r->code ?? ''),
-                'name' => (string) $r->name,
-                'status' => (string) $r->status,
-                'phone' => $r->phone ? (string) $r->phone : null,
-                'active_loan_count' => (int) $r->active_loan_count,
-                'principal_total' => round($total, 2),
-                'principal_outstanding' => round($total - $paid, 2),
-                'members_with_loan' => (int) ($memberLoanCounts[(int) $r->group_row_id] ?? 0),
-                'href' => '/master-data/groups/'.((string) ($r->code ?? '')),
-            ];
-        })->all();
-
-        return $this->withMatchMeta($items);
-    }
-
-    /**
-     * Find loans by group/member/loan number. Prefer active/disbursed.
-     *
-     * @param  array<string, mixed>  $params
-     * @return array{items: list<array<string, mixed>>, match_count: int, needs_clarification: bool}
-     */
-    public function searchLoans(array $params): array
-    {
-        $groupQ = trim((string) ($params['group_query'] ?? $params['group_name'] ?? ''));
-        $memberQ = trim((string) ($params['member_query'] ?? $params['member_name'] ?? ''));
-        $loanNumber = trim((string) ($params['loan_number'] ?? ''));
-        $loanId = (int) ($params['loan_row_id'] ?? $params['loan_id'] ?? 0);
-        $status = trim((string) ($params['status'] ?? ''));
-
-        if ($loanId <= 0 && $groupQ === '' && $memberQ === '' && $loanNumber === '') {
-            throw ValidationException::withMessages([
-                'query' => 'Berikan group_query, member_query, loan_number, atau loan_row_id',
-            ]);
-        }
-
-        $tenantId = $this->context->id();
-        $q = DB::connection('tenant')
-            ->table('loans as l')
-            ->leftJoin('loan_borrowers as lb', function ($join) use ($tenantId): void {
-                $join->on('lb.loan_row_id', '=', 'l.row_id')
-                    ->where('lb.tenant_id', '=', $tenantId);
-            })
-            ->leftJoin('groups as g', function ($join) use ($tenantId): void {
-                $join->on('g.row_id', '=', 'lb.group_row_id')
-                    ->where('g.tenant_id', '=', $tenantId);
-            })
-            ->leftJoin('loan_products as p', function ($join) use ($tenantId): void {
-                $join->on('p.row_id', '=', 'l.loan_product_row_id')
-                    ->where('p.tenant_id', '=', $tenantId);
-            })
-            ->where('l.tenant_id', $tenantId);
-
-        if ($loanId > 0) {
-            $q->where('l.row_id', $loanId);
-        }
-        if ($loanNumber !== '') {
-            $q->where('l.loan_number', 'like', '%'.$loanNumber.'%');
-        }
-        if ($groupQ !== '') {
-            $q->where(function ($w) use ($groupQ): void {
-                $w->where('g.name', 'like', '%'.$groupQ.'%')
-                    ->orWhere('g.code', 'like', '%'.$groupQ.'%');
-            });
-        }
-        if ($memberQ !== '') {
-            $q->leftJoin('members as m', function ($join) use ($tenantId): void {
-                $join->on('m.row_id', '=', 'lb.member_row_id')
-                    ->where('m.tenant_id', '=', $tenantId);
-            })->leftJoin('people as pe', function ($join) use ($tenantId): void {
-                $join->on('pe.row_id', '=', 'm.person_row_id')
-                    ->where('pe.tenant_id', '=', $tenantId);
-            })->where('pe.full_name', 'like', '%'.$memberQ.'%');
-        }
-        if ($status !== '') {
-            $q->where('l.status', $status);
-        } else {
-            // Prefer workable loans; still return drafts if nothing else matches later.
-            $q->whereIn('l.status', ['active', 'disbursed', 'ongoing', 'approved', 'funded']);
-        }
-
-        $rows = $q->orderByRaw("FIELD(l.status,'active','disbursed','ongoing','funded','approved','verified','waiting','draft')")
-            ->orderByDesc('l.row_id')
-            ->limit(20)
-            ->get([
-                'l.row_id as loan_row_id',
-                'l.id as loan_id',
-                'l.loan_number',
-                'l.status',
-                'l.principal_amount',
-                'l.disbursed_at',
-                'p.code as product_code',
-                'p.name as product_name',
-                'lb.group_row_id',
-                'lb.member_row_id',
-                'g.name as group_name',
-                'g.code as group_code',
-            ]);
-
-        // Fallback: if status filter empty and no hits, retry without status filter.
-        if ($rows->isEmpty() && $status === '') {
-            $params['status'] = '*';
-            // Re-run loose: any status
-            $paramsLoose = $params;
-            unset($paramsLoose['status']);
-            $paramsLoose['status'] = '__any__';
-
-            return $this->searchLoansAnyStatus($paramsLoose);
-        }
-
-        $items = $rows->map(function ($r): array {
-            $loanRowId = (int) $r->loan_row_id;
-            $next = $this->nextOpenInstallment($loanRowId);
-
-            return [
-                'loan_row_id' => $loanRowId,
-                'loan_id' => (int) $r->loan_id,
-                'loan_number' => $r->loan_number,
-                'status' => (string) $r->status,
-                'principal_amount' => (float) $r->principal_amount,
-                'product_code' => $r->product_code ? (string) $r->product_code : null,
-                'product_name' => $r->product_name ? (string) $r->product_name : null,
-                'group_row_id' => $r->group_row_id ? (int) $r->group_row_id : null,
-                'group_name' => $r->group_name ? (string) $r->group_name : null,
-                'group_code' => $r->group_code ? (string) $r->group_code : null,
-                'member_row_id' => $r->member_row_id ? (int) $r->member_row_id : null,
-                'disbursed_at' => $r->disbursed_at ? (string) $r->disbursed_at : null,
-                'next_installment' => $next,
-            ];
-        })->all();
-
-        return $this->withMatchMeta($items);
-    }
-
-    /**
-     * @param  array<string, mixed>  $params
-     * @return array{items: list<array<string, mixed>>, match_count: int, needs_clarification: bool}
-     */
-    private function searchLoansAnyStatus(array $params): array
-    {
-        $params['status'] = ''; // will be treated specially
-        // Direct rebuild without preferred status filter — set a sentinel.
-        $groupQ = trim((string) ($params['group_query'] ?? $params['group_name'] ?? ''));
-        $memberQ = trim((string) ($params['member_query'] ?? $params['member_name'] ?? ''));
-        $loanNumber = trim((string) ($params['loan_number'] ?? ''));
-        $loanId = (int) ($params['loan_row_id'] ?? $params['loan_id'] ?? 0);
-        $tenantId = $this->context->id();
-
-        $q = DB::connection('tenant')
-            ->table('loans as l')
-            ->leftJoin('loan_borrowers as lb', function ($join) use ($tenantId): void {
-                $join->on('lb.loan_row_id', '=', 'l.row_id')->where('lb.tenant_id', '=', $tenantId);
-            })
-            ->leftJoin('groups as g', function ($join) use ($tenantId): void {
-                $join->on('g.row_id', '=', 'lb.group_row_id')->where('g.tenant_id', '=', $tenantId);
-            })
-            ->leftJoin('loan_products as p', function ($join) use ($tenantId): void {
-                $join->on('p.row_id', '=', 'l.loan_product_row_id')->where('p.tenant_id', '=', $tenantId);
-            })
-            ->where('l.tenant_id', $tenantId);
-
-        if ($loanId > 0) {
-            $q->where('l.row_id', $loanId);
-        }
-        if ($loanNumber !== '') {
-            $q->where('l.loan_number', 'like', '%'.$loanNumber.'%');
-        }
-        if ($groupQ !== '') {
-            $q->where(function ($w) use ($groupQ): void {
-                $w->where('g.name', 'like', '%'.$groupQ.'%')->orWhere('g.code', 'like', '%'.$groupQ.'%');
-            });
-        }
-        if ($memberQ !== '') {
-            $q->leftJoin('members as m', function ($join) use ($tenantId): void {
-                $join->on('m.row_id', '=', 'lb.member_row_id')->where('m.tenant_id', '=', $tenantId);
-            })->leftJoin('people as pe', function ($join) use ($tenantId): void {
-                $join->on('pe.row_id', '=', 'm.person_row_id')->where('pe.tenant_id', '=', $tenantId);
-            })->where('pe.full_name', 'like', '%'.$memberQ.'%');
-        }
-
-        $rows = $q->orderByDesc('l.row_id')->limit(20)->get([
-            'l.row_id as loan_row_id',
-            'l.id as loan_id',
-            'l.loan_number',
-            'l.status',
-            'l.principal_amount',
-            'l.disbursed_at',
-            'p.code as product_code',
-            'p.name as product_name',
-            'lb.group_row_id',
-            'lb.member_row_id',
-            'g.name as group_name',
-            'g.code as group_code',
-        ]);
-
-        $items = $rows->map(function ($r): array {
-            $loanRowId = (int) $r->loan_row_id;
-
-            return [
-                'loan_row_id' => $loanRowId,
-                'loan_id' => (int) $r->loan_id,
-                'loan_number' => $r->loan_number,
-                'status' => (string) $r->status,
-                'principal_amount' => (float) $r->principal_amount,
-                'product_code' => $r->product_code ? (string) $r->product_code : null,
-                'product_name' => $r->product_name ? (string) $r->product_name : null,
-                'group_row_id' => $r->group_row_id ? (int) $r->group_row_id : null,
-                'group_name' => $r->group_name ? (string) $r->group_name : null,
-                'group_code' => $r->group_code ? (string) $r->group_code : null,
-                'member_row_id' => $r->member_row_id ? (int) $r->member_row_id : null,
-                'disbursed_at' => $r->disbursed_at ? (string) $r->disbursed_at : null,
-                'next_installment' => $this->nextOpenInstallment($loanRowId),
-            ];
-        })->all();
-
-        return $this->withMatchMeta($items);
-    }
-
-    /**
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     */
-    public function getLoan(array $params): array
-    {
-        $loanId = (int) ($params['loan_row_id'] ?? $params['loan_id'] ?? 0);
-        if ($loanId <= 0) {
-            throw ValidationException::withMessages(['loan_row_id' => 'required']);
-        }
-
-        $loan = Loan::query()
-            ->with(['product:row_id,code,name', 'borrower.group:row_id,name,phone,code'])
-            ->where('row_id', $loanId)
-            ->firstOrFail();
-
-        $tenantId = $this->context->id();
-        $paid = (float) DB::connection('tenant')
-            ->table('loan_installments')
-            ->where('tenant_id', $tenantId)
-            ->where('loan_row_id', $loanId)
-            ->where('component', 'principal')
-            ->sum('principal_paid');
-
-        $next = $this->nextOpenInstallment($loanId);
-        $members = [];
-        if ($loan->borrower?->group_row_id) {
-            $members = $this->groupMemberItems((int) $loan->borrower->group_row_id);
-        }
-
-        $memberName = null;
-        $memberRowId = $loan->borrower?->member_row_id ? (int) $loan->borrower->member_row_id : null;
-        if ($memberRowId) {
-            $memberName = DB::connection('tenant')
-                ->table('members as m')
-                ->join('people as p', function ($join) use ($tenantId): void {
-                    $join->on('p.row_id', '=', 'm.person_row_id')->where('p.tenant_id', '=', $tenantId);
-                })
-                ->where('m.tenant_id', $tenantId)
-                ->where('m.row_id', $memberRowId)
-                ->value('p.full_name');
-        }
-
-        return [
-            'loan_row_id' => (int) $loan->row_id,
-            'loan_id' => (int) $loan->id,
-            'loan_number' => $loan->loan_number,
-            'status' => $loan->status,
-            'principal_amount' => (float) $loan->principal_amount,
-            'principal_paid' => $paid,
-            'principal_remaining' => round((float) $loan->principal_amount - $paid, 2),
-            'product_code' => $loan->product?->code,
-            'group_row_id' => $loan->borrower?->group_row_id ? (int) $loan->borrower->group_row_id : null,
-            'group_name' => $loan->borrower?->group?->name,
-            'group_code' => $loan->borrower?->group?->code,
-            'member_row_id' => $memberRowId,
-            'member_name' => $memberName ? (string) $memberName : null,
-            'disbursed_at' => $loan->disbursed_at?->toDateString(),
-            'next_installment' => $next,
-            'group_members' => $members,
-        ];
-    }
 
     /**
      * @param  array<string, mixed>  $params
@@ -721,22 +319,6 @@ final class AssistantToolService
         }
 
         return $this->withMatchMeta($items);
-    }
-
-    /**
-     * @param  array<string, mixed>  $params
-     * @return array{due_date:string,items:list<array<string,mixed>>}
-     */
-    public function listDueBilling(array $params): array
-    {
-        $due = isset($params['due_date'])
-            ? CarbonImmutable::createFromFormat('Y-m-d', (string) $params['due_date'])->startOfDay()
-            : CarbonImmutable::today();
-
-        return [
-            'due_date' => $due->toDateString(),
-            'items' => $this->notices->dueOn($due),
-        ];
     }
 
     /**
@@ -834,15 +416,6 @@ final class AssistantToolService
             $q->whereDate('e.transaction_date', '>=', CarbonImmutable::today()->subDays(7)->toDateString());
         }
 
-        // Prefer installment journals when user hints angsuran/kelompok
-        $installmentHint = trim((string) ($params['group_query'] ?? $params['wrong_group_query'] ?? $params['correct_group_query'] ?? ''));
-        if ($type === '' && $sourceType === '' && ($installmentHint !== '' || filter_var($params['installments_only'] ?? false, FILTER_VALIDATE_BOOLEAN))) {
-            $q->where(function ($w): void {
-                $w->where('e.source_type', 'loan_installment')
-                    ->orWhere('e.transaction_type', 'angsuran');
-            });
-        }
-
         $rows = $q->orderByDesc('e.transaction_date')
             ->orderByDesc('e.row_id')
             ->limit($limit)
@@ -874,7 +447,6 @@ final class AssistantToolService
                 ->get(['a.code', 'a.name', 'a.row_id as account_row_id', 'jl.debit', 'jl.credit']);
 
             $totalDebit = round((float) $lines->sum('debit'), 2);
-            $loanCtx = null;
             $sourceRowId = isset($r->source_row_id) ? (int) $r->source_row_id : 0;
             // re-fetch source_row_id if not in select — add below in query
             $item = [
@@ -897,22 +469,7 @@ final class AssistantToolService
                     'debit' => (float) $l->debit,
                     'credit' => (float) $l->credit,
                 ])->all(),
-                'split' => $this->extractInstallmentSplitFromLines($lines),
             ];
-
-            if ((string) $r->source_type === 'loan_installment' && $sourceRowId > 0) {
-                $loanCtx = $this->loanContextForJournal($sourceRowId);
-                $item['loan'] = $loanCtx;
-            }
-
-            // optional filter: wrong/group name in description or linked loan group
-            $groupQ = trim((string) ($params['group_query'] ?? $params['wrong_group_query'] ?? ''));
-            if ($groupQ !== '') {
-                $hay = mb_strtolower($item['description'].' '.($loanCtx['group_name'] ?? ''));
-                if (! str_contains($hay, mb_strtolower($groupQ))) {
-                    continue;
-                }
-            }
 
             $items[] = $item;
         }
@@ -949,10 +506,6 @@ final class AssistantToolService
     public function reverseJournal(array $params, User $actor): array
     {
         $resolved = $this->resolveJournalForReverse($params);
-        if (($resolved['needs_clarification'] ?? false) === true) {
-            return $resolved;
-        }
-
         /** @var JournalEntry $original */
         $original = $resolved['entry'];
         $reversalDate = (string) ($params['reversal_date'] ?? $params['transaction_date'] ?? CarbonImmutable::today()->toDateString());
@@ -961,16 +514,6 @@ final class AssistantToolService
             $reason = sprintf('Pembatalan/koreksi jurnal #%s', $original->id ?? $original->row_id);
         }
 
-        $correctGroup = trim((string) ($params['correct_group_query'] ?? $params['correct_group_name'] ?? ''));
-        $correctLoanId = (int) ($params['correct_loan_id'] ?? $params['correct_loan_row_id'] ?? 0);
-        $isInstallment = (string) $original->source_type === 'loan_installment'
-            || (string) $original->transaction_type === 'angsuran';
-        $willRepostInstallment = $isInstallment && (
-            filter_var($params['repost'] ?? false, FILTER_VALIDATE_BOOLEAN)
-            || filter_var($params['repost_installment'] ?? false, FILTER_VALIDATE_BOOLEAN)
-            || $correctGroup !== ''
-            || $correctLoanId > 0
-        );
         $willRepostGeneral = filter_var($params['repost'] ?? false, FILTER_VALIDATE_BOOLEAN)
             || isset($params['correct_bank_account_query'])
             || isset($params['correct_debit_account_row_id']);
@@ -978,14 +521,8 @@ final class AssistantToolService
         if (! $this->isConfirmed($params)) {
             $original->loadMissing('lines.account');
             $amount = round((float) $original->lines->sum('debit'), 2);
-            $loanMeta = $isInstallment && $original->source_row_id
-                ? $this->loanContextForJournal((int) $original->source_row_id)
-                : null;
             $warnings = [];
-            if ($willRepostInstallment && $correctGroup === '' && $correctLoanId <= 0) {
-                $warnings[] = 'Repost angsuran diminta tapi kelompok/pinjaman tujuan belum jelas.';
-            }
-            if ($willRepostGeneral && empty($params['correct_bank_account_query']) && empty($params['correct_debit_account_row_id']) && ! $willRepostInstallment) {
+            if ($willRepostGeneral && empty($params['correct_bank_account_query']) && empty($params['correct_debit_account_row_id'])) {
                 $warnings[] = 'Repost diminta; pastikan akun koreksi sudah dipilih.';
             }
 
@@ -997,22 +534,14 @@ final class AssistantToolService
                     $original->transaction_type ?? $original->source_type ?? 'jurnal',
                     number_format($amount, 0, ',', '.'),
                     $original->transaction_date?->toDateString() ?? '?',
-                    $loanMeta['group_name'] ?? null ? ' — '.$loanMeta['group_name'] : '',
-                    $willRepostInstallment
-                        ? ' lalu post ulang angsuran ke '.($correctGroup !== '' ? $correctGroup : ($correctLoanId > 0 ? 'loan #'.$correctLoanId : '?'))
-                        : ($willRepostGeneral ? ' lalu post jurnal pengganti' : ' (tanpa post ulang)'),
+                    $willRepostGeneral ? ' lalu post jurnal pengganti' : ' (tanpa post ulang)',
                 ),
                 plan: [
                     'journal_row_id' => (int) $original->row_id,
                     'reversal_date' => $reversalDate,
                     'reason' => $reason,
                     'amount' => $amount,
-                    'was_installment' => $isInstallment,
-                    'original_loan' => $loanMeta,
-                    'repost_installment' => $willRepostInstallment,
-                    'correct_group_query' => $correctGroup !== '' ? $correctGroup : null,
-                    'correct_loan_id' => $correctLoanId > 0 ? $correctLoanId : null,
-                    'repost_general' => $willRepostGeneral && ! $willRepostInstallment,
+                    'repost_general' => $willRepostGeneral,
                     'correct_bank_account_query' => $params['correct_bank_account_query'] ?? null,
                     'lines' => $original->lines->map(fn ($l): array => [
                         'account_code' => $l->account?->code,
@@ -1040,61 +569,18 @@ final class AssistantToolService
             throw new RuntimeException($e->getMessage(), 0, $e);
         }
 
-        // Side-effect cleanup for installment journals (tracking rows only —
-        // schedule principal_paid is not updated by recordInstallmentPayment today).
-        if ((string) $original->source_type === 'loan_installment') {
-            $this->cleanupInstallmentSideEffects((int) $original->row_id);
-            $outNoteLoan = (int) ($original->source_row_id ?? 0);
-        } else {
-            $outNoteLoan = 0;
-        }
-
         $out = [
             'reversed' => true,
             'original' => $this->serializeJournal($original->fresh(['lines.account'])),
             'reversal' => $this->serializeJournal($reversal->load('lines.account')),
             'reason' => $reason,
-            'was_installment' => (string) $original->source_type === 'loan_installment',
-            'original_loan_row_id' => $outNoteLoan > 0 ? $outNoteLoan : null,
         ];
-
-        $correctGroup = trim((string) ($params['correct_group_query'] ?? $params['correct_group_name'] ?? ''));
-        $correctLoanId = (int) ($params['correct_loan_id'] ?? $params['correct_loan_row_id'] ?? 0);
-        $isInstallmentCorrection = (string) $original->source_type === 'loan_installment'
-            || (string) $original->transaction_type === 'angsuran'
-            || $correctGroup !== ''
-            || $correctLoanId > 0
-            || filter_var($params['repost_installment'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         // Optional: immediately post the correct replacement
         $repost = filter_var($params['repost'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $hasGeneralRepost = isset($params['correct_bank_account_query'])
             || isset($params['correct_transaction_type'])
             || isset($params['correct_debit_account_row_id']);
-
-        if ($isInstallmentCorrection && ($repost || $correctGroup !== '' || $correctLoanId > 0 || filter_var($params['repost_installment'] ?? false, FILTER_VALIDATE_BOOLEAN))) {
-            $inst = $this->buildCorrectedInstallmentParams($original, $params, $reversalDate, $reason);
-            if (($inst['needs_clarification'] ?? false) === true) {
-                $out['correction'] = $inst;
-                $out['message'] = 'Angsuran salah sudah di-reversal. Pilih pinjaman/kelompok yang benar untuk post ulang.';
-
-                return $out;
-            }
-            try {
-                // Parent reverse already confirmed — post child without second preview gate.
-                $out['correction'] = $this->recordInstallment(array_merge($inst, ['confirm' => true]), $actor);
-                $out['message'] = 'Angsuran salah dibatalkan dan dicatat ulang ke pinjaman/kelompok yang benar.';
-            } catch (ValidationException $e) {
-                $out['correction'] = [
-                    'needs_clarification' => true,
-                    'reason' => 'correction_validation_failed',
-                    'message' => 'Reversal OK; angsuran koreksi gagal validasi.',
-                    'messages' => $e->errors(),
-                ];
-            }
-
-            return $out;
-        }
 
         if ($repost || $hasGeneralRepost) {
             $correct = $this->buildCorrectedJournalParams($original, $params, $reversalDate, $reason);
@@ -1116,235 +602,7 @@ final class AssistantToolService
                 ];
             }
         } else {
-            $out['message'] = $out['was_installment']
-                ? 'Angsuran dibatalkan via reversal GL. Tidak ada post ulang (beri correct_group_query / correct_loan_id + repost).'
-                : 'Jurnal dibatalkan via reversal. Tidak ada entri pengganti (set repost=true untuk koreksi).';
-        }
-
-        return $out;
-    }
-
-    /**
-     * @param  Collection<int, object>  $lines
-     * @return array{principal_amount: float, interest_amount: float, penalty_amount: float, cash_account_row_id: ?int, total: float}
-     */
-    private function extractInstallmentSplitFromLines($lines): array
-    {
-        $principal = 0.0;
-        $interest = 0.0;
-        $penalty = 0.0;
-        $cashRowId = null;
-        foreach ($lines as $l) {
-            $code = (string) ($l->code ?? $l->account_code ?? '');
-            $debit = (float) ($l->debit ?? 0);
-            $credit = (float) ($l->credit ?? 0);
-            $name = mb_strtolower((string) ($l->name ?? $l->account_name ?? ''));
-            if ($debit > 0 && str_starts_with($code, '1.1.01.')) {
-                $cashRowId = isset($l->account_row_id) ? (int) $l->account_row_id : $cashRowId;
-            }
-            if ($credit <= 0) {
-                continue;
-            }
-            // Order matters: "Pendapatan Jasa Piutang …" contains both jasa+piutang.
-            if (str_contains($name, 'denda')) {
-                $penalty += $credit;
-            } elseif (str_starts_with($code, '4.') || str_contains($name, 'pendapatan') || str_contains($name, 'jasa')) {
-                $interest += $credit;
-            } elseif (str_starts_with($code, '1.1.03') || str_starts_with($code, '1.1.02') || str_contains($name, 'piutang')) {
-                $principal += $credit;
-            } else {
-                $principal += $credit;
-            }
-        }
-
-        return [
-            'principal_amount' => round($principal, 2),
-            'interest_amount' => round($interest, 2),
-            'penalty_amount' => round($penalty, 2),
-            'cash_account_row_id' => $cashRowId,
-            'total' => round($principal + $interest + $penalty, 2),
-        ];
-    }
-
-    /**
-     * @return array{loan_row_id: int, group_row_id: ?int, group_name: ?string, product_code: ?string, status: ?string}|null
-     */
-    private function loanContextForJournal(int $loanRowId): ?array
-    {
-        if ($loanRowId <= 0) {
-            return null;
-        }
-        $tenantId = $this->context->id();
-        $row = DB::connection('tenant')
-            ->table('loans as l')
-            ->leftJoin('loan_borrowers as lb', function ($join) use ($tenantId): void {
-                $join->on('lb.loan_row_id', '=', 'l.row_id')->where('lb.tenant_id', '=', $tenantId);
-            })
-            ->leftJoin('groups as g', function ($join) use ($tenantId): void {
-                $join->on('g.row_id', '=', 'lb.group_row_id')->where('g.tenant_id', '=', $tenantId);
-            })
-            ->leftJoin('loan_products as p', function ($join) use ($tenantId): void {
-                $join->on('p.row_id', '=', 'l.loan_product_row_id')->where('p.tenant_id', '=', $tenantId);
-            })
-            ->where('l.tenant_id', $tenantId)
-            ->where('l.row_id', $loanRowId)
-            ->first([
-                'l.row_id',
-                'l.status',
-                'lb.group_row_id',
-                'g.name as group_name',
-                'p.code as product_code',
-            ]);
-        if ($row === null) {
-            return null;
-        }
-
-        return [
-            'loan_row_id' => (int) $row->row_id,
-            'group_row_id' => $row->group_row_id ? (int) $row->group_row_id : null,
-            'group_name' => $row->group_name ? (string) $row->group_name : null,
-            'product_code' => $row->product_code ? (string) $row->product_code : null,
-            'status' => $row->status ? (string) $row->status : null,
-        ];
-    }
-
-    private function cleanupInstallmentSideEffects(int $journalRowId): void
-    {
-        $tenantId = $this->context->id();
-        // tracking table may not exist on older shards
-        try {
-            DB::connection('tenant')
-                ->table('loan_installment_tracking')
-                ->where('tenant_id', $tenantId)
-                ->where('journal_entry_row_id', $journalRowId)
-                ->delete();
-        } catch (\Throwable) {
-            // ignore missing table
-        }
-    }
-
-    /**
-     * After reversing a wrong-group installment, rebuild record_installment params
-     * for the correct group/loan, reusing principal/interest/cash from original lines.
-     *
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     */
-    private function buildCorrectedInstallmentParams(JournalEntry $original, array $params, string $date, string $reason): array
-    {
-        $original->loadMissing('lines.account');
-        $lines = $original->lines->map(fn ($l) => (object) [
-            'code' => $l->account?->code,
-            'name' => $l->account?->name,
-            'debit' => $l->debit,
-            'credit' => $l->credit,
-            'account_row_id' => $l->account_row_id,
-        ]);
-        $split = $this->extractInstallmentSplitFromLines($lines);
-
-        $cashRowId = null;
-        foreach ($original->lines as $l) {
-            if ((float) $l->debit > 0 && $l->account && str_starts_with((string) $l->account->code, '1.1.01.')) {
-                $cashRowId = (int) $l->account_row_id;
-                break;
-            }
-        }
-        if ($cashRowId === null) {
-            $cash = $this->resolveCashAccount((string) ($params['cash_account_query'] ?? 'Kas Tunai'));
-            if (isset($cash['needs_clarification'])) {
-                return $cash;
-            }
-            $cashRowId = $cash['row_id'];
-        }
-
-        $correctLoanId = (int) ($params['correct_loan_id'] ?? $params['correct_loan_row_id'] ?? 0);
-        $correctGroup = trim((string) ($params['correct_group_query'] ?? $params['correct_group_name'] ?? ''));
-        $memberQuery = trim((string) ($params['member_query'] ?? $params['correct_member_query'] ?? ''));
-        // Try parse member from original description "a/n X" / "dari X"
-        if ($memberQuery === '' && is_string($original->description)) {
-            if (preg_match('/a\/n\s+([^.,;]+)/iu', $original->description, $m)
-                || preg_match('/(?:dari|titipan(?:\s+angsuran)?)\s+([^.,;]+?)(?:\s+kelompok|\s+group|$)/iu', $original->description, $m)) {
-                $memberQuery = trim($m[1]);
-            }
-        }
-
-        if ($correctLoanId <= 0) {
-            if ($correctGroup === '') {
-                return [
-                    'needs_clarification' => true,
-                    'reason' => 'correct_loan_required',
-                    'message' => 'Sebutkan correct_group_query atau correct_loan_id untuk angsuran pengganti.',
-                    'candidates' => [],
-                    'split' => $split,
-                ];
-            }
-            $loans = $this->searchLoans(['group_query' => $correctGroup]);
-            if ($loans['match_count'] === 0) {
-                return [
-                    'needs_clarification' => true,
-                    'reason' => 'correct_loan_not_found',
-                    'message' => "Tidak ada pinjaman aktif untuk kelompok \"{$correctGroup}\".",
-                    'candidates' => [],
-                ];
-            }
-            if ($loans['match_count'] > 1) {
-                return [
-                    'needs_clarification' => true,
-                    'reason' => 'ambiguous_correct_loan',
-                    'message' => 'Beberapa pinjaman di kelompok tujuan. Pilih correct_loan_id.',
-                    'candidates' => $loans['items'],
-                    'match_count' => $loans['match_count'],
-                    'split' => $split,
-                ];
-            }
-            $correctLoanId = (int) $loans['items'][0]['loan_row_id'];
-        }
-
-        // Don't repost onto the same loan that was just reversed
-        $origLoan = (int) ($original->source_row_id ?? 0);
-        if ($origLoan > 0 && $correctLoanId === $origLoan && $correctGroup === '') {
-            return [
-                'needs_clarification' => true,
-                'reason' => 'same_loan',
-                'message' => 'Pinjaman tujuan sama dengan yang dibatalkan. Sebutkan kelompok/pinjaman yang benar.',
-                'candidates' => [],
-            ];
-        }
-
-        $out = [
-            'transaction_date' => $date,
-            'loan_id' => $correctLoanId,
-            'principal_amount' => $split['principal_amount'],
-            'interest_amount' => $split['interest_amount'],
-            'penalty_amount' => $split['penalty_amount'],
-            'cash_account_row_id' => $cashRowId,
-            'description' => mb_substr(
-                trim((string) ($params['correct_description'] ?? '')) !== ''
-                    ? (string) $params['correct_description']
-                    : sprintf('Koreksi angsuran: %s (dari jurnal #%s)', $reason, $original->id ?? $original->row_id),
-                0,
-                500,
-            ),
-        ];
-
-        if ($memberQuery !== '') {
-            $out['member_query'] = $memberQuery;
-            if ($correctGroup !== '') {
-                $out['group_query'] = $correctGroup;
-            }
-        } elseif (! empty($params['reference']) || ! empty($params['member_row_id'])) {
-            $out['reference'] = (int) ($params['reference'] ?? $params['member_row_id']);
-        } else {
-            // let normalizeInstallmentParams resolve from group members / clarify
-            if ($correctGroup !== '') {
-                $out['group_query'] = $correctGroup;
-            }
-        }
-
-        // optional override amounts
-        if (isset($params['correct_amount']) || isset($params['total_amount'])) {
-            $out['total_amount'] = (float) ($params['correct_amount'] ?? $params['total_amount']);
-            unset($out['principal_amount'], $out['interest_amount']);
+            $out['message'] = 'Jurnal dibatalkan via reversal. Tidak ada entri pengganti (set repost=true untuk koreksi).';
         }
 
         return $out;
@@ -1388,17 +646,6 @@ final class AssistantToolService
         if (empty($searchParams['account_query']) && ! empty($params['wrong_account_query'])) {
             $searchParams['account_query'] = $params['wrong_account_query'];
         }
-        if (empty($searchParams['group_query']) && ! empty($params['wrong_group_query'])) {
-            $searchParams['group_query'] = $params['wrong_group_query'];
-        }
-        // angsuran salah kelompok → batasi ke loan_installment
-        if (! empty($params['wrong_group_query']) || ! empty($params['correct_group_query']) || ! empty($params['correct_loan_id'])) {
-            $searchParams['installments_only'] = true;
-            if (empty($searchParams['transaction_type']) && empty($searchParams['source_type'])) {
-                $searchParams['source_type'] = 'loan_installment';
-            }
-        }
-
         $found = $this->searchJournals($searchParams);
         if ($found['match_count'] === 0) {
             return [
@@ -1928,436 +1175,12 @@ final class AssistantToolService
         return (int) $fallback;
     }
 
-    /**
-     * Accept either flat principal/interest OR total_amount + optional
-     * member/group names. Resolve loan, cash account, and split schedule.
-     *
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     */
-    public function recordInstallment(array $params, User $actor): array
-    {
-        $resolved = $this->normalizeInstallmentParams($params);
-        if (($resolved['needs_clarification'] ?? false) === true) {
-            return $resolved;
-        }
 
-        $loanId = (int) $resolved['loan_id'];
-        $principal = (float) $resolved['principal_amount'];
-        $interest = (float) $resolved['interest_amount'];
-        $penalty = (float) ($resolved['penalty_amount'] ?? 0);
-        $total = round($principal + $interest + $penalty, 2);
-        if ($total <= 0) {
-            throw ValidationException::withMessages(['amount' => 'Total angsuran harus > 0']);
-        }
 
-        $next = $this->nextOpenInstallment($loanId);
-        $dueTotal = $next ? (float) $next['total_remaining'] : null;
-        $excess = $dueTotal !== null ? round($total - $dueTotal, 2) : 0.0;
-        $short = $dueTotal !== null ? round($dueTotal - $total, 2) : 0.0;
-        $warnings = [];
-        $options = [];
-        if ($excess > 0) {
-            $warnings[] = sprintf(
-                'Kelebihan bayar Rp %s di atas sisa angsuran ke-%s (Rp %s). Default: sisa ke pokok.',
-                number_format($excess, 0, ',', '.'),
-                $next['installment_number'] ?? '?',
-                number_format($dueTotal, 0, ',', '.'),
-            );
-            $options = [
-                ['id' => 'apply_excess_to_principal', 'label' => 'Terima full; kelebihan ke pokok'],
-                ['id' => 'cap_to_due', 'label' => 'Batasi ke tagihan saja (Rp '.number_format($dueTotal, 0, ',', '.').')'],
-                ['id' => 'cancel', 'label' => 'Batalkan, jangan catat'],
-            ];
-        } elseif ($short > 0 && $dueTotal !== null) {
-            $warnings[] = sprintf(
-                'Kurang bayar Rp %s dari tagihan angsuran ke-%s (Rp %s).',
-                number_format($short, 0, ',', '.'),
-                $next['installment_number'] ?? '?',
-                number_format($dueTotal, 0, ',', '.'),
-            );
-        }
 
-        // User chose cap_to_due on a previous preview turn
-        $choice = (string) ($params['allocation_choice'] ?? $resolved['allocation_choice'] ?? '');
-        if ($choice === 'cap_to_due' && $next !== null && $dueTotal !== null && $total > $dueTotal) {
-            $capped = $this->splitInstallmentAmount($loanId, $dueTotal, isset($resolved['installment_number']) ? (int) $resolved['installment_number'] : null);
-            $resolved['principal_amount'] = $capped['principal_amount'];
-            $resolved['interest_amount'] = $capped['interest_amount'];
-            $resolved['penalty_amount'] = $capped['penalty_amount'];
-            $principal = $capped['principal_amount'];
-            $interest = $capped['interest_amount'];
-            $penalty = $capped['penalty_amount'];
-            $total = $dueTotal;
-            $excess = 0.0;
-            $warnings[] = 'Nominal dibatasi ke sisa tagihan (cap_to_due).';
-        }
-        if ($choice === 'cancel') {
-            return [
-                'cancelled' => true,
-                'message' => 'Pencatatan angsuran dibatalkan atas permintaan user.',
-            ];
-        }
 
-        if (! $this->isConfirmed($params)) {
-            $cash = Account::query()->where('row_id', (int) $resolved['cash_account_row_id'])->first(['row_id', 'code', 'name']);
-            $memberName = DB::connection('tenant')
-                ->table('members as m')
-                ->join('people as p', function ($join): void {
-                    $join->on('p.row_id', '=', 'm.person_row_id')->on('p.tenant_id', '=', 'm.tenant_id');
-                })
-                ->where('m.row_id', (int) $resolved['reference'])
-                ->value('p.full_name');
 
-            $loanMeta = $this->loanContextForJournal($loanId);
 
-            return $this->previewResponse(
-                action: 'record_installment',
-                summary: sprintf(
-                    'Angsuran Rp %s (pokok %s + jasa %s%s) pinjaman #%s%s tgl %s — penyetor %s, kas %s',
-                    number_format($total, 0, ',', '.'),
-                    number_format($principal, 0, ',', '.'),
-                    number_format($interest, 0, ',', '.'),
-                    $penalty > 0 ? ' + denda '.number_format($penalty, 0, ',', '.') : '',
-                    $loanId,
-                    $loanMeta['group_name'] ?? null ? ' ('.$loanMeta['group_name'].')' : '',
-                    (string) $resolved['transaction_date'],
-                    $memberName ? (string) $memberName : ('#'.$resolved['reference']),
-                    $cash ? "{$cash->code} {$cash->name}" : '#'.$resolved['cash_account_row_id'],
-                ),
-                plan: [
-                    'transaction_date' => $resolved['transaction_date'],
-                    'loan_id' => $loanId,
-                    'loan' => $loanMeta,
-                    'installment_number' => $resolved['installment_number'] ?? $next['installment_number'] ?? null,
-                    'principal_amount' => $principal,
-                    'interest_amount' => $interest,
-                    'penalty_amount' => $penalty,
-                    'total' => $total,
-                    'next_installment' => $next,
-                    'due_total' => $dueTotal,
-                    'excess' => $excess > 0 ? $excess : 0.0,
-                    'shortfall' => $short > 0 ? $short : 0.0,
-                    'cash_account' => $cash ? ['row_id' => (int) $cash->row_id, 'code' => $cash->code, 'name' => $cash->name] : null,
-                    'reference_member_row_id' => (int) $resolved['reference'],
-                    'reference_member_name' => $memberName ? (string) $memberName : null,
-                    'description' => $resolved['description'] ?? null,
-                ],
-                warnings: $warnings,
-                proposedParams: array_merge($resolved, ['confirm' => true]),
-                options: $options,
-            );
-        }
-
-        // Overpayment without explicit choice → still ask (don't silent-post excess)
-        if ($excess > 0 && $choice === '') {
-            return [
-                'needs_clarification' => true,
-                'reason' => 'overpayment',
-                'message' => $warnings[0] ?? 'Kelebihan bayar. Pilih alokasi.',
-                'options' => $options,
-                'plan' => [
-                    'total' => $total,
-                    'due_total' => $dueTotal,
-                    'excess' => $excess,
-                    'next_installment' => $next,
-                ],
-                'proposed_params' => array_merge($resolved, ['confirm' => true]),
-            ];
-        }
-
-        $tenantId = $this->context->id();
-        $cashExists = Rule::exists(Account::class, 'row_id')
-            ->where(fn ($q) => $q->where('tenant_id', $tenantId)->where('is_active', true)->where('is_postable', true)->where('code', 'like', '1.1.01.%'));
-        $memberExists = Rule::exists(Member::class, 'row_id')
-            ->where(fn ($q) => $q->where('tenant_id', $tenantId)->where('status', 'active'));
-
-        $data = Validator::make($resolved, [
-            'transaction_date' => ['required', 'date', 'before_or_equal:today'],
-            'loan_id' => ['required', 'integer', Rule::exists(Loan::class, 'row_id')],
-            'installment_number' => ['nullable', 'integer', 'min:1'],
-            'principal_amount' => ['required', 'numeric', 'min:0'],
-            'interest_amount' => ['required', 'numeric', 'min:0'],
-            'penalty_amount' => ['nullable', 'numeric', 'min:0'],
-            'cash_account_row_id' => ['required', 'integer', $cashExists],
-            'description' => ['required', 'string', 'max:500'],
-            'reference' => ['required', 'integer', $memberExists],
-            'member_allocations' => ['nullable', 'array'],
-        ])->validate();
-
-        $posted = $this->loans->recordInstallmentPayment($data, (int) $actor->row_id);
-        $out = $this->serializeJournal($posted->load('lines.account'));
-        $out['resolved'] = [
-            'loan_id' => (int) $data['loan_id'],
-            'installment_number' => $data['installment_number'] ?? null,
-            'principal_amount' => (float) $data['principal_amount'],
-            'interest_amount' => (float) $data['interest_amount'],
-            'penalty_amount' => (float) ($data['penalty_amount'] ?? 0),
-            'cash_account_row_id' => (int) $data['cash_account_row_id'],
-            'reference' => (int) $data['reference'],
-            'excess_applied_to_principal' => $excess > 0 && $choice !== 'cap_to_due',
-        ];
-
-        return $out;
-    }
-
-    /**
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     */
-    private function normalizeInstallmentParams(array $params): array
-    {
-        // loan_id alias
-        if (empty($params['loan_id']) && ! empty($params['loan_row_id'])) {
-            $params['loan_id'] = $params['loan_row_id'];
-        }
-
-        $memberQuery = trim((string) ($params['member_query'] ?? $params['member_name'] ?? ''));
-        $groupQuery = trim((string) ($params['group_query'] ?? $params['group_name'] ?? ''));
-        $candidates = [];
-
-        if (empty($params['loan_id'])) {
-            // Group loans often have borrower.group_row_id only (member_row_id null).
-            // Resolve loan by group/loan_number first; member_query is for penyetor, not borrower filter.
-            $search = $this->searchLoans([
-                'group_query' => $groupQuery,
-                'member_query' => $groupQuery === '' ? $memberQuery : '',
-                'loan_number' => (string) ($params['loan_number'] ?? ''),
-            ]);
-            $candidates = $search['items'];
-            if (count($candidates) === 0 && $memberQuery !== '' && $groupQuery !== '') {
-                // last resort: member-owned loans only
-                $search = $this->searchLoans([
-                    'member_query' => $memberQuery,
-                    'loan_number' => (string) ($params['loan_number'] ?? ''),
-                ]);
-                $candidates = $search['items'];
-            }
-            if (count($candidates) === 0) {
-                return [
-                    'needs_clarification' => true,
-                    'reason' => 'loan_not_found',
-                    'message' => 'Pinjaman tidak ditemukan. Coba sebutkan kelompok/nomor pinjaman.',
-                    'candidates' => [],
-                ];
-            }
-            if (count($candidates) > 1) {
-                return [
-                    'needs_clarification' => true,
-                    'reason' => 'ambiguous_loan',
-                    'message' => 'Beberapa pinjaman cocok. Pilih loan_row_id.',
-                    'candidates' => $candidates,
-                    'match_count' => count($candidates),
-                ];
-            }
-            $params['loan_id'] = $candidates[0]['loan_row_id'];
-        }
-
-        $loanId = (int) $params['loan_id'];
-        $loan = Loan::query()->with(['borrower.group'])->where('row_id', $loanId)->first();
-        if ($loan === null) {
-            return [
-                'needs_clarification' => true,
-                'reason' => 'loan_not_found',
-                'message' => "loan_id {$loanId} tidak ada",
-                'candidates' => [],
-            ];
-        }
-
-        // reference (penyetor)
-        if (empty($params['reference'])) {
-            if (! empty($params['member_row_id'])) {
-                $params['reference'] = (int) $params['member_row_id'];
-            } elseif ($memberQuery !== '') {
-                $members = $this->searchMembers([
-                    'query' => $memberQuery,
-                    'group_query' => $groupQuery !== '' ? $groupQuery : (string) ($loan->borrower?->group?->name ?? ''),
-                ]);
-                if ($members['match_count'] === 1) {
-                    $params['reference'] = $members['items'][0]['member_row_id'];
-                } elseif ($members['match_count'] > 1) {
-                    return [
-                        'needs_clarification' => true,
-                        'reason' => 'ambiguous_member',
-                        'message' => 'Beberapa anggota cocok sebagai penyetor. Pilih member_row_id (reference).',
-                        'candidates' => $members['items'],
-                        'loan_id' => $loanId,
-                    ];
-                } elseif ($loan->borrower?->member_row_id) {
-                    $params['reference'] = (int) $loan->borrower->member_row_id;
-                } else {
-                    return [
-                        'needs_clarification' => true,
-                        'reason' => 'member_not_found',
-                        'message' => 'Anggota penyetor tidak ditemukan.',
-                        'candidates' => $this->groupMemberItems((int) ($loan->borrower?->group_row_id ?? 0)),
-                        'loan_id' => $loanId,
-                    ];
-                }
-            } elseif ($loan->borrower?->member_row_id) {
-                $params['reference'] = (int) $loan->borrower->member_row_id;
-            } else {
-                $groupMembers = $this->groupMemberItems((int) ($loan->borrower?->group_row_id ?? 0));
-                if (count($groupMembers) === 1) {
-                    $params['reference'] = $groupMembers[0]['member_row_id'];
-                } else {
-                    return [
-                        'needs_clarification' => true,
-                        'reason' => 'member_required',
-                        'message' => 'Sebutkan nama anggota penyetor (reference).',
-                        'candidates' => $groupMembers,
-                        'loan_id' => $loanId,
-                    ];
-                }
-            }
-        }
-
-        // cash account
-        if (empty($params['cash_account_row_id'])) {
-            $cashHint = trim((string) ($params['cash_account_query'] ?? $params['cash_account_name'] ?? 'Kas Tunai'));
-            $cash = $this->resolveCashAccount($cashHint);
-            if (($cash['needs_clarification'] ?? false) === true) {
-                return $cash + ['loan_id' => $loanId];
-            }
-            $params['cash_account_row_id'] = $cash['row_id'];
-        }
-
-        // split principal/interest from total or schedule
-        $hasPrincipal = isset($params['principal_amount']) && $params['principal_amount'] !== '' && $params['principal_amount'] !== null;
-        $hasInterest = isset($params['interest_amount']) && $params['interest_amount'] !== '' && $params['interest_amount'] !== null;
-        $totalAmount = isset($params['total_amount']) ? (float) $params['total_amount'] : (isset($params['amount']) ? (float) $params['amount'] : 0.0);
-
-        $next = $this->nextOpenInstallment($loanId);
-        if (empty($params['installment_number']) && $next !== null) {
-            $params['installment_number'] = $next['installment_number'];
-        }
-
-        if (! $hasPrincipal || ! $hasInterest) {
-            if ($totalAmount <= 0 && $next !== null) {
-                // full next installment
-                $params['principal_amount'] = $next['principal_remaining'];
-                $params['interest_amount'] = $next['interest_remaining'];
-            } elseif ($totalAmount > 0) {
-                $split = $this->splitInstallmentAmount($loanId, $totalAmount, isset($params['installment_number']) ? (int) $params['installment_number'] : null);
-                $params['principal_amount'] = $split['principal_amount'];
-                $params['interest_amount'] = $split['interest_amount'];
-                $params['penalty_amount'] = $params['penalty_amount'] ?? $split['penalty_amount'];
-                if (empty($params['installment_number']) && $split['installment_number'] !== null) {
-                    $params['installment_number'] = $split['installment_number'];
-                }
-            } else {
-                return [
-                    'needs_clarification' => true,
-                    'reason' => 'amount_required',
-                    'message' => 'Berikan total_amount atau principal_amount+interest_amount.',
-                    'loan_id' => $loanId,
-                    'next_installment' => $next,
-                ];
-            }
-        }
-
-        if (empty($params['description'])) {
-            $who = $memberQuery !== '' ? $memberQuery : 'anggota';
-            $grp = $groupQuery !== '' ? $groupQuery : (string) ($loan->borrower?->group?->name ?? '');
-            $params['description'] = trim(sprintf(
-                'Titipan angsuran %s%s',
-                $who,
-                $grp !== '' ? ' kelompok '.$grp : '',
-            ));
-        }
-
-        $params['resolved_from'] = [
-            'loan_status' => $loan->status,
-            'group_name' => $loan->borrower?->group?->name,
-            'next_installment' => $next,
-        ];
-
-        return $params;
-    }
-
-    /**
-     * Allocate total payment: interest first, then principal, against open schedule.
-     *
-     * @return array{principal_amount: float, interest_amount: float, penalty_amount: float, installment_number: ?int}
-     */
-    private function splitInstallmentAmount(int $loanId, float $total, ?int $installmentNumber): array
-    {
-        $tenantId = $this->context->id();
-        $q = DB::connection('tenant')
-            ->table('loan_installments')
-            ->where('tenant_id', $tenantId)
-            ->where('loan_row_id', $loanId)
-            ->whereIn('status', ['pending', 'partial', 'overdue']);
-
-        if ($installmentNumber !== null && $installmentNumber > 0) {
-            $q->where('installment_number', $installmentNumber);
-        }
-
-        $rows = $q->orderBy('installment_number')->orderBy('component')->get();
-        if ($rows->isEmpty()) {
-            // no schedule → all principal
-            return [
-                'principal_amount' => round($total, 2),
-                'interest_amount' => 0.0,
-                'penalty_amount' => 0.0,
-                'installment_number' => $installmentNumber,
-            ];
-        }
-
-        $byNum = [];
-        foreach ($rows as $r) {
-            $n = (int) $r->installment_number;
-            $byNum[$n] ??= ['principal' => 0.0, 'interest' => 0.0, 'penalty' => 0.0];
-            $comp = (string) $r->component;
-            if ($comp === 'principal' || $comp === 'combined') {
-                $byNum[$n]['principal'] += max(0, (float) $r->principal_due - (float) $r->principal_paid);
-            }
-            if ($comp === 'interest' || $comp === 'combined') {
-                $byNum[$n]['interest'] += max(0, (float) $r->interest_due - (float) $r->interest_paid);
-            }
-            $byNum[$n]['penalty'] += max(0, (float) $r->penalty_due - (float) $r->penalty_paid);
-        }
-
-        $remaining = round($total, 2);
-        $principal = 0.0;
-        $interest = 0.0;
-        $penalty = 0.0;
-        $firstNum = null;
-
-        foreach ($byNum as $n => $due) {
-            if ($remaining <= 0) {
-                break;
-            }
-            $firstNum ??= $n;
-
-            $takePenalty = min($remaining, round($due['penalty'], 2));
-            $penalty += $takePenalty;
-            $remaining = round($remaining - $takePenalty, 2);
-
-            $takeInterest = min($remaining, round($due['interest'], 2));
-            $interest += $takeInterest;
-            $remaining = round($remaining - $takeInterest, 2);
-
-            $takePrincipal = min($remaining, round($due['principal'], 2));
-            $principal += $takePrincipal;
-            $remaining = round($remaining - $takePrincipal, 2);
-
-            // only first open installment for single payment UX
-            break;
-        }
-
-        // leftover beyond schedule → principal
-        if ($remaining > 0) {
-            $principal = round($principal + $remaining, 2);
-        }
-
-        return [
-            'principal_amount' => round($principal, 2),
-            'interest_amount' => round($interest, 2),
-            'penalty_amount' => round($penalty, 2),
-            'installment_number' => $firstNum,
-        ];
-    }
 
     /**
      * @return array{row_id: int}|array{needs_clarification: bool, reason: string, message: string, candidates: list<array<string,mixed>>}
@@ -2412,38 +1235,6 @@ final class AssistantToolService
         }
 
         return ['row_id' => (int) $fallback->row_id];
-    }
-
-    /**
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     */
-    public function sendBillingNotices(array $params): array
-    {
-        $data = Validator::make($params, [
-            'due_date' => ['required', 'date_format:Y-m-d'],
-            'installment_row_ids' => ['required', 'array', 'min:1'],
-            'installment_row_ids.*' => ['integer', 'min:1'],
-        ])->validate();
-
-        $due = CarbonImmutable::createFromFormat('Y-m-d', $data['due_date'])->startOfDay();
-        $ids = array_map('intval', $data['installment_row_ids']);
-
-        if (! $this->isConfirmed($params)) {
-            return $this->previewResponse(
-                action: 'send_billing_notices',
-                summary: sprintf('Kirim WA tagihan %d angsuran untuk jatuh tempo %s', count($ids), $due->toDateString()),
-                plan: [
-                    'due_date' => $due->toDateString(),
-                    'installment_row_ids' => $ids,
-                    'count' => count($ids),
-                ],
-                warnings: count($ids) > 50 ? ['Jumlah penerima besar (>50)'] : [],
-                proposedParams: array_merge($params, ['confirm' => true]),
-            );
-        }
-
-        return $this->notices->sendBilling($ids, $due);
     }
 
     /**
@@ -2587,68 +1378,6 @@ final class AssistantToolService
             'message' => 'Beberapa akun bank cocok. Pilih debit_account_row_id dari daftar (nama akun tenant).',
             'candidates' => $pool,
         ];
-    }
-
-    /**
-     * Next unpaid/partial installment (merged principal+interest components).
-     *
-     * @return array{installment_number: int, due_date: ?string, principal_remaining: float, interest_remaining: float, penalty_remaining: float, total_remaining: float}|null
-     */
-    private function nextOpenInstallment(int $loanId): ?array
-    {
-        $tenantId = $this->context->id();
-        $rows = DB::connection('tenant')
-            ->table('loan_installments')
-            ->where('tenant_id', $tenantId)
-            ->where('loan_row_id', $loanId)
-            ->whereIn('status', ['pending', 'partial', 'overdue'])
-            ->orderBy('installment_number')
-            ->orderBy('component')
-            ->get();
-
-        if ($rows->isEmpty()) {
-            return null;
-        }
-
-        $byNum = [];
-        foreach ($rows as $r) {
-            $n = (int) $r->installment_number;
-            $byNum[$n] ??= [
-                'installment_number' => $n,
-                'due_date' => $r->due_date ? (string) $r->due_date : null,
-                'principal_remaining' => 0.0,
-                'interest_remaining' => 0.0,
-                'penalty_remaining' => 0.0,
-            ];
-            $comp = (string) $r->component;
-            if ($comp === 'principal' || $comp === 'combined') {
-                $byNum[$n]['principal_remaining'] += max(0, (float) $r->principal_due - (float) $r->principal_paid);
-            }
-            if ($comp === 'interest' || $comp === 'combined') {
-                $byNum[$n]['interest_remaining'] += max(0, (float) $r->interest_due - (float) $r->interest_paid);
-            }
-            $byNum[$n]['penalty_remaining'] += max(0, (float) $r->penalty_due - (float) $r->penalty_paid);
-            if ($byNum[$n]['due_date'] === null && $r->due_date) {
-                $byNum[$n]['due_date'] = (string) $r->due_date;
-            }
-        }
-
-        foreach ($byNum as $row) {
-            $total = round(
-                $row['principal_remaining'] + $row['interest_remaining'] + $row['penalty_remaining'],
-                2,
-            );
-            if ($total > 0) {
-                $row['principal_remaining'] = round($row['principal_remaining'], 2);
-                $row['interest_remaining'] = round($row['interest_remaining'], 2);
-                $row['penalty_remaining'] = round($row['penalty_remaining'], 2);
-                $row['total_remaining'] = $total;
-
-                return $row;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -2852,12 +1581,6 @@ final class AssistantToolService
             'kesehatan_keuangan', 'financial_health' => 'financial_health',
             'aset_tetap', 'fixed_assets', 'inventaris' => 'fixed_assets',
             'aset_takberwujud', 'intangible_assets' => 'intangible_assets',
-            'portofolio', 'portfolio', 'perkembangan_pinjaman' => 'portfolio',
-            'rencana_vs_realisasi', 'schedule_vs_actual' => 'schedule_vs_actual',
-            'lpp_desa' => 'lpp_desa',
-            'lpp_kelompok' => 'lpp_kelompok',
-            'kolek_desa', 'kolektibilitas' => 'kolek_desa',
-            'cadangan_penghapusan', 'ppap' => 'cadangan_penghapusan',
             'anggota', 'members' => 'members',
             'kelompok', 'groups' => 'groups',
             default => 'balance_sheet',
@@ -2945,50 +1668,6 @@ final class AssistantToolService
                 'excel' => '/accounting/reports/assets/intangible/excel',
                 'query' => array_filter(['as_of' => $params['as_of_date'] ?? $now->toDateString()]),
             ],
-            'portfolio' => [
-                'name' => 'Laporan Portofolio Pinjaman',
-                'short_name' => 'Portofolio',
-                'pdf' => '/lending/reports/portfolio/pdf',
-                'excel' => null,
-                'query' => array_filter([
-                    'as_of' => $params['as_of_date'] ?? ($month ? CarbonImmutable::createFromDate($year, $month, 1)->endOfMonth()->toDateString() : "{$year}-12-31"),
-                ]),
-            ],
-            'schedule_vs_actual' => [
-                'name' => 'Laporan Rencana vs Realisasi Pinjaman',
-                'short_name' => 'Rencana vs Realisasi',
-                'pdf' => '/lending/reports/schedule-vs-actual/pdf',
-                'excel' => null,
-                'query' => array_filter(['month' => $month, 'year' => $year]),
-            ],
-            'lpp_desa' => [
-                'name' => 'LPP per Desa',
-                'short_name' => 'LPP Desa',
-                'pdf' => '/lending/reports/lpp-desa/pdf',
-                'excel' => null,
-                'query' => array_filter(['month' => $month, 'year' => $year]),
-            ],
-            'lpp_kelompok' => [
-                'name' => 'LPP per Kelompok',
-                'short_name' => 'LPP Kelompok',
-                'pdf' => '/lending/reports/lpp-kelompok/pdf',
-                'excel' => null,
-                'query' => array_filter(['month' => $month, 'year' => $year]),
-            ],
-            'kolek_desa' => [
-                'name' => 'Laporan Kolektibilitas per Desa',
-                'short_name' => 'Kolektibilitas',
-                'pdf' => '/lending/reports/kolek-desa/pdf',
-                'excel' => null,
-                'query' => array_filter(['month' => $month, 'year' => $year]),
-            ],
-            'cadangan_penghapusan' => [
-                'name' => 'Laporan Cadangan Penghapusan Pinjaman',
-                'short_name' => 'Cadangan PPAP',
-                'pdf' => '/lending/reports/cadangan-penghapusan/pdf',
-                'excel' => null,
-                'query' => array_filter(['month' => $month, 'year' => $year]),
-            ],
             'members' => [
                 'name' => 'Ekspor Data Anggota',
                 'short_name' => 'Data Anggota',
@@ -3042,61 +1721,4 @@ final class AssistantToolService
         ];
     }
 
-    public function simulateLoan(array $params): array
-    {
-        $productCode = isset($params['product_code']) ? strtolower(trim((string) $params['product_code'])) : null;
-        if ($productCode !== null && $productCode !== '') {
-            $product = LoanProduct::query()->where('code', $productCode)->where('is_active', true)->first();
-            if ($product !== null) {
-                if (! isset($params['interest_rate'])) {
-                    $params['interest_rate'] = (float) $product->default_interest_rate;
-                }
-                if (! isset($params['term_months'])) {
-                    $params['term_months'] = (int) $product->default_term_months;
-                }
-                if (! isset($params['rounding_step'])) {
-                    $params['rounding_step'] = is_numeric($product->rounding_method) ? max(500, (int) $product->rounding_method) : 500;
-                }
-            }
-        }
-
-        $params['principal_amount'] = max(100000.0, (float) ($params['principal_amount'] ?? 10000000));
-        $params['term_months'] = max(1, min(120, (int) ($params['term_months'] ?? 12)));
-        $params['interest_rate'] = max(0.0, min(100.0, (float) ($params['interest_rate'] ?? 12.0)));
-        $params['installment_method'] = (string) ($params['installment_method'] ?? 'flat');
-        if (! in_array($params['installment_method'], ['flat', 'declining', 'annuity'], true)) {
-            $params['installment_method'] = 'flat';
-        }
-        $params['principal_frequency'] = (string) ($params['principal_frequency'] ?? 'monthly');
-        $params['interest_frequency'] = (string) ($params['interest_frequency'] ?? 'monthly');
-        $params['rounding_step'] = max(500, (int) ($params['rounding_step'] ?? 500));
-        $params['start_date'] = (string) ($params['start_date'] ?? date('Y-m-d'));
-
-        $simulation = $this->loanSimulator->simulate($params);
-
-        $borrowerName = (string) ($params['borrower_name'] ?? 'Calon Peminjam');
-        $pdfQuery = http_build_query([
-            'principal_amount' => $params['principal_amount'],
-            'term_months' => $params['term_months'],
-            'interest_rate' => $params['interest_rate'],
-            'installment_method' => $params['installment_method'],
-            'principal_frequency' => $params['principal_frequency'],
-            'interest_frequency' => $params['interest_frequency'],
-            'rounding_step' => $params['rounding_step'],
-            'start_date' => $params['start_date'],
-            'borrower_name' => $borrowerName,
-            'download' => '1',
-        ]);
-        $pdfUrl = "/lending/simulation/pdf?{$pdfQuery}";
-        $buttonMarkup = sprintf('::button{"label":"Unduh Jadwal Simulasi (PDF)","url":"%s","icon":"download"}::', $pdfUrl);
-
-        return [
-            'success' => true,
-            'summary' => $simulation['summary'],
-            'pdf_url' => $pdfUrl,
-            'download_button' => $buttonMarkup,
-            'schedule_preview' => array_slice($simulation['schedule'], 0, 3),
-            'total_installments' => count($simulation['schedule']),
-        ];
-    }
 }

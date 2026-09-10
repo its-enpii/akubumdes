@@ -200,9 +200,6 @@ function submitBulkReverse() {
                     <a v-if="can('journals.create')" href="/accounting/journal-entries/create">
                         <AppButton variant="secondary" icon="add" size="compact">Jurnal Umum</AppButton>
                     </a>
-                    <a v-if="can('installments.record')" href="/accounting/journal-entries/installment">
-                        <AppButton icon="payments" size="compact">Jurnal Angsuran</AppButton>
-                    </a>
                 </div>
             </header>
 
@@ -334,7 +331,7 @@ function submitBulkReverse() {
                                             target="_blank"
                                             rel="noopener"
                                             class="rounded-lg px-2 py-1 text-xs font-semibold text-primary hover:bg-primary/10"
-                                            title="Cetak Kuitansi Angsuran"
+                                            title="Cetak Bukti Kas"
                                         >
                                             Kuitansi
                                         </a>

@@ -5,16 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature\MasterData;
 
 use App\Domain\Access\Services\PermissionChecker;
-use App\Domain\Lending\Models\Loan;
-use App\Domain\Lending\Models\LoanBeneficiary;
-use App\Domain\Lending\Models\LoanBorrower;
-use App\Domain\Lending\Services\Reports\LoanDocumentService;
 use App\Domain\Membership\Models\Member;
 use App\Domain\Membership\Services\MemberService;
 use App\Models\Tenant\OrganizationUnit;
 use App\Models\User;
 use App\Tenancy\Middleware\ResolveTenant;
-use App\Tenancy\Services\TenantLoanProductProvisioner;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -184,99 +179,5 @@ final class MemberIdentityPhotoTest extends TestCase
             File::ensureDirectoryExists(dirname($database));
             File::put($database, '');
         }
-    }
-
-    public function test_ktp_document_renders_placeholder_without_photo(): void
-    {
-        $loan = $this->createLoanWithMember();
-
-        $html = $this->renderKtpHtml($loan);
-
-        self::assertStringContainsString('FOTO KTP BELUM DIUNGGAH', $html);
-        self::assertStringNotContainsString('data:image', $html);
-    }
-
-    public function test_ktp_document_embeds_uploaded_photo(): void
-    {
-        $member = $this->createMember();
-        $this->actingAs($this->user)
-            ->post('/master-data/members/'.$member->row_id.'/identity-photo', [
-                'identity_photo' => UploadedFile::fake()->image('ktp.jpg', 200, 120),
-            ]);
-
-        $loan = $this->createLoanWithMember($member);
-        $html = $this->renderKtpHtml($loan);
-
-        self::assertStringContainsString('data:image/jpeg;base64,', $html);
-    }
-
-    private function createMember(): Member
-    {
-        return app(MemberService::class)->create([
-            'nik' => '3273010203040001',
-            'name' => 'Budi Anggota',
-            'gender' => 'L',
-            'birth_place' => 'Bandung',
-            'birth_date' => '1990-01-02',
-            'phone' => '081234567890',
-            'family_card_number' => '3273010203040004',
-            'address' => 'Jalan Desa',
-            'village_id' => $this->village->row_id,
-            'registered_at' => '2026-07-19',
-            'status' => 'active',
-            'has_guarantor' => false,
-            'has_business' => false,
-        ], (int) $this->user->row_id);
-    }
-
-    private function createLoanWithMember(?Member $member = null): Loan
-    {
-        $member ??= $this->createMember();
-
-        app(TenantLoanProductProvisioner::class)->ensureDefaults();
-        $productId = (int) DB::connection('tenant')->table('loan_products')->where('code', 'spp')->value('row_id');
-
-        $loan = Loan::query()->create([
-            'legacy_source' => 'group_loan',
-            'loan_product_row_id' => $productId,
-            'sequence_number' => 1,
-            'loan_number' => 'PK-KTP-000001',
-            'proposed_at' => '2026-02-01',
-            'verified_at' => '2026-02-10',
-            'approved_at' => '2026-02-15',
-            'funded_at' => '2026-02-20',
-            'disbursed_at' => null,
-            'principal_amount' => 5000000,
-            'interest_rate' => 1.5,
-            'service_rate_total' => 18.0,
-            'term_months' => 12,
-            'installment_method' => 'flat',
-            'principal_frequency' => 'monthly',
-            'interest_frequency' => 'monthly',
-            'status' => 'approved',
-        ]);
-
-        LoanBorrower::query()->create([
-            'loan_row_id' => $loan->row_id,
-            'group_row_id' => null,
-            'member_row_id' => $member->row_id,
-        ]);
-
-        LoanBeneficiary::query()->create([
-            'loan_row_id' => $loan->row_id,
-            'member_row_id' => $member->row_id,
-            'proposed_amount' => 5000000,
-            'verified_amount' => 5000000,
-            'allocated_amount' => 5000000,
-        ]);
-
-        return $loan;
-    }
-
-    private function renderKtpHtml(Loan $loan): string
-    {
-        $payload = app(LoanDocumentService::class)->payload($loan, 'ktp');
-
-        return (string) view('reports.pdf.loan_documents.ktp', $payload)->render();
     }
 }

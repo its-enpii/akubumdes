@@ -6,15 +6,8 @@ namespace Tests\Feature\Onboarding;
 
 use App\Domain\Accounting\Models\Account;
 use App\Domain\Accounting\Models\JournalEntry;
-use App\Domain\Lending\Models\Loan;
-use App\Domain\Lending\Models\LoanInstallment;
-use App\Domain\Lending\Models\LoanProduct;
-use App\Domain\Membership\Models\Member;
-use App\Domain\Membership\Models\Person;
 use App\Domain\Onboarding\Services\TenantOnboardingService;
 use App\Models\User;
-use App\Tenancy\Services\TenantLoanProductProvisioner;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Tests\Concerns\BuildsTenantTestDatabase;
@@ -97,45 +90,4 @@ final class TenantOnboardingTest extends TestCase
         ], '2026-01-01', (int) $this->user->row_id);
     }
 
-    public function test_can_import_active_loans_with_fifo_payments(): void
-    {
-        app(TenantLoanProductProvisioner::class)->ensureDefaults();
-        $product = LoanProduct::query()->first();
-
-        $person = Person::query()->create([
-            'national_identity_number' => '3515011203900099',
-            'full_name' => 'Budi Tester',
-            'gender' => 'L',
-        ]);
-
-        $member = Member::query()->create([
-            'person_row_id' => $person->row_id,
-            'member_number' => 'MEM-001',
-            'registered_at' => '2026-01-01',
-            'status' => 'active',
-        ]);
-
-        $csvContent = "nomor_spk,nik_anggota,nama_kelompok,tanggal_pencairan,plafon_pinjaman,bunga_persen,jangka_bulan,akumulasi_pokok_dibayar,akumulasi_bunga_dibayar\n".
-            'SPK-TEST-001,3515011203900099,,2026-01-01,12000000,10,12,3000000,300000';
-
-        $file = UploadedFile::fake()->createWithContent('active_loans.csv', $csvContent);
-
-        $result = $this->service->importActiveLoans($file, (int) $this->user->row_id);
-
-        $this->assertEquals(1, $result['imported']);
-        $this->assertEmpty($result['errors']);
-
-        $loan = Loan::query()->where('loan_number', 'SPK-TEST-001')->first();
-        $this->assertNotNull($loan);
-        $this->assertEquals('disbursed', $loan->status);
-
-        $installments = LoanInstallment::query()->where('loan_row_id', $loan->row_id)->orderBy('installment_number')->get();
-        $this->assertCount(12, $installments);
-
-        // First 3 installments (1,000,000 principal each) should be paid
-        $this->assertEquals('paid', $installments[0]->status);
-        $this->assertEquals('paid', $installments[1]->status);
-        $this->assertEquals('paid', $installments[2]->status);
-        $this->assertEquals('pending', $installments[3]->status);
-    }
 }

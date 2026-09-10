@@ -1,15 +1,13 @@
 <script setup>
 import { useCan } from '../../../composables/useCan';
 import { useConfirm } from '../../../composables/useConfirm';
-import { useMoney } from '../../../composables/useMoney';
 import { useToast } from '../../../composables/useToast';
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import AppBadge from '../../../Components/AppBadge.vue';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
 import AppCheckbox from '../../../Components/AppCheckbox.vue';
-import AppDatePicker from '../../../Components/AppDatePicker.vue';
 import AppEmptyState from '../../../Components/AppEmptyState.vue';
 import AppIcon from '../../../Components/AppIcon.vue';
 import AppInput from '../../../Components/AppInput.vue';
@@ -24,22 +22,16 @@ const props = defineProps({
     instances: { type: Array, default: () => [] },
     global: { type: Object, default: () => ({ enabled: false, configured: false }) },
     baseUrl: { type: String, default: '' },
-    due_date: { type: String, default: null },
-    items: { type: Array, default: () => [] },
-    billing_gateway: { type: Object, default: null },
-    totals: { type: Object, default: null },
 });
 
 const { confirm: confirmAction } = useConfirm();
 const { can } = useCan();
-const { money } = useMoney();
 const toast = useToast();
 const loadingAction = ref(null);
 
 const tabs = computed(() => [
     ...(can('settings.manage') ? [{ key: 'instances', label: 'Status & Instance', icon: 'settings' }] : []),
     ...(can('settings.manage') ? [{ key: 'templates', label: 'Template Pesan', icon: 'edit_note' }] : []),
-    ...(can('messages.send') ? [{ key: 'billing', label: 'Kirim Tagihan', icon: 'send' }] : []),
 ]);
 const activeTab = ref(getInitialTab());
 
@@ -77,8 +69,6 @@ const form = useForm({
 });
 
 const globalForm = useForm({
-    template_billing: props.global.template_billing ?? '',
-    template_installment: props.global.template_installment ?? '',
     is_enabled: props.global.enabled ?? false,
     rotation_mode: props.global.rotation_mode ?? 'round_robin',
 });
@@ -312,94 +302,6 @@ function statusLabel(status) {
 
 const qrTone = computed(() => statusTone(qrStatus.value));
 
-const selectedDate = ref(props.due_date);
-const syncingDate = ref(false);
-const selected = reactive({});
-
-function hydrateSelection() {
-    Object.keys(selected).forEach((key) => delete selected[key]);
-    for (const item of props.items) {
-        selected[item.installment_row_id] = Boolean(item.can_send);
-    }
-}
-hydrateSelection();
-
-watch(
-    () => [props.due_date, props.items],
-    () => {
-        syncingDate.value = true;
-        selectedDate.value = props.due_date;
-        hydrateSelection();
-        queueMicrotask(() => {
-            syncingDate.value = false;
-        });
-    },
-    { deep: true },
-);
-
-function formatDate(value) {
-    if (!value) return '—';
-    const date = new Date(`${value}T00:00:00`);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-function goDate(value) {
-    if (!value || value === props.due_date) return;
-    router.get('/settings/whatsapp', { tab: 'billing', due_date: value }, {
-        preserveState: false,
-        preserveScroll: true,
-        replace: true,
-    });
-}
-
-watch(selectedDate, (value) => {
-    if (!syncingDate.value && value && value !== props.due_date) goDate(value);
-});
-
-const selectedIds = computed(() =>
-    props.items
-        .filter((item) => selected[item.installment_row_id])
-        .map((item) => item.installment_row_id),
-);
-
-const selectedAmount = computed(() =>
-    props.items
-        .filter((item) => selected[item.installment_row_id])
-        .reduce((sum, item) => sum + Number(item.amount || 0), 0),
-);
-
-function selectSendable() {
-    for (const item of props.items) {
-        selected[item.installment_row_id] = Boolean(item.can_send);
-    }
-}
-
-function clearSelection() {
-    for (const item of props.items) {
-        selected[item.installment_row_id] = false;
-    }
-}
-
-const billingForm = useForm({
-    due_date: props.due_date,
-    installment_row_ids: [],
-});
-
-function sendBilling() {
-    billingForm.due_date = props.due_date;
-    billingForm.installment_row_ids = selectedIds.value;
-    if (billingForm.installment_row_ids.length === 0) return;
-    billingForm.post('/notifications/billing/send', { preserveScroll: true });
-}
-
-const gatewayOk = computed(() => props.billing_gateway?.configured && props.billing_gateway?.enabled);
-const sourceLabel = {
-    group: 'Kelompok',
-    member: 'Anggota',
-    beneficiary: 'Pemanfaat',
-    none: '—',
-};
 </script>
 
 <template>
@@ -423,9 +325,6 @@ const sourceLabel = {
                     </AppBadge>
                     <AppBadge :tone="props.global.enabled ? 'success' : 'warning'">
                         {{ props.global.enabled ? 'Gateway Aktif' : 'Gateway Nonaktif' }}
-                    </AppBadge>
-                    <AppBadge v-if="props.billing_gateway" :tone="props.billing_gateway.state === 'open' ? 'success' : 'warning'">
-                        {{ props.billing_gateway.state ? statusLabel(props.billing_gateway.state) : 'Status Tidak Diketahui' }}
                     </AppBadge>
                 </div>
             </header>
@@ -534,11 +433,6 @@ const sourceLabel = {
 
                     <AppRadioGroup v-model="globalForm.rotation_mode" label="Strategi Rotasi Nomor" :options="rotationOptions" />
 
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <AppTextarea v-model="globalForm.template_billing" label="Pesan Tagihan" :rows="5" hint="Placeholder: {nama}, {angsuran_ke}, {total}, {tanggal}, {pinjaman}" />
-                        <AppTextarea v-model="globalForm.template_installment" label="Pesan Angsuran" :rows="5" hint="Placeholder: {nama}, {penyetor}, {angsuran_ke}, {total}" />
-                    </div>
-
                     <div class="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3">
                         <div>
                             <p class="text-sm font-bold text-primary">Aktifkan Gateway</p>
@@ -568,92 +462,6 @@ const sourceLabel = {
                 <AppButton :loading="form.processing" @click="submitInstance">{{ editingInstance ? 'Simpan' : 'Tambah' }}</AppButton>
             </template>
         </AppModal>
-
-        <div v-if="activeTab === 'billing'" class="space-y-6">
-            <div class="grid gap-4 md:grid-cols-3">
-                <AppCard>
-                    <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Jatuh tempo</p>
-                    <p class="mt-2 text-lg font-bold text-primary">{{ formatDate(props.due_date) }}</p>
-                    <p class="mt-1 text-xs text-on-surface-variant">{{ props.totals.count }} pinjaman · {{ props.totals.with_phone }} punya nomor</p>
-                </AppCard>
-                <AppCard>
-                    <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Total tagihan</p>
-                    <p class="mt-2 text-2xl font-bold text-primary">{{ money(props.totals.amount) }}</p>
-                </AppCard>
-                <AppCard>
-                    <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Dipilih</p>
-                    <p class="mt-2 text-2xl font-bold text-primary">{{ selectedIds.length }} · {{ money(selectedAmount) }}</p>
-                    <p class="mt-1 text-xs text-on-surface-variant">Instance {{ props.billing_gateway?.instance }}</p>
-                </AppCard>
-            </div>
-
-            <AppCard>
-                <div class="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
-                    <AppDatePicker v-model="selectedDate" label="Tanggal Jatuh Tempo" />
-                    <div class="flex flex-wrap items-end gap-2">
-                        <AppButton variant="secondary" class="h-14" @click="selectSendable">Pilih ber-nomor</AppButton>
-                        <AppButton variant="ghost" class="h-14" @click="clearSelection">Kosongkan</AppButton>
-                    </div>
-                </div>
-            </AppCard>
-
-            <AppCard :padded="false">
-                <header class="flex flex-col gap-3 border-b border-outline-variant px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <h2 class="text-lg font-bold text-primary">Daftar Jatuh Tempo</h2>
-                        <p class="text-sm text-on-surface-variant">Hanya pinjaman aktif dengan sisa angsuran.</p>
-                    </div>
-                    <AppButton
-                        icon="send"
-                        :loading="billingForm.processing"
-                        :disabled="billingForm.processing || !gatewayOk || selectedIds.length === 0"
-                        @click="sendBilling"
-                    >
-                        Kirim ({{ selectedIds.length }})
-                    </AppButton>
-                </header>
-
-                <div v-if="props.items.length === 0" class="p-6">
-                    <AppEmptyState icon="event_available" title="Tidak ada jatuh tempo" description="Ubah tanggal atau pastikan ada angsuran belum lunas." />
-                </div>
-
-                <div v-else class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-surface-container-low text-on-surface-variant">
-                            <tr>
-                                <th class="w-12 px-4 py-3" />
-                                <th class="px-4 py-3 font-semibold">Pinjaman</th>
-                                <th class="px-4 py-3 font-semibold">Ke</th>
-                                <th class="px-4 py-3 text-right font-semibold">Tagihan</th>
-                                <th class="px-4 py-3 font-semibold">Nomor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="item in props.items"
-                                :key="item.installment_row_id"
-                                class="border-t border-outline-variant"
-                                :class="!item.can_send && 'opacity-60'"
-                            >
-                                <td class="px-4 py-3">
-                                    <AppCheckbox v-model="selected[item.installment_row_id]" :disabled="!item.can_send" />
-                                </td>
-                                <td class="px-4 py-3">
-                                    <p class="font-semibold text-primary">{{ item.borrower }}</p>
-                                    <p class="text-xs text-on-surface-variant">{{ item.loan_number || `#${item.loan_row_id}` }}</p>
-                                </td>
-                                <td class="px-4 py-3 font-semibold text-primary">{{ item.installment_number }}</td>
-                                <td class="px-4 py-3 text-right font-semibold text-primary">{{ money(item.amount) }}</td>
-                                <td class="px-4 py-3">
-                                    <p class="font-mono text-sm text-primary">{{ item.phone || '—' }}</p>
-                                    <p class="text-xs text-on-surface-variant">{{ sourceLabel[item.phone_source] || item.phone_source }}</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </AppCard>
-        </div>
 
         <AppModal v-model="showQrModal" :title="qrInstance ? `Status ${qrInstance.name}` : 'Status Instance'" size="sm">
             <div class="space-y-4 text-center">

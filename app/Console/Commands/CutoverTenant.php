@@ -28,9 +28,6 @@ final class CutoverTenant extends Command
         {--skip-coa : Skip tenancy:import-legacy-chart-of-accounts}
         {--skip-accounting : Skip legacy:migrate-accounting}
         {--skip-membership : Skip legacy:migrate-membership}
-        {--skip-lending : Skip legacy:migrate-lending}
-        {--skip-payment-progress : Skip legacy:apply-loan-payment-progress}
-        {--skip-reconcile : Skip legacy:reconcile-lending}
         {--skip-sequences : Skip tenancy:initialize-sequences}
         {--continue-on-error : Do not abort chain on first non-zero exit}';
 
@@ -210,31 +207,6 @@ final class CutoverTenant extends Command
                     'suffix' => $suffix,
                 ], $commonFlags),
                 'skip' => (bool) $this->option('skip-membership'),
-            ],
-            [
-                'name' => 'lending',
-                'command' => 'legacy:migrate-lending',
-                'params' => array_merge([
-                    'tenant' => $tenant,
-                    'suffix' => $suffix,
-                ], $commonFlags),
-                'skip' => (bool) $this->option('skip-lending'),
-            ],
-            [
-                'name' => 'loan-payment-progress',
-                'command' => 'legacy:apply-loan-payment-progress',
-                'params' => ['tenant' => $tenant],
-                'skip' => (bool) $this->option('skip-payment-progress') || $dryRun,
-            ],
-            [
-                'name' => 'reconcile-lending',
-                'command' => 'legacy:reconcile-lending',
-                'params' => [
-                    'tenant' => $tenant,
-                    'suffix' => $suffix,
-                ],
-                // Recon always writes result rows; skip on pure dry-run chain.
-                'skip' => (bool) $this->option('skip-reconcile') || $dryRun,
             ],
             [
                 'name' => 'initialize-sequences',

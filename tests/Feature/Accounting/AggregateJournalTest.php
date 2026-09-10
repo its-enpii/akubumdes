@@ -53,7 +53,7 @@ final class AggregateJournalTest extends TestCase
             'account_type' => 'asset', 'normal_balance' => 'D', 'level' => 3, 'is_postable' => true, 'is_active' => true,
         ]);
         $this->ar = Account::query()->create([
-            'code' => '1.1.02', 'name' => 'Piutang',
+            'code' => '1.1.02', 'name' => 'Aset Tak Lancar',
             'account_type' => 'asset', 'normal_balance' => 'D', 'level' => 3, 'is_postable' => true, 'is_active' => true,
         ]);
         $this->revenue = Account::query()->create([
@@ -91,7 +91,7 @@ final class AggregateJournalTest extends TestCase
                 'description' => 'Backfill Jan-Mei migrasi ke SIDBM',
                 'lines' => [
                     ['account_row_id' => $this->cash->row_id, 'debit' => 11_000_000, 'credit' => 0, 'description' => 'Kas naik'],
-                    ['account_row_id' => $this->ar->row_id, 'debit' => 0, 'credit' => 5_000_000, 'description' => 'Piutang turun'],
+                    ['account_row_id' => $this->ar->row_id, 'debit' => 0, 'credit' => 5_000_000, 'description' => 'Aset tak lancar turun'],
                     ['account_row_id' => $this->revenue->row_id, 'debit' => 0, 'credit' => 6_000_000, 'description' => 'Pendapatan'],
                 ],
             ])

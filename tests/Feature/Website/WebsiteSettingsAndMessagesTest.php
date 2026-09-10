@@ -364,8 +364,8 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
 
     public function test_messages_search_filters_results(): void
     {
-        SiteMessage::query()->create(['name' => 'Ali Ahmad', 'message' => 'Tanya bunga.']);
-        SiteMessage::query()->create(['name' => 'Budi', 'message' => 'Tanya angsuran.']);
+        SiteMessage::query()->create(['name' => 'Ali Ahmad', 'message' => 'Tanya jadwal laporan.']);
+        SiteMessage::query()->create(['name' => 'Budi', 'message' => 'Tanya layanan.']);
 
         $this->actingAs($this->user)
             ->get('/website/messages?q=Ali')

@@ -6,10 +6,8 @@ namespace App\Http\Controllers\Settings;
 
 use App\Domain\Documents\Services\SignatureImageService;
 use App\Domain\Documents\Services\SignatureTemplateService;
-use App\Domain\Lending\Services\LoanService;
 use App\Domain\Membership\Models\OrganizationProfile;
 use App\Http\Requests\Settings\IdentityRequest;
-use App\Http\Requests\Settings\LendingSystemRequest;
 use App\Http\Requests\Settings\LogoUploadRequest;
 use App\Http\Requests\Settings\OfflineAccessRequest;
 use App\Http\Requests\Settings\SignatureImageUploadRequest;
@@ -45,28 +43,6 @@ final class SettingsController
             'timezone' => 'Asia/Jakarta',
         ]);
 
-        $columns = ['row_id', 'id', 'code', 'name', 'default_interest_rate', 'default_term_months', 'is_active'];
-        if (DB::connection('tenant')->getSchemaBuilder()->hasColumn('loan_products', 'rounding_method')) {
-            $columns[] = 'rounding_method';
-        }
-
-        $products = DB::connection('tenant')
-            ->table('loan_products')
-            ->orderBy('code')
-            ->get($columns)
-            ->map(fn ($p) => [
-                'row_id' => (int) $p->row_id,
-                'id' => (int) $p->id,
-                'code' => (string) $p->code,
-                'name' => (string) $p->name,
-                'default_interest_rate' => (float) $p->default_interest_rate,
-                'default_term_months' => (int) $p->default_term_months,
-                'rounding_method' => (string) ($p->rounding_method ?? 'decimal_2'),
-                'is_active' => (bool) $p->is_active,
-            ])
-            ->values()
-            ->all();
-
         $logoUrl = $profile->logo_path ? asset('storage/'.$profile->logo_path) : null;
         $templates = $signatures->all();
         $signatureImages = $images->urls();
@@ -89,7 +65,6 @@ final class SettingsController
                 'timezone' => (string) ($profile->timezone ?: 'Asia/Jakarta'),
                 'operational_start_date' => $profile->operational_start_date?->toDateString(),
             ],
-            'products' => $products,
             'logoUrl' => $logoUrl,
             'whatsapp' => $this->whatsappPayload($settings, $gateway),
             'offline' => [
@@ -130,41 +105,6 @@ final class SettingsController
         );
 
         return $this->flashRedirect('Identitas lembaga berhasil diperbarui.', 'identity');
-    }
-
-    public function updateLendingSystem(LendingSystemRequest $request): RedirectResponse
-    {
-        $data = $request->validated();
-        $rows = $data['products'] ?? [];
-
-        foreach ($rows as $row) {
-            $update = [
-                'default_interest_rate' => $row['default_interest_rate'],
-                'default_term_months' => $row['default_term_months'],
-                'is_active' => (bool) ($row['is_active'] ?? true),
-                'updated_at' => now(),
-            ];
-
-            if (DB::connection('tenant')->getSchemaBuilder()->hasColumn('loan_products', 'rounding_method')) {
-                $update['rounding_method'] = $row['rounding_method'] ?? 'decimal_2';
-            }
-
-            DB::connection('tenant')->table('loan_products')
-                ->where('row_id', $row['row_id'])
-                ->update($update);
-        }
-
-        return $this->flashRedirect('Pengaturan sistem pinjaman berhasil diperbarui.', 'lending-system');
-    }
-
-    public function syncRounding(LoanService $loanService): JsonResponse
-    {
-        $count = $loanService->syncRoundingFromProducts();
-
-        return response()->json([
-            'success' => true,
-            'message' => "Pembulatan berhasil disinkronkan ke {$count} pinjaman.",
-        ]);
     }
 
     public function updateLogo(LogoUploadRequest $request, TenantContext $context): RedirectResponse

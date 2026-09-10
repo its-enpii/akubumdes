@@ -45,7 +45,6 @@
                     <li>Laporan Arus Kas (Metode Langsung)</li>
                     <li>Laporan Perubahan Ekuitas</li>
                     <li>Catatan Atas Laporan Keuangan (CALK)</li>
-                    <li>Laporan Perkembangan Piutang (LPP) & Kolektibilitas Pinjaman</li>
                     <li>Laporan Penilaian Tingkat Kesehatan Keuangan Usaha</li>
                     <li>Laporan Rekapitulasi Inventaris & Aset Tetap</li>
                 </ol>

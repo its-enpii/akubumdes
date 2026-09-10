@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Notifications;
 
 use App\Domain\Accounting\Models\JournalEntry;
-use App\Domain\Lending\Models\Loan;
-use App\Domain\Lending\Models\LoanInstallment;
-use App\Domain\Lending\Models\LoanPayment;
 use App\Models\Platform\Invoice;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -70,115 +67,7 @@ final class NotificationCenterController
                 }
             }
 
-            // 2. Proposed loans needing verification / approval
-            $proposedLoans = Loan::query()
-                ->with(['borrower.group', 'borrower.member.person'])
-                ->where('status', 'proposed')
-                ->latest('row_id')
-                ->take(3)
-                ->get();
-
-            if ($proposedLoans->isNotEmpty()) {
-                $userIds = $proposedLoans->pluck('created_by_user_id')->filter()->unique()->values()->all();
-                $userMap = ! empty($userIds) ? User::query()->whereIn('row_id', $userIds)->pluck('name', 'row_id')->all() : [];
-
-                foreach ($proposedLoans as $proposal) {
-                    $borrowerName = $proposal->borrower?->group?->name
-                        ?? $proposal->borrower?->member?->person?->full_name
-                        ?? 'Kelompok';
-
-                    $creatorName = ($proposal->created_by_user_id && isset($userMap[$proposal->created_by_user_id]))
-                        ? $userMap[$proposal->created_by_user_id]
-                        : 'Petugas Lapangan';
-
-                    $id = 'loan_proposed_'.$proposal->row_id;
-                    $items[] = [
-                        'id' => $id,
-                        'type' => 'loan_proposed',
-                        'title' => 'Proposal: '.$borrowerName,
-                        'message' => 'Pengajuan pinjaman Rp '.number_format((float) ($proposal->proposed_amount ?? $proposal->principal_amount), 0, ',', '.').' menunggu verifikasi & persetujuan.',
-                        'time' => $proposal->proposed_at?->diffForHumans() ?? 'Perlu Tindakan',
-                        'target_url' => "/lending/loans/{$proposal->row_id}",
-                        'icon' => 'assignment_late',
-                        'variant' => 'warning',
-                        'read' => in_array($id, $readIds, true),
-                        'actor' => $creatorName,
-                    ];
-                }
-            }
-
-            // 3. Overdue loan installments
-            $overdueInstallments = LoanInstallment::query()
-                ->with(['loan.borrower.group', 'loan.borrower.member.person'])
-                ->where('status', 'pending')
-                ->where('due_date', '<', $today->toDateString())
-                ->latest('due_date')
-                ->take(3)
-                ->get();
-
-            if ($overdueInstallments->isNotEmpty()) {
-                foreach ($overdueInstallments as $inst) {
-                    $borrowerName = $inst->loan?->borrower?->group?->name
-                        ?? $inst->loan?->borrower?->member?->person?->full_name
-                        ?? 'Peminjam';
-
-                    $instAmount = (float) $inst->principal_due + (float) $inst->interest_due;
-                    $loanRowId = $inst->loan_row_id ?? $inst->loan?->row_id;
-
-                    $id = 'installment_overdue_'.$inst->row_id;
-                    $items[] = [
-                        'id' => $id,
-                        'type' => 'loan_overdue',
-                        'title' => 'Tunggakan: '.$borrowerName,
-                        'message' => 'Angsuran ke-'.$inst->installment_number.' sebesar Rp '.number_format($instAmount, 0, ',', '.').' melewati jatuh tempo.',
-                        'time' => $inst->due_date?->diffForHumans() ?? 'Terlambat',
-                        'target_url' => $loanRowId ? "/lending/loans/{$loanRowId}" : '/lending/loans',
-                        'icon' => 'warning',
-                        'variant' => 'danger',
-                        'read' => in_array($id, $readIds, true),
-                        'actor' => null, // Delinquency is system alert, not an actor action
-                    ];
-                }
-            }
-
-            // 4. Recent loan payments recorded by users
-            $recentPayments = LoanPayment::query()
-                ->with(['loan.borrower.group', 'loan.borrower.member.person'])
-                ->latest('row_id')
-                ->take(3)
-                ->get();
-
-            if ($recentPayments->isNotEmpty()) {
-                $userIds = $recentPayments->pluck('created_by_user_id')->filter()->unique()->values()->all();
-                $userMap = ! empty($userIds) ? User::query()->whereIn('row_id', $userIds)->pluck('name', 'row_id')->all() : [];
-
-                foreach ($recentPayments as $payment) {
-                    $borrowerName = $payment->loan?->borrower?->group?->name
-                        ?? $payment->loan?->borrower?->member?->person?->full_name
-                        ?? 'Peminjam';
-                    $recorderName = ($payment->created_by_user_id && isset($userMap[$payment->created_by_user_id]))
-                        ? $userMap[$payment->created_by_user_id]
-                        : 'Kasir';
-
-                    $loanRowId = $payment->loan_row_id ?? $payment->loan?->row_id;
-                    $id = 'payment_recent_'.$payment->row_id;
-
-                    $items[] = [
-                        'id' => $id,
-                        'type' => 'payment_activity',
-                        'title' => 'Penerimaan Angsuran: '.$borrowerName,
-                        'message' => 'Pembayaran angsuran Rp '.number_format((float) $payment->amount, 0, ',', '.').' dicatat oleh '.$recorderName.'.',
-                        'time' => $payment->created_at?->diffForHumans() ?? 'Baru saja',
-                        'target_url' => $loanRowId ? "/lending/loans/{$loanRowId}" : '/lending/loans',
-                        'icon' => 'payments',
-                        'variant' => 'success',
-                        'read' => in_array($id, $readIds, true),
-                        'actor' => $recorderName,
-                    ];
-                }
-            }
-
-            // 5. Recent journal entries created by users
+            // 2. Recent journal entries created by users
             $recentJournals = JournalEntry::query()
                 ->latest('row_id')
                 ->take(3)
@@ -219,7 +108,7 @@ final class NotificationCenterController
                     'id' => $id,
                     'type' => 'system',
                     'title' => 'Operasional Normal',
-                    'message' => 'Tidak ada tunggakan atau pengajuan tertunda yang membutuhkan tindakan saat ini.',
+                    'message' => 'Tidak ada pemberitahuan yang membutuhkan tindakan saat ini.',
                     'time' => 'Hari ini',
                     'target_url' => '/dashboard',
                     'icon' => 'check_circle',

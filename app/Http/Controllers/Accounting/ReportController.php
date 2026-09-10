@@ -12,7 +12,6 @@ use App\Domain\Accounting\Services\Reports\BalanceSheetService;
 use App\Domain\Accounting\Services\Reports\CalkService;
 use App\Domain\Accounting\Services\Reports\CashFlowService;
 use App\Domain\Accounting\Services\Reports\EquityChangeService;
-use App\Domain\Accounting\Services\Reports\FinancialHealthService;
 use App\Domain\Accounting\Services\Reports\GeneralLedgerService;
 use App\Domain\Accounting\Services\Reports\IncomeStatementService;
 use App\Domain\Accounting\Services\Reports\JournalListingService;
@@ -42,7 +41,6 @@ final class ReportController
         private readonly CashFlowService $cashFlow,
         private readonly EquityChangeService $equityChange,
         private readonly CalkService $calk,
-        private readonly FinancialHealthService $financialHealthService,
         private readonly AssetReportService $assetReportService,
         private readonly AnnualReportPackService $annualReportPack,
         private readonly ReportPdf $pdf,
@@ -55,13 +53,6 @@ final class ReportController
 
         return Inertia::render('Accounting/Reports/Index', [
             'reports' => [
-                ['key' => 'loan-portfolio', 'title' => 'Portofolio Pinjaman', 'href' => '/lending/reports/portfolio', 'icon' => 'payments'],
-                ['key' => 'schedule-vs-actual', 'title' => 'Rencana vs Realisasi', 'href' => '/lending/reports/schedule-vs-actual', 'icon' => 'compare_arrows'],
-                ['key' => 'lpp-desa', 'title' => 'LPP Rekap Desa', 'href' => '/lending/reports/lpp-desa', 'icon' => 'holiday_village'],
-                ['key' => 'lpp-kelompok', 'title' => 'LPP Rincian Kelompok', 'href' => '/lending/reports/lpp-kelompok', 'icon' => 'groups_2'],
-                ['key' => 'kolek-desa', 'title' => 'Kolektibilitas Pinjaman', 'href' => '/lending/reports/kolek-desa', 'icon' => 'pie_chart'],
-                ['key' => 'cadangan-penghapusan', 'title' => 'Cadangan Kerugian (CKPN)', 'href' => '/lending/reports/cadangan-penghapusan', 'icon' => 'shield'],
-                ['key' => 'financial-health', 'title' => 'Penilaian Kesehatan Usaha', 'href' => '/accounting/reports/financial-health', 'icon' => 'health_and_safety'],
                 ['key' => 'journals', 'title' => 'Jurnal Transaksi', 'href' => '/accounting/reports/journals', 'icon' => 'receipt_long'],
                 ['key' => 'trial-balance', 'title' => 'Neraca Saldo', 'href' => '/accounting/reports/trial-balance', 'icon' => 'table_chart'],
                 ['key' => 'balance-sheet', 'title' => 'Neraca', 'href' => '/accounting/reports/balance-sheet', 'icon' => 'account_balance'],

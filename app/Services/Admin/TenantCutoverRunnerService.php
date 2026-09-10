@@ -249,27 +249,6 @@ final class TenantCutoverRunnerService
                 'skip' => ! empty($options['skip_membership']),
             ],
             [
-                'name' => 'lending',
-                'label' => 'Migrasi Data Pinjaman & Spk',
-                'command' => 'legacy:migrate-lending',
-                'params' => array_merge(['tenant' => $tenantCode, 'suffix' => $suffix], $commonFlags),
-                'skip' => ! empty($options['skip_lending']),
-            ],
-            [
-                'name' => 'loan-payment-progress',
-                'label' => 'Pembaruan Progress Realisasi Angsuran',
-                'command' => 'legacy:apply-loan-payment-progress',
-                'params' => ['tenant' => $tenantCode],
-                'skip' => ! empty($options['skip_payment_progress']) || $dryRun,
-            ],
-            [
-                'name' => 'reconcile-lending',
-                'label' => 'Rekonsiliasi Pinjaman Legacy vs Next',
-                'command' => 'legacy:reconcile-lending',
-                'params' => ['tenant' => $tenantCode, 'suffix' => $suffix],
-                'skip' => ! empty($options['skip_reconcile']) || $dryRun,
-            ],
-            [
                 'name' => 'initialize-sequences',
                 'label' => 'Inisialisasi Sequence / Nomor Otomatis',
                 'command' => 'tenancy:initialize-sequences',

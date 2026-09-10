@@ -91,7 +91,7 @@ final class JournalEntryOptionResolver
         'penyusutan_kendaraan' => 'Beban Penyusutan Kendaraan & Mesin',
         'penyusutan_inventaris' => 'Beban Penyusutan Inventaris & Peralatan',
         'amortisasi_aset_tak_berwujud' => 'Beban Amortisasi Aset Tak Berwujud',
-        'cadangan_kerugian_piutang' => 'Penyisihan Cadangan Kerugian Piutang (CKP)',
+        'cadangan_kerugian_aset' => 'Penyisihan Cadangan Kerugian Aset',
         'pengakuan_utang_laba' => 'Pengakuan Utang Laba Bagian Desa/Masyarakat',
         'taksiran_pph_pajak' => 'Pengakuan Taksiran PPh Pajak',
         'utang_bonus_prestasi' => 'Pengakuan Utang Bonus Prestasi Kerja',
@@ -141,7 +141,7 @@ final class JournalEntryOptionResolver
         'penyusutan_kendaraan' => 'Penyesuaian & Penyusutan',
         'penyusutan_inventaris' => 'Penyesuaian & Penyusutan',
         'amortisasi_aset_tak_berwujud' => 'Penyesuaian & Penyusutan',
-        'cadangan_kerugian_piutang' => 'Penyesuaian & Penyusutan',
+        'cadangan_kerugian_aset' => 'Penyesuaian & Penyusutan',
         'pengakuan_utang_laba' => 'Penyesuaian & Penyusutan',
         'taksiran_pph_pajak' => 'Penyesuaian & Penyusutan',
         'utang_bonus_prestasi' => 'Penyesuaian & Penyusutan',
@@ -190,12 +190,11 @@ final class JournalEntryOptionResolver
         'penyusutan_kendaraan' => ['sumber_dana' => 'Akumulasi Penyusutan Kendaraan', 'disimpan_ke' => 'Beban Penyusutan Kendaraan'],
         'penyusutan_inventaris' => ['sumber_dana' => 'Akumulasi Penyusutan Inventaris', 'disimpan_ke' => 'Beban Penyusutan Inventaris'],
         'amortisasi_aset_tak_berwujud' => ['sumber_dana' => 'Akumulasi Amortisasi', 'disimpan_ke' => 'Beban Amortisasi'],
-        'cadangan_kerugian_piutang' => ['sumber_dana' => 'Cadangan Kerugian Piutang', 'disimpan_ke' => 'Beban Penyisihan Kerugian'],
+        'cadangan_kerugian_aset' => ['sumber_dana' => 'Cadangan Kerugian Aset', 'disimpan_ke' => 'Beban Penyisihan Kerugian'],
         'pengakuan_utang_laba' => ['sumber_dana' => 'Akun Utang Laba Bagian Desa/Masyarakat', 'disimpan_ke' => 'Laba Berjalan / Beban Laba'],
         'taksiran_pph_pajak' => ['sumber_dana' => 'Akun Utang Pajak PPh', 'disimpan_ke' => 'Beban Pajak Penghasilan'],
         'utang_bonus_prestasi' => ['sumber_dana' => 'Akun Utang Bonus Prestasi', 'disimpan_ke' => 'Beban Bonus Prestasi'],
         'penghapusan_aset' => ['sumber_dana' => 'Akumulasi Penyusutan Aset', 'disimpan_ke' => 'Beban Penghapusan Aset Tetap'],
-        'angsuran' => ['sumber_dana' => 'Tujuan', 'disimpan_ke' => 'Akun Kredit'],
     ];
 
     /** @var array<string, array{starts_with?: array<int, string>, not_starts_with?: array<int, string>, exclude_codes?: array<int, string>, exact?: string, all?: bool}> */
@@ -301,8 +300,8 @@ final class JournalEntryOptionResolver
         'penyusutan_inventaris:disimpan_ke' => ['exact' => '5.3.01.03'],
         'amortisasi_aset_tak_berwujud:sumber_dana' => ['starts_with' => ['1.2.04']],
         'amortisasi_aset_tak_berwujud:disimpan_ke' => ['starts_with' => ['5.3.01']],
-        'cadangan_kerugian_piutang:sumber_dana' => ['starts_with' => ['1.1.04']],
-        'cadangan_kerugian_piutang:disimpan_ke' => ['starts_with' => ['5.1.07']],
+        'cadangan_kerugian_aset:sumber_dana' => ['starts_with' => ['1.1.04']],
+        'cadangan_kerugian_aset:disimpan_ke' => ['starts_with' => ['5.1.07']],
         'pengakuan_utang_laba:sumber_dana' => ['starts_with' => ['2.1.04']],
         'pengakuan_utang_laba:disimpan_ke' => ['starts_with' => ['3.2', '5.']],
         'taksiran_pph_pajak:sumber_dana' => ['exact' => '2.1.03.01'],
@@ -312,8 +311,6 @@ final class JournalEntryOptionResolver
         'penghapusan_aset:sumber_dana' => ['starts_with' => ['1.2.02']],
         'penghapusan_aset:disimpan_ke' => ['exact' => '5.3.02.01'],
 
-        'angsuran:sumber_dana' => ['starts_with' => ['1.1.01']],
-        'angsuran:disimpan_ke' => ['all' => true],
     ];
 
     public static function isAssetPurchase(?string $type): bool

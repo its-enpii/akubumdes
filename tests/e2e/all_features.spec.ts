@@ -125,16 +125,6 @@ test.describe('3. Operational Tenant Suite Tests', () => {
         await expect(page.locator('h1')).toBeVisible();
     });
 
-    test('3.6. Lending - Pinjaman (/lending/loans)', async ({ page }) => {
-        await page.goto(`${BASE}/lending/loans`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-    });
-
-    test('3.7. Lending - Reports (/lending/reports)', async ({ page }) => {
-        await page.goto(`${BASE}/lending/reports`, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('h1')).toBeVisible();
-    });
-
     test('3.8. Accounting - Bagan Akun COA (/accounting/chart-of-accounts)', async ({ page }) => {
         await page.goto(`${BASE}/accounting/chart-of-accounts`, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('h1')).toBeVisible();

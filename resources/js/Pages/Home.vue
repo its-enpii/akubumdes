@@ -20,12 +20,6 @@ const floatPill2Ref = ref(null);
 
 const features = [
     {
-        icon: 'account_balance',
-        title: 'Pengelolaan Dana Bergulir',
-        desc: 'Manajemen permohonan pinjaman kelompok SPP & UEP, verifikasi berjenjang, jadwal angsuran amortisasi, hingga mutasi kolektibilitas per pemanfaat.',
-        badge: 'Lending Engine',
-    },
-    {
         icon: 'bar_chart',
         title: 'Konsolidasi Keuangan Kabupaten',
         desc: 'Portal pengawasan terpadu untuk Pemerintah Kabupaten (Dinas PMD & Inspektorat). Laporan Neraca, Laba Rugi, Buku Besar, dan CALK otomatis se-wilayah.',
@@ -34,7 +28,7 @@ const features = [
     {
         icon: 'smart_toy',
         title: 'AI Assistant & Pengetahuan Regulasi',
-        desc: 'Asisten cerdas terintegrasi untuk analisis data pinjaman, proyeksi keuangan bulanan, serta konsultasi regulasi dan SOP BUMDesma.',
+        desc: 'Asisten cerdas terintegrasi untuk analisis data keuangan, proyeksi keuangan bulanan, serta konsultasi regulasi dan SOP BUMDesma.',
         badge: 'AI Intelligence',
     },
     {
@@ -46,7 +40,7 @@ const features = [
     {
         icon: 'chat',
         title: 'Notifikasi WhatsApp Otomatis',
-        desc: 'Pengiriman slip pencairan pinjaman, struk angsuran, dan notifikasi pengingat jatuh tempo langsung ke nomor WhatsApp pengurus & pemanfaat.',
+        desc: 'Pengiriman pemberitahuan operasional dan notifikasi pembayaran tagihan langsung ke nomor WhatsApp pengurus.',
         badge: 'WA Gateway',
     },
     {
@@ -88,7 +82,7 @@ const steps = [
     {
         num: '03',
         title: 'Operasional Harian',
-        desc: 'Pencatatan pinjaman, pembayaran angsuran, kas/bank, dan jurnal akuntansi otomatis sesuai standar SAK Entitas Privat.',
+        desc: 'Pencatatan kas/bank dan jurnal akuntansi otomatis sesuai standar SAK Entitas Privat.',
     },
     {
         num: '04',
@@ -100,7 +94,7 @@ const steps = [
 const faqs = [
     {
         q: 'Apa itu SIDBM Next dan siapa saja yang dapat menggunakannya?',
-        a: 'SIDBM Next adalah sistem informasi tata kelola keuangan terpadu yang dirancang khusus untuk BUMDesma LKD (Lembaga Keuangan Desa / Eks UPK PNPM-MPd), pengelola dana bergulir masyarakat, serta instansi pembina teknis di tingkat Kabupaten (Dinas PMD & Inspektorat).',
+        a: 'SIDBM Next adalah sistem informasi tata kelola keuangan terpadu yang dirancang khusus untuk BUMDesma LKD (Lembaga Keuangan Desa / Eks UPK PNPM-MPd), operasional keuangan desa, serta instansi pembina teknis di tingkat Kabupaten (Dinas PMD & Inspektorat).',
     },
     {
         q: 'Apakah sistem ini sesuai dengan regulasi pemerintah dan standar akuntansi terkini?',
@@ -547,7 +541,7 @@ onUnmounted(() => {
                                     <!-- Mock Stats Cards -->
                                     <div class="grid grid-cols-2 gap-3.5">
                                         <div class="rounded-2xl bg-surface-container-low p-3.5 space-y-1 border border-outline-variant/40 hover:border-primary/30 transition-colors">
-                                            <span class="text-[11px] font-bold text-outline uppercase tracking-wider">Outstanding Piutang</span>
+                                            <span class="text-[11px] font-bold text-outline uppercase tracking-wider">Kas &amp; Bank</span>
                                             <p class="text-lg font-black text-primary">Rp 1.480.500.000</p>
                                             <span class="inline-flex items-center gap-1 text-[11px] font-bold text-secondary">
                                                 <AppIcon name="trending_up" class="text-sm" /> +12.4% bln ini

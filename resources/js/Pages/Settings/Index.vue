@@ -20,7 +20,6 @@ import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout.vue';
 
 const props = defineProps({
     identity: { type: Object, required: true },
-    products: { type: Array, required: true },
     logoUrl: { type: String, default: null },
     whatsapp: { type: Object, required: true },
     signatures: { type: Object, required: true },
@@ -34,7 +33,6 @@ const flash = computed(() => page.props.flash?.success);
 
 const tabs = [
     { key: 'identity', label: 'Identitas Lembaga', icon: 'badge' },
-    { key: 'lending-system', label: 'Sistem Pinjaman', icon: 'tune' },
     { key: 'logo', label: 'Logo Lembaga', icon: 'image' },
     { key: 'offline', label: 'Akses Offline', icon: 'cloud_off' },
     { key: 'signatures', label: 'Tanda Tangan', icon: 'draw' },
@@ -76,25 +74,6 @@ function submitIdentity() {
     identityForm.put('/settings/identity', { preserveScroll: true });
 }
 
-// === Lending system form ===
-const lendingForm = useForm({
-    products: props.products.map((p) => ({ ...p })),
-});
-const roundingOptions = [
-    { value: 'decimal_2', label: '2 Desimal' },
-    { value: 'rupiah_bersih', label: 'Rupiah Bersih' },
-    { value: 'ceil_100', label: 'Ke Atas (Rp 100)' },
-    { value: 'floor_100', label: 'Ke Bawah (Rp 100)' },
-    { value: '500', label: 'Rp 500' },
-    { value: '1000', label: 'Rp 1.000' },
-    { value: '5000', label: 'Rp 5.000' },
-    { value: '10000', label: 'Rp 10.000' },
-    { value: '50000', label: 'Rp 50.000' },
-];
-function submitLending() {
-    lendingForm.put('/settings/lending-system', { preserveScroll: true });
-}
-
 // === Logo ===
 const logoForm = useForm({ logo: null });
 const logoPreview = ref(props.logoUrl);
@@ -124,36 +103,6 @@ function submitLogo() {
 const { confirm: confirmAction } = useConfirm();
 const toast = useToast();
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
-
-const syncLoading = ref(false);
-async function syncRounding() {
-    if (!await confirmAction({
-        title: 'Sinkronkan Pembulatan',
-        message: 'Pembulatan dari setiap produk akan diterapkan ke semua pinjaman berstatus draft/verified dan jadwal angsurannya akan digenerate ulang. Lanjutkan?',
-        confirmLabel: 'Sinkronkan',
-        variant: 'primary',
-        icon: 'sync',
-    })) return;
-    syncLoading.value = true;
-    try {
-        const res = await fetch('/settings/lending-system/sync-rounding', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken(),
-            },
-            credentials: 'same-origin',
-        });
-        const data = await res.json();
-        toast.success(data.message);
-    } catch {
-        toast.error('Terjadi kesalahan saat sinkronisasi pembulatan.');
-    } finally {
-        syncLoading.value = false;
-    }
-}
 
 async function destroyLogo() {
     if (!await confirmAction({ title: 'Hapus Logo', message: 'Hapus logo organisasi?' })) return;
@@ -328,66 +277,7 @@ function applySignatureStarter() {
                         </form>
                     </AppCard>
 
-                    <AppCard v-show="activeTab === 'lending-system'" bordered>
-                        <h2 class="mb-1 text-lg font-bold text-primary">Sistem Pinjaman</h2>
-                        <p class="mb-5 text-sm text-on-surface-variant">Default jasa, jangka, dan metode pembulatan angsuran per produk pinjaman.</p>
-                        <div v-if="!lendingForm.products.length" class="rounded-lg border border-outline-variant bg-surface-container-low p-4 text-sm text-on-surface-variant">Belum ada produk pinjaman.</div>
-                        <div v-else class="space-y-4">
-                            <div v-for="(product, idx) in lendingForm.products" :key="product.row_id" class="grid gap-4 rounded-lg border border-outline-variant p-4 sm:grid-cols-2 lg:grid-cols-4">
-                                <div class="sm:col-span-2 lg:col-span-1">
-                                    <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Produk</p>
-                                    <p class="mt-1 font-bold text-primary">{{ product.code }}</p>
-                                    <p class="text-sm text-on-surface-variant">{{ product.name }}</p>
-                                </div>
-                                <AppInput v-model.number="lendingForm.products[idx].default_interest_rate" label="Default Jasa (%)" type="number" step="0.01" :min="0" :max="100" :error="lendingForm.errors[`products.${idx}.default_interest_rate`]" />
-                                <AppInput v-model.number="lendingForm.products[idx].default_term_months" label="Jangka (bulan)" type="number" :min="1" :max="240" :error="lendingForm.errors[`products.${idx}.default_term_months`]" />
-                                <SmartSelect v-model="lendingForm.products[idx].rounding_method" :options="roundingOptions" label="Pembulatan" />
-                            </div>
-                        </div>
-                        <div class="mt-5 flex justify-end gap-2 border-t border-outline-variant pt-4">
-                            <AppButton type="button" variant="outline" :loading="syncLoading" :disabled="syncLoading || !lendingForm.products.length" icon="sync" @click="syncRounding">Sinkronkan ke Pinjaman</AppButton>
-                            <AppButton type="button" :loading="lendingForm.processing" :disabled="lendingForm.processing || !lendingForm.products.length" icon="save" @click="submitLending">Simpan Sistem Pinjaman</AppButton>
-                        </div>
-                    </AppCard>
 
-                    <AppCard v-show="activeTab === 'offline'" bordered>
-                        <h2 class="mb-1 text-lg font-bold text-primary">Akses Offline</h2>
-                        <p class="mb-5 text-sm text-on-surface-variant">
-                            Aktifkan agar satu pengguna terpilih tetap dapat menginput, mengedit, dan menghapus data saat offline di desktop dan Android.
-                        </p>
-                        <div class="mb-5 flex flex-wrap items-center gap-3 rounded-lg bg-surface-container-low p-4">
-                            <AppBadge tone="primary-soft">Mutasi menunggu sinkron</AppBadge>
-                            <span class="text-lg font-bold text-primary">{{ outbox.pending }}</span>
-                            <AppBadge tone="error-soft">Gagal</AppBadge>
-                            <span class="text-lg font-bold text-error">{{ outbox.failed }}</span>
-                            <AppBadge tone="success-soft">Tersinkron</AppBadge>
-                            <span class="text-lg font-bold text-success">{{ outbox.synced }}</span>
-                        </div>
-                        <form class="space-y-5" @submit.prevent="submitOffline">
-                            <div class="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3">
-                                <div>
-                                    <p class="text-sm font-bold text-primary">Aktifkan Akses Offline</p>
-                                    <p class="text-xs text-on-surface-variant">Jika nonaktif, mode offline akan kembali hanya-baca.</p>
-                                </div>
-                                <AppSwitch v-model="offlineForm.is_enabled" />
-                            </div>
-                            <SmartSelect
-                                v-model="offlineForm.user_id"
-                                label="Pengguna Offline"
-                                placeholder="Pilih satu pengguna"
-                                :options="offlineUserOptions"
-                                :required="offlineForm.is_enabled"
-                                hint="Hanya satu pengguna per tenant yang dapat diizinkan."
-                            />
-                            <p v-if="offlineForm.errors.user_id" class="text-sm text-error">{{ offlineForm.errors.user_id }}</p>
-                            <p v-if="offlineForm.errors.is_enabled" class="text-sm text-error">{{ offlineForm.errors.is_enabled }}</p>
-                            <div class="flex justify-end border-t border-outline-variant pt-4">
-                                <AppButton type="submit" icon="save" :loading="offlineForm.processing" :disabled="offlineForm.processing">
-                                    Simpan Pengaturan Offline
-                                </AppButton>
-                            </div>
-                        </form>
-                    </AppCard>
                     <AppCard v-show="activeTab === 'logo'" bordered>
                         <h2 class="mb-1 text-lg font-bold text-primary">Logo Lembaga</h2>
                         <p class="mb-5 text-sm text-on-surface-variant">Logo akan tampil di sidebar aplikasi. Format: PNG, JPG, atau WebP. Maks 2 MB.</p>

@@ -128,7 +128,7 @@ function pickGreeting() {
         `Butuh bantuan? ${name} siap membantu.`,
         `Perlu bantuan mencatat transaksi? Mungkin ${name} bisa bantu.`,
         `Halo! ${name} di sini. Ada data yang ingin dicari?`,
-        `${salam}. ${name} siap bantu cek angsuran, jurnal, atau data anggota.`,
+        `${salam}. ${name} siap bantu cek jurnal atau data anggota.`,
     ];
     return pool[Math.floor(Math.random() * pool.length)];
 }

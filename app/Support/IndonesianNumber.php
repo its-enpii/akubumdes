@@ -30,12 +30,6 @@ final class IndonesianNumber
         return trim($words).' rupiah';
     }
 
-    /** Bulatkan nilai ke ribuan (untuk kewajiban angsuran). */
-    public static function roundInstallment(float $value): float
-    {
-        return round($value / 1000) * 1000;
-    }
-
     private static function toWords(int $value, array $units): string
     {
         if ($value < 12) {

@@ -40,7 +40,6 @@ final readonly class RegencyConsolidatedReportService
     {
         $period = $this->resolvePeriod($year, $month);
         $asOf = CarbonImmutable::parse($period['as_of'])->startOfDay();
-        $endOfMonth = CarbonImmutable::createFromDate($year, $month ?? (int) date('n'), 1)->endOfMonth()->toDateString();
         $kecamatans = $this->listKecamatans($shard)->whereIn('row_id', $tenantIds)->values();
 
         if ($tenantIds === []) {
@@ -48,15 +47,8 @@ final readonly class RegencyConsolidatedReportService
                 'period' => $period,
                 'summary' => [
                     'total_kecamatans' => 0,
-                    'total_turnover' => 0.0,
                     'total_assets' => 0.0,
-                    'avg_npl_ratio' => 0.0,
-                    'npl_status' => 'Sehat',
-                    'npl_tone' => 'success',
                     'total_cash' => 0.0,
-                    'active_loans_count' => 0,
-                    'active_loan_principal' => 0.0,
-                    'total_tunggakan_pokok' => 0.0,
                     'net_income_ytd' => 0.0,
                     'revenue_ops_ytd' => 0.0,
                     'expense_ops_ytd' => 0.0,
@@ -69,100 +61,27 @@ final readonly class RegencyConsolidatedReportService
         $cashBalances = $this->queryBalancesForAccountCodes($tenantIds, ['1.1.01%', '1.1.02%'], $asOf);
         $totalCash = round(array_sum(array_column($cashBalances, 'balance')), 2);
 
-        // 2. Data Pinjaman Aktif, Angsuran, & Kolektibilitas NPL
-        $loans = DB::connection('tenant')
-            ->table('loans')
-            ->whereIn('tenant_id', $tenantIds)
-            ->whereIn('status', ['active', 'disbursed'])
-            ->get(['row_id', 'tenant_id', 'principal_amount', 'disbursed_at']);
-
-        $loanRowIds = $loans->pluck('row_id')->map(fn ($id) => (int) $id)->all();
-
-        $installments = $loanRowIds === []
-            ? collect()
-            : DB::connection('tenant')
-                ->table('loan_installments')
-                ->whereIn('tenant_id', $tenantIds)
-                ->whereIn('loan_row_id', $loanRowIds)
-                ->where('due_date', '<=', $endOfMonth)
-                ->groupBy(['tenant_id', 'loan_row_id'])
-                ->selectRaw('tenant_id, loan_row_id, CAST(COALESCE(SUM(principal_due), 0) AS CHAR) as total_principal_due')
-                ->get()
-                ->groupBy('tenant_id');
-
-        $allocations = $loanRowIds === []
-            ? collect()
-            : DB::connection('tenant')
-                ->table('loan_payment_allocations as a')
-                ->join('loan_payments as p', function ($j): void {
-                    $j->on('p.tenant_id', '=', 'a.tenant_id')
-                        ->on('p.row_id', '=', 'a.payment_row_id');
-                })
-                ->whereIn('a.tenant_id', $tenantIds)
-                ->whereIn('p.loan_row_id', $loanRowIds)
-                ->where('a.component', 'principal')
-                ->where('p.paid_at', '<=', $endOfMonth)
-                ->groupBy(['a.tenant_id', 'p.loan_row_id'])
-                ->selectRaw('a.tenant_id, p.loan_row_id, CAST(COALESCE(SUM(a.amount), 0) AS CHAR) as total_principal_paid')
-                ->get()
-                ->groupBy('tenant_id');
-
-        // 3. Neraca & Akumulasi Aset Gabungan
+        // 2. Neraca & Akumulasi Aset Gabungan
         $balanceSheet = $this->balanceSheet($shard, $tenantIds, $year, $month);
         $totalAssets = (float) ($balanceSheet['summary']['total_assets'] ?? 0.0);
         $assetGroup = collect($balanceSheet['groups'] ?? [])->firstWhere('type', 'asset');
         $tenantAssetsMap = is_array($assetGroup) ? ($assetGroup['tenants'] ?? []) : [];
 
-        // 4. Ringkasan Laba Rugi Konsolidasi YTD
+        // 3. Ringkasan Laba Rugi Konsolidasi YTD
         $incomeStatement = $this->incomeStatement($shard, $tenantIds, $year, $month);
         $totalNetIncomeYtd = (float) ($incomeStatement['summary']['after_tax']['ytd'] ?? 0);
         $totalRevenueOpsYtd = (float) ($incomeStatement['summary']['revenue_ops']['ytd'] ?? 0);
         $totalExpenseOpsYtd = (float) ($incomeStatement['summary']['expense_ops']['ytd'] ?? 0);
 
-        // 5. Rekap Per Kecamatan & Perhitungan Metrik Supervisi
+        // 4. Rekap Per Kecamatan
         $recap = [];
         $regencyCode = $shard->regency_code ?: '3301';
-        $totalTurnover = 0.0;
-        $totalActivePrincipal = 0.0;
-        $totalTunggakanPokok = 0.0;
-        $totalActiveLoans = 0;
         $totalKecCount = count($kecamatans);
 
         foreach ($kecamatans as $index => $kecamatan) {
             $tId = (int) $kecamatan->row_id;
             $kecCash = round((float) ($cashBalances[$tId]['balance'] ?? 0), 2);
             $kecAssets = round((float) ($tenantAssetsMap[$tId] ?? 0.0), 2);
-
-            $tLoans = $loans->where('tenant_id', $tId);
-            $tInsts = ($installments->get($tId) ?? collect())->keyBy('loan_row_id');
-            $tAllocs = ($allocations->get($tId) ?? collect())->keyBy('loan_row_id');
-
-            $tAlokasi = 0.0;
-            $tSaldo = 0.0;
-            $tTunggakan = 0.0;
-
-            foreach ($tLoans as $l) {
-                $lId = (int) $l->row_id;
-                $alokasi = (float) $l->principal_amount;
-                $tAlokasi += $alokasi;
-
-                $due = (float) ($tInsts->get($lId)->total_principal_due ?? 0.0);
-                $paid = (float) ($tAllocs->get($lId)->total_principal_paid ?? 0.0);
-
-                $saldo = max(0.0, round($alokasi - $paid, 2));
-                $tunggakan = max(0.0, round($due - $paid, 2));
-
-                $tSaldo += $saldo;
-                $tTunggakan += $tunggakan;
-            }
-
-            $totalTurnover += $tAlokasi;
-            $totalActivePrincipal += $tSaldo;
-            $totalTunggakanPokok += $tTunggakan;
-            $totalActiveLoans += $tLoans->count();
-
-            $kecNplRatio = $tSaldo > 0 ? round(($tTunggakan / $tSaldo) * 100, 2) : 0.0;
-            $nplEval = self::evaluateNpl($kecNplRatio);
 
             $savedGeo = RegencyGeoService::resolveSavedCoordinate($kecamatan->map_latitude, $kecamatan->map_longitude, $kecamatan->map_zoom);
             $geo = $savedGeo ?? RegencyGeoService::resolveDistrictCoordinate(
@@ -191,13 +110,6 @@ final readonly class RegencyConsolidatedReportService
                 'district_code' => $kecamatan->district_code,
                 'cash' => $kecCash,
                 'total_assets' => $kecAssets,
-                'turnover' => round($tAlokasi, 2),
-                'active_loans' => $tLoans->count(),
-                'active_principal' => round($tSaldo, 2),
-                'tunggakan_pokok' => round($tTunggakan, 2),
-                'npl_ratio' => $kecNplRatio,
-                'npl_status' => $nplEval['status'],
-                'npl_tone' => $nplEval['tone'],
                 'groups_count' => $kecGroups,
                 'members_count' => $kecMembers,
                 'lat' => $geo['lat'],
@@ -206,50 +118,18 @@ final readonly class RegencyConsolidatedReportService
             ];
         }
 
-        $avgNplRatio = $totalActivePrincipal > 0
-            ? round(($totalTunggakanPokok / $totalActivePrincipal) * 100, 2)
-            : 0.0;
-        $regencyNplEval = self::evaluateNpl($avgNplRatio);
-
         return [
             'period' => $period,
             'summary' => [
                 'total_kecamatans' => count($tenantIds),
-                'total_turnover' => round($totalTurnover, 2),
                 'total_assets' => round($totalAssets, 2),
-                'avg_npl_ratio' => $avgNplRatio,
-                'npl_status' => $regencyNplEval['status'],
-                'npl_tone' => $regencyNplEval['tone'],
                 'total_cash' => $totalCash,
-                'active_loans_count' => $totalActiveLoans,
-                'active_loan_principal' => round($totalActivePrincipal, 2),
-                'total_tunggakan_pokok' => round($totalTunggakanPokok, 2),
                 'net_income_ytd' => $totalNetIncomeYtd,
                 'revenue_ops_ytd' => $totalRevenueOpsYtd,
                 'expense_ops_ytd' => $totalExpenseOpsYtd,
             ],
             'kecamatans' => $recap,
         ];
-    }
-
-    /**
-     * Evaluasi predikat kesehatan rasio NPL berdasarkan standar BUMDesma / LKD.
-     *
-     * @return array{status: string, tone: string}
-     */
-    public static function evaluateNpl(float $ratio): array
-    {
-        if ($ratio <= 5.0) {
-            return ['status' => 'Sehat (≤ 5%)', 'tone' => 'success'];
-        }
-        if ($ratio <= 10.0) {
-            return ['status' => 'Cukup Sehat (5–10%)', 'tone' => 'primary'];
-        }
-        if ($ratio <= 25.0) {
-            return ['status' => 'Kurang Sehat (10–25%)', 'tone' => 'warning'];
-        }
-
-        return ['status' => 'Tidak Sehat (> 25%)', 'tone' => 'error'];
     }
 
     /**
@@ -896,12 +776,6 @@ final readonly class RegencyConsolidatedReportService
                 'label' => 'Total Kas & Setara Kas Gabungan',
                 'value' => $cf['reconciliation']['cash_closing'] ?? 0,
                 'tone' => 'primary',
-            ],
-            [
-                'key' => 'active_principal',
-                'label' => 'Total Portofolio Pinjaman Bergulir',
-                'value' => $dashboard['summary']['active_loan_principal'] ?? 0,
-                'tone' => 'info',
             ],
             [
                 'key' => 'total_assets',

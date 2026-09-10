@@ -43,10 +43,6 @@ export function useKeyboardShortcuts() {
                     event.preventDefault();
                     router.visit('/accounting/journals');
                     break;
-                case 'l':
-                    event.preventDefault();
-                    router.visit('/lending/loans');
-                    break;
                 case 'm':
                     event.preventDefault();
                     router.visit('/membership/members');

@@ -34,8 +34,6 @@ const isExpanded = ref(false);
 const metricOptions = [
     { key: 'turnover', label: 'Perputaran Dana', icon: 'sync_alt' },
     { key: 'assets', label: 'Akumulasi Aset', icon: 'account_balance' },
-    { key: 'npl', label: 'Rasio NPL (Risiko)', icon: 'health_and_safety' },
-    { key: 'loans', label: 'Pinjaman Aktif', icon: 'credit_score' },
 ];
 
 const filteredKecamatans = computed(() => {
@@ -62,34 +60,16 @@ function compactNumber(val) {
 }
 
 function getMarkerColor(kec) {
-    if (activeMetric.value === 'npl') {
-        const ratio = Number(kec.npl_ratio || 0);
-        if (ratio <= 5.0) return { bg: '#0b5c2a', border: '#8fd4b0', label: 'Sehat' };
-        if (ratio <= 10.0) return { bg: '#0b3d66', border: '#81a8d7', label: 'Cukup Sehat' };
-        if (ratio <= 25.0) return { bg: '#8f5300', border: '#ffddb0', label: 'Kurang Sehat' };
-        return { bg: '#ba1a1a', border: '#ffdad6', label: 'Tidak Sehat' };
-    }
-
     if (activeMetric.value === 'assets') {
         return { bg: '#002746', border: '#81a8d7', label: 'Aset' };
-    }
-
-    if (activeMetric.value === 'loans') {
-        return { bg: '#0b3d2a', border: '#8fd4b0', label: 'Pinjaman' };
     }
 
     return { bg: '#0b3d66', border: '#a2cafa', label: 'Perputaran' };
 }
 
 function getMetricValueFormatted(kec) {
-    if (activeMetric.value === 'npl') {
-        return `${Number(kec.npl_ratio || 0).toFixed(1)}% NPL`;
-    }
     if (activeMetric.value === 'assets') {
         return compactNumber(kec.total_assets);
-    }
-    if (activeMetric.value === 'loans') {
-        return `${kec.active_loans || 0} Pinj`;
     }
     return compactNumber(kec.turnover);
 }
@@ -267,7 +247,7 @@ onUnmounted(() => {
                             <AppBadge tone="primary-soft">{{ kecamatans.length }} Kecamatan</AppBadge>
                         </div>
                         <p class="text-xs text-on-surface-variant">
-                            Visualisasi spasial sebaran BUMDesma, total perputaran dana, akumulasi aset, dan rasio NPL per wilayah.
+                            Visualisasi spasial sebaran BUMDesma, total perputaran dana, dan akumulasi aset per wilayah.
                         </p>
                     </div>
                 </div>
@@ -339,26 +319,7 @@ onUnmounted(() => {
                     <span class="text-[10px] text-on-surface-variant font-medium">{{ metricOptions.find(m => m.key === activeMetric)?.label }}</span>
                 </div>
 
-                <div v-if="activeMetric === 'npl'" class="space-y-1 text-xs">
-                    <div class="flex items-center justify-between gap-3">
-                        <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-secondary"></span> Sehat</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant">≤ 5.0%</span>
-                    </div>
-                    <div class="flex items-center justify-between gap-3">
-                        <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-primary-container"></span> Cukup Sehat</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant">5.1 – 10.0%</span>
-                    </div>
-                    <div class="flex items-center justify-between gap-3">
-                        <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-tertiary-container"></span> Kurang Sehat</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant">10.1 – 25.0%</span>
-                    </div>
-                    <div class="flex items-center justify-between gap-3">
-                        <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-error"></span> Tidak Sehat / Macet</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant">> 25.0%</span>
-                    </div>
-                </div>
-
-                <div v-else class="space-y-1.5 text-xs text-on-surface-variant">
+                <div class="space-y-1.5 text-xs text-on-surface-variant">
                     <p class="text-[11px]">Pin lokasi merepresentasikan titik kantor BUMDesma / UPK per kecamatan.</p>
                     <div class="flex items-center gap-2 pt-1 border-t border-outline-variant/30 text-[11px] text-primary font-medium">
                         <AppIcon name="touch_app" />
@@ -387,13 +348,6 @@ onUnmounted(() => {
                     </button>
                 </div>
 
-                <div class="mt-3 flex items-center justify-between">
-                    <span class="text-xs text-on-surface-variant font-medium">Status Risiko NPL</span>
-                    <AppBadge :tone="selectedKecamatan.npl_tone || 'primary'">
-                        {{ selectedKecamatan.npl_status || 'Sehat' }} ({{ selectedKecamatan.npl_ratio }}%)
-                    </AppBadge>
-                </div>
-
                 <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
                     <div class="rounded-lg bg-surface-container-low p-2.5">
                         <span class="text-[10px] text-on-surface-variant font-medium">Perputaran Dana</span>
@@ -402,10 +356,6 @@ onUnmounted(() => {
                     <div class="rounded-lg bg-surface-container-low p-2.5">
                         <span class="text-[10px] text-on-surface-variant font-medium">Total Aset</span>
                         <p class="mt-0.5 font-bold text-primary">{{ money(selectedKecamatan.total_assets) }}</p>
-                    </div>
-                    <div class="rounded-lg bg-surface-container-low p-2.5">
-                        <span class="text-[10px] text-on-surface-variant font-medium">Pinjaman Aktif</span>
-                        <p class="mt-0.5 font-bold text-primary">{{ selectedKecamatan.active_loans }} Pinjaman</p>
                     </div>
                     <div class="rounded-lg bg-surface-container-low p-2.5">
                         <span class="text-[10px] text-on-surface-variant font-medium">Kas & Bank</span>

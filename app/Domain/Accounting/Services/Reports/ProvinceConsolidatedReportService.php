@@ -44,8 +44,6 @@ final readonly class ProvinceConsolidatedReportService
                     'total_regencies' => 0,
                     'total_kecamatans' => 0,
                     'total_cash' => 0.0,
-                    'active_loans_count' => 0,
-                    'active_loan_principal' => 0.0,
                     'net_income_ytd' => 0.0,
                 ],
                 'regency_recap' => [],
@@ -54,14 +52,6 @@ final readonly class ProvinceConsolidatedReportService
 
         $cashBalances = $this->queryBalancesForAccountCodes($tenantIds, ['1.1.01%', '1.1.02%'], $asOf);
         $totalCash = round(array_sum(array_column($cashBalances, 'balance')), 2);
-
-        $loanStats = DB::connection('tenant')
-            ->table('loans')
-            ->whereIn('tenant_id', $tenantIds)
-            ->whereIn('status', ['active', 'disbursed'])
-            ->selectRaw('COUNT(*) as total_loans')
-            ->selectRaw('CAST(COALESCE(SUM(principal_amount), 0) AS CHAR) as total_principal')
-            ->first();
 
         $incomeStatement = $this->incomeStatement($tenantIds, $year, $month);
         $netIncomeYtd = (float) ($incomeStatement['summary']['after_tax']['ytd'] ?? 0);
@@ -76,19 +66,10 @@ final readonly class ProvinceConsolidatedReportService
                 $regCash += (float) ($cashBalances[$tId]['balance'] ?? 0);
             }
 
-            $regLoans = DB::connection('tenant')
-                ->table('loans')
-                ->whereIn('tenant_id', $regTenantIds)
-                ->whereIn('status', ['active', 'disbursed'])
-                ->selectRaw('COUNT(*) as total_loans, CAST(COALESCE(SUM(principal_amount), 0) AS CHAR) as total_principal')
-                ->first();
-
             $regencyRecap[] = [
                 'regency_name' => $regName,
                 'kecamatans_count' => count($regTenants),
                 'cash' => round($regCash, 2),
-                'active_loans' => (int) ($regLoans->total_loans ?? 0),
-                'active_principal' => (float) ($regLoans->total_principal ?? 0),
             ];
         }
 
@@ -98,8 +79,6 @@ final readonly class ProvinceConsolidatedReportService
                 'total_regencies' => count($byRegency),
                 'total_kecamatans' => count($tenantIds),
                 'total_cash' => $totalCash,
-                'active_loans_count' => (int) ($loanStats->total_loans ?? 0),
-                'active_loan_principal' => (float) ($loanStats->total_principal ?? 0),
                 'net_income_ytd' => $netIncomeYtd,
             ],
             'regency_recap' => $regencyRecap,

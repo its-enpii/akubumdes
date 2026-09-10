@@ -285,31 +285,25 @@ final readonly class TenantDataPurifierService
                 ->pluck('transaction_date')
                 ->all();
 
-            // 1. Delete loan installment tracking
-            $deletedInstallments = $conn->table('loan_installment_tracking')
-                ->where('tenant_id', $tenantId)
-                ->whereIn('journal_entry_row_id', $allIds)
-                ->delete();
-
-            // 2. Clear reversed_entry_row_id references on other entries to prevent FK constraint
+            // Clear reversed_entry_row_id references on other entries to prevent FK constraint
             $conn->table('journal_entries')
                 ->where('tenant_id', $tenantId)
                 ->whereIn('reversed_entry_row_id', $allIds)
                 ->update(['reversed_entry_row_id' => null]);
 
-            // 3. Delete journal lines
+            // Delete journal lines
             $deletedLines = $conn->table('journal_lines')
                 ->where('tenant_id', $tenantId)
                 ->whereIn('journal_entry_row_id', $allIds)
                 ->delete();
 
-            // 4. Delete journal entries
+            // Delete journal entries
             $deletedEntries = $conn->table('journal_entries')
                 ->where('tenant_id', $tenantId)
                 ->whereIn('row_id', $allIds)
                 ->delete();
 
-            // 5. Recalculate affected monthly balances
+            // Recalculate affected monthly balances
             $monthsRecalculated = [];
             foreach ($affectedDates as $d) {
                 if ($d) {
@@ -329,7 +323,6 @@ final readonly class TenantDataPurifierService
             return [
                 'deleted_entries' => $deletedEntries,
                 'deleted_lines' => $deletedLines,
-                'deleted_installments' => $deletedInstallments,
             ];
         });
     }

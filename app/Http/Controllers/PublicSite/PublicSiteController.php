@@ -268,7 +268,6 @@ final class PublicSiteController
             'Disallow: /dashboard',
             'Disallow: /website',
             'Disallow: /master-data',
-            'Disallow: /lending',
             'Disallow: /accounting',
             'Disallow: /settings',
             'Disallow: /admin',
