@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\MasterData;
 
 use App\Domain\Access\Services\PermissionChecker;
-use App\Domain\Membership\Models\Member;
-use App\Domain\Membership\Services\MemberService;
 use App\Models\Tenant\OrganizationUnit;
 use App\Models\User;
 use App\Tenancy\Middleware\ResolveTenant;

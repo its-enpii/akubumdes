@@ -89,5 +89,4 @@ final class TenantOnboardingTest extends TestCase
             ['account_row_id' => (int) $kas->row_id, 'debit' => 5000000, 'credit' => 0],
         ], '2026-01-01', (int) $this->user->row_id);
     }
-
 }

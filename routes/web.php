@@ -296,6 +296,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
             Route::post('/data-purifier/end-training', [TenantDataPurifierController::class, 'endTraining'])->name('data-purifier.end-training');
             Route::post('/data-purifier/purge', [TenantDataPurifierController::class, 'purge'])->name('data-purifier.purge');
             Route::post('/data-purifier/reset-training', [TenantDataPurifierController::class, 'resetTraining'])->name('data-purifier.reset-training');
+        });
     });
 });
 
@@ -418,7 +419,6 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
         Route::get('/groups/{group}/edit', [GroupController::class, 'edit'])->name('groups.edit');
         Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
     });
-
 
     // Accounting
     Route::redirect('/assets', '/accounting/assets', 301);
@@ -581,8 +581,6 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
     // Notifications (Center & Billing Notice)
     Route::get('/api/notifications', [NotificationCenterController::class, 'index'])->name('notifications.feed');
     Route::post('/api/notifications/mark-read', [NotificationCenterController::class, 'markRead'])->name('notifications.mark-read');
-    });
-
     // WhatsApp Gateway API routes
     Route::prefix('wa')->name('wa.')->group(function (): void {
         Route::post('/send', [WhatsappController::class, 'sendMessage'])->name('send');

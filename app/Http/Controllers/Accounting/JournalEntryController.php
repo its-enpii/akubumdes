@@ -10,19 +10,14 @@ use App\Domain\Accounting\Services\JournalEntryOptionResolver;
 use App\Domain\Accounting\Services\JournalPostingService;
 use App\Domain\Assets\Services\AssetService;
 use App\Http\Requests\Accounting\JournalEntryRequest;
-use App\Support\ReportPdf;
 use App\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
-use DomainException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class JournalEntryController
 {
@@ -291,5 +286,4 @@ final class JournalEntryController
             'end' => $start->endOfYear()->toDateString(),
         ];
     }
-
 }

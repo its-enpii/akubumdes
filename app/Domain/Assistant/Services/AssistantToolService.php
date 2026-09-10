@@ -12,13 +12,11 @@ use App\Domain\Accounting\Services\JournalPostingService;
 use App\Domain\Accounting\Services\JournalReversalService;
 use App\Domain\Assets\Models\Asset;
 use App\Domain\Assets\Services\AssetService;
-use App\Domain\Membership\Models\Member;
 use App\Http\Requests\Accounting\JournalEntryRequest;
 use App\Models\User;
 use App\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
 use DomainException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -230,6 +228,7 @@ final class AssistantToolService
 
         return $this->withMatchMeta($items);
     }
+
     public function searchGroups(array $params): array
     {
         $q = trim((string) ($params['query'] ?? ''));
@@ -261,7 +260,6 @@ final class AssistantToolService
 
         return $this->withMatchMeta($items);
     }
-
 
     /**
      * @param  array<string, mixed>  $params
@@ -1175,13 +1173,6 @@ final class AssistantToolService
         return (int) $fallback;
     }
 
-
-
-
-
-
-
-
     /**
      * @return array{row_id: int}|array{needs_clarification: bool, reason: string, message: string, candidates: list<array<string,mixed>>}
      */
@@ -1720,5 +1711,4 @@ final class AssistantToolService
             'instructions' => 'Sertakan tombol action_button ini dalam respon Anda agar pengguna bisa langsung mendownload file laporan dengan satu klik.',
         ];
     }
-
 }

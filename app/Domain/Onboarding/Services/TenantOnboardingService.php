@@ -6,9 +6,6 @@ namespace App\Domain\Onboarding\Services;
 
 use App\Domain\Accounting\Models\JournalEntry;
 use App\Domain\Accounting\Models\JournalLine;
-use App\Domain\Membership\Models\Group;
-use App\Domain\Membership\Models\Member;
-use App\Domain\Membership\Models\Person;
 use App\Support\Csv;
 use App\Tenancy\Services\TenantSequenceService;
 use Illuminate\Support\Facades\DB;

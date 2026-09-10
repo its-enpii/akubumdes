@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
-use App\Domain\Membership\Models\Group;
-use App\Domain\Membership\Models\Member;
-use App\Domain\Membership\Models\Person;
 use App\Models\Platform\TenantMembership;
-use App\Models\Tenant\OrganizationUnit;
 use App\Models\User;
 use App\Tenancy\Services\DefaultChartOfAccountsProvisioner;
 use App\Tenancy\Services\FiscalPeriodProvisioner;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Tests\Concerns\BuildsTenantTestDatabase;
@@ -120,5 +115,4 @@ final class MobileSyncApiTest extends TestCase
     {
         return $query === [] ? '' : '?'.http_build_query($query);
     }
-
 }

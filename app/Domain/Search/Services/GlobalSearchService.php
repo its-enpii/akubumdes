@@ -11,7 +11,6 @@ use App\Domain\Membership\Models\Group;
 use App\Domain\Membership\Models\Member;
 use App\Models\User;
 use App\Tenancy\TenantContext;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Header omnibox — jump to entity, not a full-text engine.

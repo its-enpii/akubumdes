@@ -128,7 +128,6 @@ final class DesktopPushApplyService
                         $lastPulled,
                         $mutationUuid,
                         $actorUserId,
-                        $workbenchTenant,
                     ): string {
                         $row = DB::connection($connection)->table($tableName)->where([
                             'tenant_id' => $tenantId,
