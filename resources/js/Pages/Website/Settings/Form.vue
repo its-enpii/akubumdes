@@ -93,7 +93,7 @@ function submit() {
                         </div>
                         <p v-if="form.remove_hero_image" class="ml-1 text-sm text-tertiary">
                             Gambar akan dihapus saat disimpan.
-                            <button type="button" class="font-semibold underline" @click="form.remove_hero_image = false">Batalkan</button>
+                            <AppButton type="button" variant="ghost" size="compact" class="font-semibold underline" @click="form.remove_hero_image = false">Batalkan</AppButton>
                         </p>
                     </div>
                 </AppCard>

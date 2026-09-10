@@ -1,6 +1,9 @@
 <script setup>
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import AppButton from '../../Components/AppButton.vue';
+import AppInput from '../../Components/AppInput.vue';
+import AppTextarea from '../../Components/AppTextarea.vue';
 
 const props = defineProps({
     organization: { type: Object, required: true },
@@ -117,41 +120,33 @@ const social = computed(() => props.settings?.social ?? {});
 
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="mb-1 block text-sm font-semibold text-primary">Nama <span class="text-error">*</span></label>
-                                    <input v-model="form.name" type="text" maxlength="120" required placeholder="Nama lengkap" class="w-full rounded-xl border border-outline-variant bg-surface px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                                    <AppInput v-model="form.name" label="Nama" required maxlength="120" placeholder="Nama lengkap" :error="form.errors.name" />
                                     <p v-if="form.errors.name" class="mt-1 text-xs text-error">{{ form.errors.name }}</p>
                                 </div>
                                 <div>
-                                    <label class="mb-1 block text-sm font-semibold text-primary">Email</label>
-                                    <input v-model="form.email" type="email" maxlength="255" placeholder="nama@email.com" class="w-full rounded-xl border border-outline-variant bg-surface px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                                    <AppInput v-model="form.email" type="email" label="Email" maxlength="255" placeholder="nama@email.com" :error="form.errors.email" />
                                     <p v-if="form.errors.email" class="mt-1 text-xs text-error">{{ form.errors.email }}</p>
                                 </div>
                             </div>
 
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="mb-1 block text-sm font-semibold text-primary">Telepon</label>
-                                    <input v-model="form.phone" type="text" maxlength="40" placeholder="08xx-xxxx-xxxx" class="w-full rounded-xl border border-outline-variant bg-surface px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                                    <AppInput v-model="form.phone" label="Telepon" maxlength="40" placeholder="08xx-xxxx-xxxx" :error="form.errors.phone" />
                                     <p v-if="form.errors.phone" class="mt-1 text-xs text-error">{{ form.errors.phone }}</p>
                                 </div>
                                 <div>
-                                    <label class="mb-1 block text-sm font-semibold text-primary">Subjek</label>
-                                    <input v-model="form.subject" type="text" maxlength="200" placeholder="Perihal pesan" class="w-full rounded-xl border border-outline-variant bg-surface px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                                    <AppInput v-model="form.subject" label="Subjek" maxlength="200" placeholder="Perihal pesan" :error="form.errors.subject" />
                                     <p v-if="form.errors.subject" class="mt-1 text-xs text-error">{{ form.errors.subject }}</p>
                                 </div>
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-sm font-semibold text-primary">Pesan <span class="text-error">*</span></label>
-                                <textarea v-model="form.message" rows="5" maxlength="5000" required placeholder="Tuliskan pesan Anda di sini..." class="w-full rounded-xl border border-outline-variant bg-surface px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+                                <AppTextarea v-model="form.message" label="Pesan" required rows="5" maxlength="5000" placeholder="Tuliskan pesan Anda di sini..." :error="form.errors.message" />
                                 <p v-if="form.errors.message" class="mt-1 text-xs text-error">{{ form.errors.message }}</p>
                             </div>
 
                             <div class="flex justify-end pt-2">
-                                <button type="submit" :disabled="form.processing" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-on-primary hover:bg-primary/90 disabled:opacity-60">
-                                    <span v-if="form.processing" class="size-4 animate-spin rounded-full border-2 border-on-primary/30 border-t-on-primary" />
-                                    <span>Kirim Pesan</span>
-                                </button>
+                                <AppButton type="submit" :disabled="form.processing" :loading="form.processing">Kirim Pesan</AppButton>
                             </div>
                         </form>
                     </div>

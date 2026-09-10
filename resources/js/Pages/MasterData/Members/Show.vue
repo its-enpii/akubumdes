@@ -3,6 +3,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppBadge from '../../../Components/AppBadge.vue';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
+import AppFileUpload from '../../../Components/AppFileUpload.vue';
 import AppIcon from '../../../Components/AppIcon.vue';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout.vue';
 import { computed } from 'vue';
@@ -40,6 +41,17 @@ function onIdentityPhotoChange(event) {
         onError: () => {
             event.target.value = '';
         },
+    });
+}
+
+function onIdentityPhotoModelChange(file) {
+    identityPhotoForm.identity_photo = file;
+
+    if (!identityPhotoForm.identity_photo) return;
+
+    identityPhotoForm.post(`/master-data/members/${props.member.row_id}/identity-photo`, {
+        preserveScroll: true,
+        onSuccess: () => identityPhotoForm.reset(),
     });
 }
 
@@ -201,12 +213,13 @@ const genderLabels = { male: 'Laki-laki', female: 'Perempuan', L: 'Laki-laki', P
                         </div>
 
                         <form class="space-y-3" @submit.prevent>
-                            <label class="block cursor-pointer rounded-lg border-2 border-dashed border-outline-variant bg-surface-container-lowest p-4 text-center transition-colors hover:border-primary hover:bg-surface-container-low">
-                                <input type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" @change="onIdentityPhotoChange" />
-                                <AppIcon name="upload" class="text-xl text-on-surface-variant" />
-                                <p class="mt-1 text-sm font-semibold text-primary">Ganti foto KTP</p>
-                                <p class="text-xs text-on-surface-variant">JPG, PNG, atau WebP · Maks 4 MB</p>
-                            </label>
+                                <AppFileUpload
+                                    :model-value="identityPhotoForm.identity_photo"
+                                    @update:model-value="onIdentityPhotoModelChange"
+                                label="Ganti foto KTP"
+                                accept="image/jpeg,image/png,image/webp"
+                                hint="JPG, PNG, atau WebP · Maks 4 MB"
+                            />
 
                             <p class="text-sm"><span class="text-on-surface-variant">NIK:</span> {{ member.nik || 'Belum tersedia' }}</p>
                             <p v-if="identityPhotoForm.errors.identity_photo" class="text-sm text-error">

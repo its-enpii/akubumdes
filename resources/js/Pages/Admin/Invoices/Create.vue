@@ -3,6 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
+import AppCheckbox from '../../../Components/AppCheckbox.vue';
 import AppCurrencyInput from '../../../Components/AppCurrencyInput.vue';
 import AppDatePicker from '../../../Components/AppDatePicker.vue';
 import AppInput from '../../../Components/AppInput.vue';
@@ -156,11 +157,7 @@ function submit() {
                     <!-- Blocking Switch Option -->
                     <div class="rounded-xl border border-outline-variant bg-surface-container-low/50 p-4 transition-colors hover:bg-surface-container-low">
                         <label class="flex items-start gap-3 cursor-pointer select-none">
-                            <input
-                                v-model="form.blocks_access"
-                                type="checkbox"
-                                class="mt-0.5 size-4 rounded border-outline-variant text-primary focus:ring-primary"
-                            />
+                            <AppCheckbox v-model="form.blocks_access" label="Blokir akses" variant="cell" />
                             <div class="space-y-0.5">
                                 <span class="text-sm font-bold text-primary flex items-center gap-1.5">
                                     <span>Blokir Akses Operasional Tenant Jika Belum Lunas</span>

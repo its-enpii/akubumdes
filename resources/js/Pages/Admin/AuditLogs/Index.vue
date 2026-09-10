@@ -1,6 +1,7 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
 import AppBadge from '../../../Components/AppBadge.vue';
+import AppAccordion from '../../../Components/AppAccordion.vue';
 import AppCard from '../../../Components/AppCard.vue';
 import SmartDataTable from '../../../Components/SmartDataTable.vue';
 import SmartSelect from '../../../Components/SmartSelect.vue';
@@ -135,10 +136,9 @@ function subjectLink(row) {
                         <template #cell-description="{ row }">
                             <p>{{ row.description || '—' }}</p>
                             <p v-if="row.ip_address" class="text-xs text-outline">{{ row.subject_type ? `#${row.subject_id} · ${subjectLink(row) ? '' : row.subject_type.split('\\').pop()} · ` : '' }}IP {{ row.ip_address }}</p>
-                            <details v-if="row.properties && Object.keys(row.properties).length" class="mt-0.5 text-xs">
-                                <summary class="cursor-pointer text-primary hover:underline">Detail</summary>
+                            <AppAccordion v-if="row.properties && Object.keys(row.properties).length" title="Detail" variant="ghost" :bordered="false" class="mt-0.5 text-xs">
                                 <pre class="mt-1 max-w-xl overflow-x-auto rounded bg-surface-container-low p-2 text-[11px] leading-relaxed text-on-surface-variant">{{ JSON.stringify(row.properties, null, 2) }}</pre>
-                            </details>
+                            </AppAccordion>
                         </template>
                     </SmartDataTable>
                 </div>

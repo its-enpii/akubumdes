@@ -5,6 +5,7 @@ import { computed, ref, watch } from 'vue';
 import AppButton from '../../Components/AppButton.vue';
 import AppCard from '../../Components/AppCard.vue';
 import AppDatePicker from '../../Components/AppDatePicker.vue';
+import AppFileUpload from '../../Components/AppFileUpload.vue';
 import AppIcon from '../../Components/AppIcon.vue';
 import AppInput from '../../Components/AppInput.vue';
 import AppTextarea from '../../Components/AppTextarea.vue';
@@ -97,6 +98,10 @@ watch(() => props.photoUrl, (newUrl) => {
 
 function onPhotoChange(event) {
     const file = event.target.files?.[0] ?? null;
+    setPhotoFile(file);
+}
+
+function onPhotoModelChange(file) {
     setPhotoFile(file);
 }
 
@@ -323,18 +328,13 @@ async function destroyPhoto() {
                                 <AppIcon v-else name="account_circle" class="text-6xl text-on-surface-variant" />
                             </div>
                             <form class="w-full space-y-3" @submit.prevent="submitPhoto">
-                                <label
-                                    class="block cursor-pointer rounded-lg border-2 border-dashed border-outline-variant bg-surface-container-lowest p-6 text-center transition-colors hover:border-primary hover:bg-surface-container-low"
-                                    :class="photoDragOver ? 'border-primary bg-primary-container/20' : ''"
-                                    @dragover.prevent="photoDragOver = true"
-                                    @dragleave="photoDragOver = false"
-                                    @drop="onPhotoDrop"
-                                >
-                                    <input type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" @change="onPhotoChange" />
-                                    <AppIcon name="upload" class="text-2xl text-on-surface-variant" />
-                                    <p class="mt-2 text-sm font-bold text-primary">Tarik foto ke sini atau klik untuk pilih</p>
-                                    <p class="mt-1 text-xs text-on-surface-variant">PNG / JPG / WebP · Maks 2 MB</p>
-                                </label>
+                                <AppFileUpload
+                                    :model-value="photoForm.photo"
+                                    @update:model-value="onPhotoModelChange"
+                                    label="Foto profil"
+                                    accept="image/png,image/jpeg,image/webp"
+                                    hint="Tarik foto ke sini atau klik untuk pilih · PNG / JPG / WebP · Maks 2 MB"
+                                />
                                 <p v-if="photoForm.errors.photo" class="text-sm text-error">{{ photoForm.errors.photo }}</p>
                                 <div class="flex justify-end gap-2 border-t border-outline-variant pt-4">
                                     <AppButton

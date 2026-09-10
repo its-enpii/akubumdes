@@ -7,6 +7,7 @@ import AppBadge from '../../Components/AppBadge.vue';
 import AppButton from '../../Components/AppButton.vue';
 import AppCard from '../../Components/AppCard.vue';
 import AppDatePicker from '../../Components/AppDatePicker.vue';
+import AppFileUpload from '../../Components/AppFileUpload.vue';
 import AppIcon from '../../Components/AppIcon.vue';
 import AppInput from '../../Components/AppInput.vue';
 import AppSwitch from '../../Components/AppSwitch.vue';
@@ -82,6 +83,10 @@ function onLogoChange(event) {
     const file = event.target.files?.[0] ?? null;
     setLogoFile(file);
 }
+function onLogoModelChange(file) {
+    setLogoFile(file);
+}
+
 function onLogoDrop(event) {
     event.preventDefault();
     logoDragOver.value = false;
@@ -209,8 +214,7 @@ async function removeSignatureImage() {
     });
 }
 
-async function handleUploadSignatureImage(event) {
-    const file = event.target.files?.[0] ?? null;
+async function onSignatureImageModelChange(file) {
     if (!file) return;
 
     const reader = new FileReader();
@@ -224,8 +228,6 @@ async function handleUploadSignatureImage(event) {
         });
     };
     reader.readAsDataURL(file);
-
-    event.target.value = '';
 }
 
 function applySignatureStarter() {
@@ -294,7 +296,7 @@ function applySignatureStarter() {
                                     @dragleave="logoDragOver = false"
                                     @drop="onLogoDrop"
                                 >
-                                    <input type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" @change="onLogoChange" />
+                                    <input type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" @change="onLogoModelChange">
                                     <AppIcon name="upload" class="text-2xl text-on-surface-variant" />
                                     <p class="mt-2 text-sm font-bold text-primary">Tarik gambar ke sini atau klik untuk pilih</p>
                                     <p class="mt-1 text-xs text-on-surface-variant">PNG / JPG / WebP · Maks 2 MB</p>
@@ -335,21 +337,10 @@ function applySignatureStarter() {
                                     >
                                         Gambar Tanda Tangan
                                     </AppButton>
-                                    <label>
-                                        <input
-                                            type="file"
-                                            accept="image/png,image/jpeg,image/webp"
-                                            class="sr-only"
-                                            @change="handleUploadSignatureImage"
-                                        />
-                                        <AppButton
-                                            variant="secondary"
-                                            size="compact"
-                                            icon="upload"
-                                            @click="event => event.currentTarget.closest('label')?.querySelector('input')?.click()"
-                                        >
-                                            Unggah Gambar
-                                        </AppButton>
+                                    <label class="cursor-pointer">
+                                        <input type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" @change="onSignatureImageModelChange">
+                                        <span class="sr-only">Unggah gambar tanda tangan</span>
+                                        <AppButton type="button" variant="secondary" size="compact" icon="upload" tabindex="-1">Unggah Gambar</AppButton>
                                     </label>
                                     <AppButton
                                         v-if="currentSignatureImageUrl"

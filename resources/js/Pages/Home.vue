@@ -5,6 +5,8 @@ import { Head, Link } from '@inertiajs/vue3';
 import AppButton from '../Components/AppButton.vue';
 import AppIcon from '../Components/AppIcon.vue';
 import AppCard from '../Components/AppCard.vue';
+import AppAccordion from '../Components/AppAccordion.vue';
+import AppIconButton from '../Components/AppIconButton.vue';
 import AppBadge from '../Components/AppBadge.vue';
 
 defineProps({
@@ -395,14 +397,15 @@ onUnmounted(() => {
                         </AppButton>
                     </Link>
 
-                    <button
-                        type="button"
-                        class="grid size-10 place-items-center rounded-lg border border-outline-variant text-on-surface md:hidden transition hover:bg-surface-container-high"
+                    <AppIconButton
+                        :name="mobileNavOpen ? 'close' : 'menu'"
+                        size="md"
+                        tone="neutral"
+                        :tooltip="mobileNavOpen ? 'Tutup navigasi' : 'Buka navigasi'"
                         :aria-label="mobileNavOpen ? 'Tutup navigasi' : 'Buka navigasi'"
+                        class="md:hidden"
                         @click="mobileNavOpen = !mobileNavOpen"
-                    >
-                        <AppIcon :name="mobileNavOpen ? 'close' : 'menu'" class="text-2xl" />
-                    </button>
+                    />
                 </div>
             </div>
 
@@ -675,35 +678,17 @@ onUnmounted(() => {
                     </div>
 
                     <div class="space-y-3">
-                        <div
+                        <AppAccordion
                             v-for="(faq, idx) in faqs"
                             :key="idx"
-                            class="reveal-item overflow-hidden rounded-2xl border border-outline-variant/70 bg-surface-container-lowest shadow-xs transition-all"
+                            :title="faq.q"
+                            :model-value="activeFaq === idx"
+                            class="reveal-item rounded-2xl"
                         >
-                            <button
-                                type="button"
-                                class="flex w-full items-center justify-between p-5 text-left text-sm font-bold text-primary hover:bg-surface-container-low/50 transition-all duration-150 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
-                                :aria-expanded="activeFaq === idx"
-                                @click="toggleFaq(idx)"
-                            >
-                                <span class="pr-4">{{ faq.q }}</span>
-                                <AppIcon
-                                    name="expand_more"
-                                    class="text-xl text-outline transition-transform duration-200 shrink-0"
-                                    :class="{ 'rotate-180 text-primary': activeFaq === idx }"
-                                />
-                            </button>
-                            <div
-                                class="grid transition-[grid-template-rows] duration-200 ease-out"
-                                :class="activeFaq === idx ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
-                            >
-                                <div class="overflow-hidden">
-                                    <div class="px-5 pb-5 text-xs sm:text-sm text-on-surface-variant leading-relaxed border-t border-outline-variant/40 pt-3 bg-surface-container-low/30">
-                                        {{ faq.a }}
-                                    </div>
-                                </div>
+                            <div class="text-xs sm:text-sm leading-relaxed">
+                                {{ faq.a }}
                             </div>
-                        </div>
+                        </AppAccordion>
                     </div>
                 </div>
             </section>

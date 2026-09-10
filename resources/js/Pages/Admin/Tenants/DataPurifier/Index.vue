@@ -331,14 +331,7 @@ function submitResetTraining() {
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <label class="hidden items-center gap-2 text-xs text-primary sm:flex">
-                        <input
-                            v-model="includeReversalPairs"
-                            type="checkbox"
-                            class="size-4 rounded border-outline-variant accent-primary"
-                        />
-                        <span>Hapus juga jurnal pembalik terkait</span>
-                    </label>
+                    <AppCheckbox v-model="includeReversalPairs" label="Hapus juga jurnal pembalik terkait" variant="inline" />
                     <AppButton
                         type="button"
                         variant="ghost"
@@ -480,14 +473,7 @@ function submitResetTraining() {
                         </p>
                     </div>
 
-                    <label class="flex items-center gap-2 text-sm text-primary">
-                        <input
-                            v-model="includeReversalPairs"
-                            type="checkbox"
-                            class="size-4 rounded border-outline-variant accent-primary"
-                        />
-                        <span>Hapus juga jurnal pembalik (reversal) terkait secara otomatis</span>
-                    </label>
+                    <AppCheckbox v-model="includeReversalPairs" label="Hapus juga jurnal pembalik (reversal) terkait secara otomatis" variant="inline" />
 
                     <div class="flex justify-end gap-2">
                         <AppButton type="button" variant="secondary" @click="purgeModalOpen = false">Batal</AppButton>
@@ -553,19 +539,15 @@ function submitResetTraining() {
                     </div>
 
                     <div class="rounded-xl bg-surface-container-low p-4 space-y-3">
-                        <label class="flex items-start gap-3 text-sm font-medium text-primary cursor-pointer">
-                            <input
-                                v-model="endTrainingForm.purge_data"
-                                type="checkbox"
-                                class="mt-0.5 size-4 rounded border-outline-variant accent-primary"
-                            />
+                        <div class="flex items-start gap-3 text-sm font-medium text-primary">
+                            <AppCheckbox v-model="endTrainingForm.purge_data" label="Bersihkan transaksi pelatihan sekarang" variant="inline" />
                             <div>
                                 <p class="font-bold">Bersihkan {{ stats.training_transactions_count }} transaksi pelatihan sekarang</p>
                                 <p class="text-xs text-on-surface-variant">
                                     Centang untuk memulai masa live dengan buku besar yang bersih dari transaksi coba-coba saat latihan.
                                 </p>
                             </div>
-                        </label>
+                        </div>
                     </div>
 
                     <div class="flex justify-end gap-2">

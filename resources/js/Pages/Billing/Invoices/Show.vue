@@ -340,12 +340,11 @@ function methodLabel(payment) {
                                     <p class="text-xs text-on-surface-variant">Semua Mobile Banking & E-Wallet (BCA, Mandiri, BRI, GoPay, Dana, dll.)</p>
                                 </div>
                             </div>
-                            <input
-                                type="radio"
-                                name="channel"
-                                :value="ch.code"
-                                :checked="selectedMethod === ch.code"
-                                class="size-4 text-primary focus:ring-primary"
+                            <AppRadioGroup
+                                :model-value="selectedMethod === ch.code ? ch.code : ''"
+                                label="Metode pembayaran"
+                                :options="[{ value: ch.code, label: ch.name }]"
+                                @update:model-value="selectChannel(ch.code, 'emoney')"
                             />
                         </div>
                     </div>
@@ -368,12 +367,11 @@ function methodLabel(payment) {
                                     <p class="text-[10px] text-on-surface-variant">Verifikasi Otomatis</p>
                                 </div>
                             </div>
-                            <input
-                                type="radio"
-                                name="channel"
-                                :value="ch.code"
-                                :checked="selectedMethod === ch.code"
-                                class="size-4 text-primary focus:ring-primary"
+                            <AppRadioGroup
+                                :model-value="selectedMethod === ch.code ? ch.code : ''"
+                                label="Metode pembayaran"
+                                :options="[{ value: ch.code, label: ch.name }]"
+                                @update:model-value="selectChannel(ch.code, 'virtual_account')"
                             />
                         </div>
                     </div>

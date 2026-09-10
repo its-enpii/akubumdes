@@ -6,6 +6,7 @@ import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
 import AppCheckbox from '../../../Components/AppCheckbox.vue';
 import AppEmptyState from '../../../Components/AppEmptyState.vue';
+import AppFileUpload from '../../../Components/AppFileUpload.vue';
 import AppIcon from '../../../Components/AppIcon.vue';
 import AppIconButton from '../../../Components/AppIconButton.vue';
 import AppInput from '../../../Components/AppInput.vue';
@@ -430,6 +431,10 @@ const uploadPersonaOptions = computed(() => [
 function onUploadFile(e) {
     const f = e.target.files?.[0] ?? null;
     setUploadFile(f);
+}
+
+function onUploadModelChange(file) {
+    setUploadFile(file);
 }
 function onUploadDrop(e) {
     e.preventDefault();
@@ -971,7 +976,13 @@ onBeforeUnmount(() => {
                                     <span class="font-semibold text-primary">Klik untuk pilih</span> atau drop file di sini
                                 </p>
                                 <p class="text-xs text-on-surface-variant">PDF / DOCX / MD / HTML / TXT — maks 20 MB</p>
-                                <input type="file" class="hidden" accept=".pdf,.docx,.md,.markdown,.html,.htm,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,text/html" @change="onUploadFile">
+                                <AppFileUpload
+                                    :model-value="uploadForm.file"
+                                    label="Dokumen asisten"
+                                    hide-label
+                                    accept=".pdf,.docx,.md,.markdown,.html,.htm,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,text/html"
+                                    @update:model-value="onUploadModelChange"
+                                />
                             </label>
                             <p v-if="uploadFileName" class="mt-2 text-xs text-on-surface-variant">
                                 Dipilih: <span class="font-semibold">{{ uploadFileName }}</span>
@@ -1095,11 +1106,12 @@ onBeforeUnmount(() => {
                     </div>
 
                     <form class="mt-3 flex items-end gap-2" @submit.prevent="sendChat">
-                        <textarea
+                        <AppTextarea
                             v-model="chatInput"
+                            label="Pertanyaan"
+                            hide-label
                             rows="2"
                             placeholder="Tulis pertanyaan…"
-                            class="min-h-12 max-h-32 flex-1 resize-none rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm leading-5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
                             :disabled="chatBusy"
                             @keydown.enter.exact.prevent="sendChat"
                         />
@@ -1296,6 +1308,3 @@ onBeforeUnmount(() => {
 .fade-enter-active, .fade-leave-active { transition: opacity 200ms ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>
-
-
-

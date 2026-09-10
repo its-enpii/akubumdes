@@ -1,6 +1,8 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AppIcon from '@/Components/AppIcon.vue';
+import AppButton from '@/Components/AppButton.vue';
+import AppInput from '@/Components/AppInput.vue';
 
 const props = defineProps({
     organization: { type: Object, required: true },
@@ -80,19 +82,8 @@ function formatDateTime(value) {
                     </p>
 
                     <form class="mt-6 flex max-w-xl gap-2" @submit.prevent>
-                        <div class="relative flex-1">
-                            <AppIcon name="search" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
-                            <input
-                                type="search"
-                                name="q"
-                                :value="search"
-                                placeholder="Cari berita…"
-                                class="w-full rounded-full border border-outline-variant bg-surface-container-lowest py-2.5 pl-10 pr-4 text-sm text-on-surface placeholder:text-on-surface-variant/70 focus:border-primary focus:outline-none"
-                            >
-                        </div>
-                        <button type="submit" class="inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-sm font-semibold text-on-primary shadow-md transition hover:bg-primary-deep">
-                            Cari
-                        </button>
+                        <AppInput type="search" label="Cari berita" hide-label :model-value="search" class="flex-1" @keydown.enter.prevent />
+                        <AppButton type="submit" icon="search">Cari</AppButton>
                     </form>
                 </div>
             </section>

@@ -165,14 +165,15 @@ function submit() {
                                     <AppIcon :name="group.icon" class="text-xl text-primary" />
                                     <span class="font-bold text-primary">{{ group.label }}</span>
                                 </div>
-                                <button
+                                <AppButton
                                     v-if="!isLocked"
                                     type="button"
-                                    class="text-xs font-semibold text-primary hover:underline"
+                                    variant="ghost"
+                                    size="compact"
                                     @click="toggleGroup(group)"
                                 >
                                     {{ isGroupAllSelected(group) ? 'Batalkan Semua' : 'Pilih Grup Ini' }}
-                                </button>
+                                </AppButton>
                             </div>
                         </template>
 
@@ -184,11 +185,11 @@ function submit() {
                                 :class="{ 'opacity-80': isLocked, 'cursor-pointer': !isLocked }"
                                 @click="togglePermission(perm.key)"
                             >
-                                <input
-                                    type="checkbox"
-                                    :checked="isLocked || form.permissions.includes(perm.key)"
+                                <AppCheckbox
+                                    :model-value="isLocked || form.permissions.includes(perm.key)"
+                                    :label="perm.label"
                                     :disabled="isLocked"
-                                    class="mt-1 size-4 rounded border-outline text-primary focus:ring-primary"
+                                    variant="cell"
                                     @click.stop="togglePermission(perm.key)"
                                 />
                                 <div class="min-w-0 flex-1">

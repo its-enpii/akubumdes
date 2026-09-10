@@ -9,6 +9,7 @@ import AppCurrencyInput from '../../Components/AppCurrencyInput.vue';
 import AppDatePicker from '../../Components/AppDatePicker.vue';
 import AppInput from '../../Components/AppInput.vue';
 import AppIconButton from '../../Components/AppIconButton.vue';
+import AppFileUpload from '../../Components/AppFileUpload.vue';
 import AppTabs from '../../Components/AppTabs.vue';
 import SmartSelect from '../../Components/SmartSelect.vue';
 import { useMoney } from '../../composables/useMoney';
@@ -384,14 +385,12 @@ const uploadGroups = () => {
                         <p class="text-xs text-on-surface-variant">
                             Upload file CSV berisi daftar anggota lengkap (NIK, Nama, Jenis Kelamin, Alamat, Desa, Phone).
                         </p>
-                        <div>
-                            <input
-                                type="file"
+                            <AppFileUpload
+                                :model-value="memberFileForm.file"
+                                label="File CSV Anggota"
                                 accept=".csv"
-                                @change="e => memberFileForm.file = e.target.files[0]"
-                                class="block w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-primary hover:file:bg-primary-fixed"
+                                @update:model-value="file => memberFileForm.file = file"
                             />
-                        </div>
                         <div class="flex justify-between items-center pt-2">
                             <a :href="`${baseUrl}/onboarding/templates/anggota`" class="text-xs text-secondary hover:underline font-semibold">
                                 ?? Download Template CSV Anggota
@@ -412,14 +411,12 @@ const uploadGroups = () => {
                         <p class="text-xs text-on-surface-variant">
                             Upload file CSV daftar kelompok usaha/masyarakat (Nama Kelompok, Desa, Alamat, Telepon).
                         </p>
-                        <div>
-                            <input
-                                type="file"
+                            <AppFileUpload
+                                :model-value="groupFileForm.file"
+                                label="File CSV Kelompok"
                                 accept=".csv"
-                                @change="e => groupFileForm.file = e.target.files[0]"
-                                class="block w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-primary hover:file:bg-primary-fixed"
+                                @update:model-value="file => groupFileForm.file = file"
                             />
-                        </div>
                         <div class="flex justify-between items-center pt-2">
                             <a :href="`${baseUrl}/onboarding/templates/kelompok`" class="text-xs text-secondary hover:underline font-semibold">
                                 ?? Download Template CSV Kelompok
