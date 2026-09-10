@@ -128,7 +128,7 @@ const trialColumns = [
         >
           Laba/Rugi berjalan:
           <span class="font-semibold text-on-surface">{{
-            money.format(net_income)
+            money(net_income)
           }}</span>
           (plug ke footer agar kolom seimbang, seperti legacy)
         </p>

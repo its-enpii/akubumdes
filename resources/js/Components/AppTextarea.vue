@@ -20,7 +20,7 @@ const inputId = props.id || useId();
 
 <template>
     <div class="space-y-2">
-        <label :for="inputId" class="ml-1 block text-sm font-bold uppercase tracking-wider text-primary">{{ label }}</label>
+        <label :for="inputId" class="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-on-surface-variant">{{ label }}</label>
         <div class="relative">
             <AppIcon v-if="icon" :name="icon" class="pointer-events-none absolute left-4 top-4 text-xl text-outline" />
             <textarea
@@ -30,7 +30,7 @@ const inputId = props.id || useId();
                 :aria-describedby="error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined"
                 :readonly="readonly"
                 :placeholder="readonly ? undefined : (placeholder ?? `Masukkan ${label.toLowerCase()}`)"
-                class="min-h-28 w-full resize-y rounded-xl border bg-surface-container-lowest px-4 py-3 text-primary shadow-[0_1px_2px_rgb(6_45_77/4%)] transition placeholder:text-outline focus:border-secondary focus:ring-4 focus:ring-secondary/12 focus:outline-none read-only:cursor-default read-only:bg-surface-container-low read-only:text-on-surface-variant"
+                class="min-h-28 w-full resize-y rounded-lg border bg-surface-container-lowest px-3.5 py-2.5 transition placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none read-only:cursor-default read-only:bg-surface-container-low read-only:text-on-surface-variant"
                 :class="[icon && 'pl-12', error ? 'border-error' : 'border-outline-variant']"
                 v-bind="$attrs"
             />

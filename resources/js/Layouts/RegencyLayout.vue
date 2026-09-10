@@ -46,21 +46,21 @@ function logout() {
             <button
                 v-if="mobileMenuOpen"
                 type="button"
-                class="fixed inset-0 z-40 bg-primary/45 backdrop-blur-xs lg:hidden"
+                class="fixed inset-0 z-40 bg-primary-deep/40 backdrop-blur-xs lg:hidden"
                 aria-label="Tutup navigasi"
                 @click="mobileMenuOpen = false"
             />
         </Transition>
 
         <aside
-            class="bg-navy-gradient fixed inset-y-0 left-0 z-50 flex w-64 flex-col py-6 shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0"
+            class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-outline-variant bg-surface-container-lowest py-6 transition-transform duration-300 ease-in-out lg:translate-x-0"
             :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
         >
             <div class="mb-8 flex items-center gap-3 px-6">
-                <div class="grid size-10 shrink-0 place-items-center rounded-xl bg-white/95 text-primary shadow-lg shadow-black/10"><AppIcon name="eco" class="text-2xl text-secondary" /></div>
+                <div class="grid size-10 shrink-0 place-items-center rounded-lg border border-outline-variant bg-surface-container-lowest"><AppIcon name="eco" class="text-2xl text-secondary" /></div>
                 <div class="min-w-0">
-                    <p class="text-lg font-extrabold leading-none tracking-[-0.03em] text-on-primary">akubumdes</p>
-                    <p class="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-fixed-dim">Portal Kabupaten</p>
+                    <p class="font-display text-lg font-bold leading-none tracking-[-0.02em] text-primary">akubumdes</p>
+                    <p class="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">{{ appName }} · Portal Kabupaten</p>
                 </div>
             </div>
 
@@ -69,33 +69,32 @@ function logout() {
                     v-for="item in navigation"
                     :key="item.label"
                     :href="item.href"
-                    class="relative flex items-center gap-3 rounded-xl px-4 py-2.5 transition-colors"
-                    :class="isActive(item) ? 'bg-white/12 text-on-primary shadow-[inset_3px_0_0_var(--color-secondary)]' : 'text-primary-fixed-dim hover:bg-white/8 hover:text-on-primary'"
+                    class="relative flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200"
+                    :class="isActive(item) ? 'bg-surface-container-low font-semibold text-primary' : 'text-on-surface-variant hover:bg-surface-container-low/70 hover:text-on-surface'"
                     @click="mobileMenuOpen = false"
                 >
+                    <span v-if="isActive(item)" class="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-secondary" aria-hidden="true" />
                     <AppIcon :name="item.icon" :filled="isActive(item)" />
                     <span>{{ item.label }}</span>
                 </Link>
             </nav>
 
-            <div class="mt-4 border-t border-primary-container px-4 pt-4">
-                <div class="flex items-center gap-3 rounded-xl bg-primary-container/50 p-3">
-                    <div class="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-fixed text-sm font-bold text-primary"><img v-if="user?.photo_url && !avatarError" :src="user.photo_url" :alt="user?.name || 'Kabupaten'" class="size-full object-cover" @error="avatarError = true" /><span v-else>{{ user?.name?.charAt(0).toUpperCase() || 'K' }}</span></div>
+            <div class="mt-4 border-t border-outline-variant px-4 pt-4">
+                <div class="flex items-center gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest p-3">
+                    <div class="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full border border-outline-variant bg-primary-fixed text-sm font-bold text-primary"><img v-if="user?.photo_url && !avatarError" :src="user.photo_url" :alt="user?.name || 'Kabupaten'" class="size-full object-cover" @error="avatarError = true" /><span v-else>{{ user?.name?.charAt(0).toUpperCase() || 'K' }}</span></div>
                     <div class="min-w-0 flex-1">
-                        <p class="truncate font-bold text-on-primary">{{ user?.name || 'Supervisor' }}</p>
-                        <p class="truncate text-xs text-primary-fixed-dim">Level Kabupaten</p>
+                        <p class="truncate font-semibold text-on-surface">{{ user?.name || 'Supervisor' }}</p>
+                        <p class="truncate text-xs text-on-surface-variant">Level Kabupaten</p>
                     </div>
-                    <AppIconButton name="logout" tone="neutral" size="sm" rounded="lg" aria-label="Keluar" class="text-primary-fixed-dim hover:bg-on-primary/10 hover:text-on-primary" @click="logout" />
+                    <AppIconButton name="logout" tone="neutral" size="sm" rounded="lg" aria-label="Keluar" class="text-on-surface-variant hover:text-primary" @click="logout" />
                 </div>
             </div>
         </aside>
 
-        <header class="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-outline-variant/70 bg-surface/85 px-4 backdrop-blur-md lg:ml-64 lg:px-6">
+        <header class="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-outline-variant bg-surface/85 px-4 backdrop-blur-md lg:ml-64 lg:px-6">
             <div class="flex items-center gap-3">
                 <AppIconButton name="menu" tone="primary" size="sm" rounded="lg" aria-label="Buka navigasi" class="lg:hidden" @click="mobileMenuOpen = true" />
-                <div>
-                    <p class="accent-bar pl-4 text-sm font-bold text-primary">Monitoring &amp; Konsolidasi Keuangan Kabupaten</p>
-                </div>
+                <p class="accent-bar pl-4 text-sm font-semibold text-on-surface">Monitoring &amp; Konsolidasi Keuangan Kabupaten</p>
             </div>
             <div class="flex items-center gap-2">
                 <Link
@@ -107,8 +106,8 @@ function logout() {
                 >
                     <AppIcon name="history_edu" class="text-2xl leading-none" />
                 </Link>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-primary-fixed px-3 py-1 text-xs font-semibold text-primary">
-                    <span class="size-1.5 rounded-full bg-primary"></span>
+                <span class="inline-flex items-center gap-1.5 rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-1 text-xs font-semibold text-primary">
+                    <span class="size-1.5 rounded-full bg-secondary"></span>
                     {{ user?.regency_name || 'Kabupaten' }}
                 </span>
             </div>

@@ -15,20 +15,20 @@ defineProps({
 
 const tones = {
     // Solid (high-emphasis)
-    neutral: 'bg-surface-container-low text-on-surface-variant ring-1 ring-outline-variant/60',
+    neutral: 'bg-surface-container-low text-on-surface-variant ring-1 ring-outline-variant',
     success: 'bg-secondary text-on-secondary',
     warning: 'bg-tertiary text-on-tertiary',
-    error: 'bg-error-container text-on-error-container',
-    primary: 'bg-primary-fixed text-primary',
+    error: 'bg-error text-on-error',
+    primary: 'bg-primary text-on-primary',
     // Soft (medium-emphasis — tinted bg, strong fg)
-    'success-soft': 'bg-secondary-container text-[#046137]',
-    'warning-soft': 'bg-tertiary-fixed text-[#5c3100]',
-    'error-soft': 'bg-error-container/40 text-error',
-    'info-soft': 'bg-primary-container/40 text-primary',
+    'success-soft': 'bg-secondary-container text-[#166534]',
+    'warning-soft': 'bg-tertiary-container text-[#92400e]',
+    'error-soft': 'bg-error-container text-[#991b1b]',
+    'info-soft': 'bg-primary-fixed text-primary',
     'primary-soft': 'bg-primary-fixed text-primary',
 };
 </script>
 
 <template>
-    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide" :class="tones[tone] || tones.neutral"><slot /></span>
+    <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]" :class="tones[tone] || tones.neutral"><slot /></span>
 </template>

@@ -22,7 +22,7 @@ const numberFmt = new Intl.NumberFormat("id-ID");
 
 function formatValue(card) {
   if (card.format === "money")
-    return money.format(Math.round(Number(card.value || 0)));
+    return money(Math.round(Number(card.value || 0)));
   return numberFmt.format(Number(card.value || 0));
 }
 
@@ -71,12 +71,8 @@ const journalColumns = [
         class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end"
       >
         <div>
-          <p
-            class="text-xs font-bold uppercase tracking-[0.18em] text-on-surface-variant"
-          >
-            Ringkasan operasional
-          </p>
-          <h1 class="mt-1 text-2xl font-bold text-primary sm:text-3xl">
+          <p class="eyebrow">Ringkasan operasional</p>
+          <h1 class="mt-1 text-2xl font-semibold tracking-[-0.02em] text-on-surface sm:text-3xl">
             {{ unitName || "Dashboard" }}
           </h1>
           <p class="mt-1 text-on-surface-variant">
@@ -117,12 +113,12 @@ const journalColumns = [
             >
           </div>
           <p
-            class="text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant"
+            class="text-[11px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant"
           >
             {{ card.label }}
           </p>
           <p
-            class="mt-2 text-2xl font-bold"
+            class="mt-1.5 font-display text-3xl font-bold tracking-[-0.02em]"
             :class="card.tone === 'error' ? 'text-error' : 'text-primary'"
           >
             {{ formatValue(card) }}
@@ -135,7 +131,7 @@ const journalColumns = [
 
       <div class="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-2">
         <section
-          class="card-shadow flex max-h-[28rem] min-h-0 flex-col rounded-xl bg-surface-container-lowest xl:col-span-2"
+          class="flex max-h-[28rem] min-h-0 flex-col rounded-lg border border-outline-variant bg-surface-container-lowest xl:col-span-2"
         >
           <header
             class="flex shrink-0 items-center justify-between border-b border-outline-variant px-6 py-4"
@@ -197,7 +193,7 @@ const journalColumns = [
       </div>
 
       <section
-        class="relative overflow-hidden rounded-xl bg-primary p-6 text-on-primary"
+        class="relative overflow-hidden rounded-lg border-t-[3px] border-secondary bg-primary p-6 text-on-primary"
       >
         <AppIcon
           name="verified"

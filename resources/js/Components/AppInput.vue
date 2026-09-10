@@ -26,7 +26,7 @@ const inputId = props.id || generatedId;
 <template>
     <div class="space-y-2">
         <div v-if="!hideLabel" class="flex items-center gap-1.5 ml-1">
-            <label :for="inputId" class="block text-sm font-bold uppercase tracking-wider text-primary">{{ label }}</label>
+            <label :for="inputId" class="block text-[11px] font-semibold uppercase tracking-[0.08em] text-on-surface-variant">{{ label }}</label>
             <AppTooltip v-if="tooltip" :id="`${inputId}-tooltip`" :text="tooltip" />
         </div>
         <label v-else :for="inputId" class="sr-only">{{ label }}</label>
@@ -44,7 +44,7 @@ const inputId = props.id || generatedId;
                 ].filter(Boolean).join(' ') || undefined"
                 :readonly="readonly"
                 :placeholder="readonly ? undefined : (placeholder ?? `Masukkan ${label.toLowerCase()}`)"
-                class="h-13 w-full rounded-xl border bg-surface-container-lowest px-4 text-primary shadow-[0_1px_2px_rgb(6_45_77/4%)] transition placeholder:text-outline focus:border-secondary focus:ring-4 focus:ring-secondary/12 focus:outline-none read-only:cursor-default read-only:bg-surface-container-low read-only:text-on-surface-variant"
+                class="h-10 w-full rounded-lg border bg-surface-container-lowest px-3.5 transition placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none read-only:cursor-default read-only:bg-surface-container-low read-only:text-on-surface-variant"
                 :class="[icon && 'pl-12', $slots.trailing && 'pr-14', error ? 'border-error' : 'border-outline-variant']"
                 v-bind="$attrs"
             >

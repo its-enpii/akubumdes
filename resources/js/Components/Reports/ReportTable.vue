@@ -34,12 +34,12 @@ function cellClass(column) {
 <template>
     <div class="overflow-x-auto" v-bind="$attrs">
         <table class="w-full border-collapse text-left text-sm">
-            <thead class="bg-surface-container-low text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+            <thead class="border-b-2 border-primary bg-surface-container-low text-[11px] font-semibold uppercase tracking-[0.08em] text-on-surface-variant">
                 <tr>
                     <th
                         v-for="column in columns"
                         :key="column.key"
-                        class="border-b border-outline-variant font-semibold"
+                        class="border-b-0 font-semibold"
                         :class="cellClass(column)"
                     >
                         {{ column.label }}
@@ -57,7 +57,7 @@ function cellClass(column) {
                         <tr
                             v-for="(row, index) in section.rows || []"
                             :key="rowKey ? row[rowKey] ?? index : index"
-                            class="border-b border-outline-variant/60 transition-colors hover:bg-surface-container-low/50"
+                            class="border-b border-outline-variant/70 transition-colors duration-200 hover:bg-surface-container-low/60"
                             :class="row.isSectionTotal && 'bg-surface-container-low font-bold'"
                         >
                             <td
@@ -92,7 +92,7 @@ function cellClass(column) {
                     <tr
                         v-for="(row, index) in rows"
                         :key="rowKey ? row[rowKey] ?? index : index"
-                        class="border-b border-outline-variant/60 transition-colors hover:bg-surface-container-low/50"
+                        class="border-b border-outline-variant/70 transition-colors duration-200 hover:bg-surface-container-low/60"
                     >
                         <td
                             v-for="column in columns"

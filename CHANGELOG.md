@@ -3,6 +3,30 @@
 Semua perubahan penting pada proyek **SIDBM Next** didokumentasikan dalam berkas ini.
 Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
+## [Unreleased]
+
+### Changed
+- **Full Visual Redesign — Minimalism & Swiss Style (akubumdes):**
+  - **Palet & Tipografi (`resources/css/app.css`):**
+    - Memperbarui palet tema `classic` (light) ke Primary Deep Royal Blue `#1E3A8A`, Secondary Accent Green `#16A34A`, Background `#F8FAFC`, Border tegas `#E2E8F0`.
+    - Memperbarui tema `midnight` (dark) ke slate gelap `#0B1220`, surface `#0F172A`, primary terang `#3B82F6`, dan accent `#22C55E`.
+    - Mengintegrasikan tipografi Google Fonts: **Outfit** (display/headings 600-700, letter-spacing -0.02em) + **Work Sans** (body 400-500, base 16px).
+    - Menambahkan utility `.eyebrow` (label kecil uppercase tracking 0.14em di atas heading utama) dan memperbarui `.stat-card` dengan border tegas 1px tanpa shadow blur.
+  - **Komponen Inti (`resources/js/Components/`):**
+    - `AppCard.vue`: beralih ke border 1px presisi `border-outline-variant` dengan radius konsisten `rounded-lg` (8px).
+    - `AppButton.vue`: 4 varian solid/outline/ghost/danger dengan font Outfit (`font-display`), height konsisten (`h-10` md), solid green `#16A34A` untuk CTA positif.
+    - `AppInput.vue`, `AppTextarea.vue`, `SmartSelect.vue`: focus ring 2px primary, label kecil uppercase tracking `0.08em`, height `h-10` presisi.
+    - `SmartDataTable.vue` & `Reports/ReportTable.vue`: header `thead` bergaris bawah tegas 2px `border-primary` dengan label uppercase kecil dan hover row `hover:bg-surface-container-low`.
+    - `AppBadge.vue`: pill status presisi dengan tone solid & soft yang kontras.
+    - `AppTabs.vue`: indikator tab aktif garis bawah presisi dan radius konsisten.
+    - `AppEmptyState.vue` & `ThemeMenu.vue`: radius `rounded-lg` konsisten dengan gaya Swiss.
+  - **Layouts (`resources/js/Layouts/`):**
+    - `AdminLayout.vue`, `AuthenticatedLayout.vue`, `ProvinceLayout.vue`, `RegencyLayout.vue`: sidebar putih bersih dengan border kanan 1px tegas, wordmark "akubumdes" font Outfit bold, navigasi aktif berindikator garis hijau `#16A34A`.
+  - **Halaman (`resources/js/Pages/`):**
+    - `Dashboard.vue` & `Admin/Dashboard.vue`: penerapan pola eyebrow section header dan KPI stat-card dengan angka Outfit tebal ukuran besar (text-3xl+).
+    - `Auth/Login.vue`: sinkronisasi token warna royal blue `#1E3A8A` + green `#16A34A` dengan wordmark Outfit.
+    - `Home.vue`: pembersihan gradient multiwarna mentah menjadi blok flat minimalis.
+
 ## [2026-09-08]
 
 ### Added

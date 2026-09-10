@@ -360,7 +360,7 @@ onUnmounted(() => {
 
     <div class="min-h-screen bg-surface font-sans text-on-surface antialiased scroll-smooth selection:bg-primary selection:text-on-primary">
         <!-- Top Banner -->
-        <div class="top-banner-bar bg-gradient-to-r from-primary via-primary-container to-primary px-4 py-2 text-center text-xs font-semibold tracking-wide text-on-primary shadow-sm">
+        <div class="top-banner-bar bg-primary-deep px-4 py-2 text-center text-xs font-semibold tracking-wide text-on-primary">
             <div class="mx-auto flex max-w-7xl items-center justify-center gap-2">
                 <span class="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-extrabold tracking-wider text-on-secondary shadow-sm">RESMI</span>
                 <span>Sistem Tata Kelola Keuangan & Dana Bergulir BUMDesma LKD Sesuai Regulasi PP No. 11/2021</span>
@@ -431,7 +431,7 @@ onUnmounted(() => {
 
         <!-- Hero Section -->
         <main>
-            <section class="relative overflow-hidden bg-gradient-to-b from-surface-container-lowest via-surface-container-low/40 to-surface py-16 sm:py-24 lg:py-28">
+            <section class="relative overflow-hidden bg-surface py-16 sm:py-24 lg:py-28">
                 <!-- Ambient Glowing Background Elements -->
                 <div class="ambient-blob-1 absolute -top-24 -left-24 size-96 rounded-full bg-primary/10 blur-3xl pointer-events-none -z-10" />
                 <div class="ambient-blob-2 absolute top-1/2 -right-24 size-[28rem] rounded-full bg-secondary/10 blur-3xl pointer-events-none -z-10" />
@@ -445,9 +445,9 @@ onUnmounted(() => {
                                 <span>Platform Dana Bergulir & Akuntansi SAK EP Generasi Baru</span>
                             </div>
 
-                            <h1 class="hero-anim-title text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-primary leading-[1.15]">
+                            <h1 class="hero-anim-title font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-[-0.02em] text-on-surface leading-[1.12]">
                                 Transformasi Digital Keuangan
-                                <span class="block bg-gradient-to-r from-primary via-secondary to-primary-container bg-clip-text text-transparent">
+                                <span class="block text-primary">
                                     BUMDesma & LKD Indonesia
                                 </span>
                             </h1>
@@ -526,7 +526,7 @@ onUnmounted(() => {
                             <div ref="heroCardRef" class="hero-preview-card w-full max-w-md will-change-transform transform-gpu">
                                 <AppCard class="space-y-4 border-2 border-primary/15 bg-surface-container-lowest/95 backdrop-blur-xl p-6 shadow-2xl rounded-3xl relative overflow-hidden">
                                     <!-- Top Card Gradient Aura -->
-                                    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-secondary to-primary-container" />
+                                    <div class="absolute top-0 left-0 right-0 h-[3px] bg-secondary" />
 
                                     <!-- Mock App Header -->
                                     <div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
@@ -591,7 +591,7 @@ onUnmounted(() => {
             </section>
 
             <!-- Stats Bar Section -->
-            <section id="statistik" class="stats-section bg-gradient-to-r from-primary via-primary-container to-primary text-on-primary py-14 scroll-mt-20 shadow-inner relative overflow-hidden">
+            <section id="statistik" class="stats-section border-y-[3px] border-secondary bg-primary text-on-primary py-14 scroll-mt-20 relative overflow-hidden">
                 <div class="ambient-circle absolute -right-16 top-0 size-80 rounded-full bg-white/5 blur-2xl pointer-events-none" />
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                     <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
@@ -694,7 +694,7 @@ onUnmounted(() => {
             </section>
 
             <!-- Bottom CTA Section -->
-            <section class="reveal-group py-16 bg-gradient-to-br from-primary via-primary-container to-primary text-on-primary text-center relative overflow-hidden">
+            <section class="reveal-group py-16 bg-primary-deep text-on-primary text-center relative overflow-hidden">
                 <div class="ambient-orb absolute -left-20 top-0 size-96 rounded-full bg-white/10 blur-3xl pointer-events-none" />
                 <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-6 relative z-10">
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight">Siap Mengoptimalkan Tata Kelola BUMDesma Anda?</h2>

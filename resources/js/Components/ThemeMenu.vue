@@ -51,9 +51,9 @@ onBeforeUnmount(() => {
                 ref="panel"
                 role="menu"
                 aria-label="Pilih tema tampilan"
-                class="fixed right-4 top-[4.5rem] z-50 w-64 origin-top-right overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-2xl"
+                class="fixed right-4 top-[4.5rem] z-50 w-64 origin-top-right overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest shadow-xl"
             >
-                <p class="px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant border-b border-outline-variant/50 bg-surface-container-low/40">
+                <p class="border-b border-outline-variant/60 bg-surface-container-low/40 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">
                     Tema tampilan
                 </p>
                 <div class="p-1">
@@ -64,12 +64,12 @@ onBeforeUnmount(() => {
                         role="menuitemradio"
                         :aria-checked="theme === t.id"
                         :aria-label="`Pilih tema ${t.label}`"
-                        class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all duration-150 active:scale-[0.98] hover:bg-surface-container-low"
-                        :class="theme === t.id && 'bg-primary-container/40 font-semibold'"
+                        class="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors duration-200 hover:bg-surface-container-low"
+                        :class="theme === t.id && 'bg-surface-container-low font-semibold'"
                         @click="choose(t.id)"
                     >
                         <span class="theme-swatch shrink-0" :data-for="t.id" aria-hidden="true"><i /><i /><i /></span>
-                        <span class="min-w-0 flex-1 truncate text-sm font-semibold text-primary">{{ t.label }}</span>
+                        <span class="min-w-0 flex-1 truncate text-sm text-on-surface">{{ t.label }}</span>
                         <AppIcon v-if="theme === t.id" name="check_circle" filled class="text-secondary transition-transform duration-200 scale-105" />
                     </button>
                 </div>

@@ -36,23 +36,23 @@ const normalizedVariant = computed(() => {
 const wrapperClass = {
     underline: 'flex flex-wrap gap-x-6 gap-y-1',
     pill: 'flex flex-col gap-1 w-full',
-    'pills-bar': 'flex flex-wrap gap-1 rounded-xl border border-outline-variant bg-surface-container-lowest p-1',
+    'pills-bar': 'flex flex-wrap gap-1 rounded-lg border border-outline-variant bg-surface-container-lowest p-1',
 };
 
 const tabBase = {
-    underline: 'flex items-center gap-2 border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition-all duration-150 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-lowest',
-    pill: 'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-low',
-    'pills-bar': 'inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-lowest',
+    underline: 'flex items-center gap-2 border-b-2 px-1 pb-3 pt-2 text-sm font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-lowest',
+    pill: 'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-low',
+    'pills-bar': 'inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-lowest',
 };
 
 const tabActive = {
-    underline: 'border-primary text-primary font-bold',
-    pill: 'bg-primary-container font-bold text-on-primary-container shadow-xs',
-    'pills-bar': 'bg-primary text-on-primary shadow-sm',
+    underline: 'border-primary text-primary font-semibold',
+    pill: 'bg-primary-container font-semibold text-on-primary-container',
+    'pills-bar': 'bg-primary text-on-primary',
 };
 
 const tabInactive = {
-    underline: 'border-transparent text-on-surface-variant hover:border-outline hover:text-on-surface',
+    underline: 'border-transparent text-on-surface-variant hover:border-outline-variant hover:text-on-surface',
     pill: 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
     'pills-bar': 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary',
 };

@@ -238,7 +238,7 @@ watch(() => props.modelValue, (value) => {
 
 <template>
     <div class="space-y-2" :data-smart-select="selectId">
-        <label :for="selectId" :class="hideLabel ? 'sr-only' : 'ml-1 block text-sm font-bold uppercase tracking-wider text-primary'">{{ label }}</label>
+        <label :for="selectId" :class="hideLabel ? 'sr-only' : 'ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-on-surface-variant'">{{ label }}</label>
         <div class="relative">
             <button
                 :id="selectId"
@@ -250,7 +250,7 @@ watch(() => props.modelValue, (value) => {
                 :aria-invalid="Boolean(error)"
                 :aria-required="required"
                 :disabled="disabled"
-                class="flex h-13 w-full items-center justify-between rounded-xl border bg-surface-container-lowest px-4 pr-16 text-left text-primary shadow-[0_1px_2px_rgb(6_45_77/4%)] transition-all duration-150 active:scale-[0.99] focus:border-secondary focus:ring-4 focus:ring-secondary/12 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                class="flex h-10 w-full items-center justify-between rounded-lg border bg-surface-container-lowest px-3.5 pr-16 text-left transition-all duration-150 active:scale-[0.99] focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
                 :class="error ? 'border-error' : 'border-outline-variant'"
                 v-bind="$attrs"
                 @click="open ? closeMenu() : openMenu()"
@@ -282,7 +282,7 @@ watch(() => props.modelValue, (value) => {
                         :id="`${selectId}-listbox`"
                         ref="listbox"
                         role="listbox"
-                        class="flex flex-col overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-2 shadow-xl"
+                        class="flex flex-col overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest p-2 shadow-lg"
                         :class="placeAbove ? 'origin-bottom' : 'origin-top'"
                         :style="menuStyle"
                         :data-smart-select="selectId"

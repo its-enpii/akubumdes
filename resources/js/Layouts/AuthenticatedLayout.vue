@@ -419,27 +419,27 @@ function logout() {
             leave-from-class="opacity-100"
             leave-to-class="opacity-0"
         >
-            <button v-if="mobileMenuOpen" type="button" class="fixed inset-0 z-40 bg-primary/45 backdrop-blur-xs lg:hidden" aria-label="Tutup navigasi" @click="mobileMenuOpen = false" />
+            <button v-if="mobileMenuOpen" type="button" class="fixed inset-0 z-40 bg-primary-deep/40 backdrop-blur-xs lg:hidden" aria-label="Tutup navigasi" @click="mobileMenuOpen = false" />
         </Transition>
-        <aside class="bg-navy-gradient fixed inset-y-0 left-0 z-50 flex w-64 flex-col py-6 shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'">
+        <aside class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-outline-variant bg-surface-container-lowest py-6 transition-transform duration-300 ease-in-out lg:translate-x-0" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'">
             <div class="mb-6 flex items-center gap-3 px-6">
-                <div class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-white/95 shadow-lg shadow-black/10">
+                <div class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest">
                     <img v-if="logoPath" :src="logoPath" alt="Logo lembaga" class="size-full object-contain" />
                     <AppIcon v-else name="eco" class="text-2xl text-secondary" />
                 </div>
-                <div class="min-w-0"><p class="font-extrabold leading-none tracking-[-0.03em] text-on-primary">akubumdes</p><p class="mt-1.5 truncate text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-fixed-dim">{{ props.unitName || 'BUMDesma / LKD' }}</p></div>
+                <div class="min-w-0"><p class="font-display text-lg font-bold leading-none tracking-[-0.02em] text-primary">akubumdes</p><p class="mt-1.5 truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">{{ props.unitName || 'BUMDesma / LKD' }}</p></div>
             </div>
 
             <nav ref="sidebarNav" class="scrollbar-hidden flex-1 space-y-5 overflow-y-auto px-2" aria-label="Navigasi utama">
                 <section v-for="section in visibleSections" :key="section.label">
-                    <h2 class="mb-1 px-4 text-[10px] font-bold uppercase tracking-[0.18em] text-primary-fixed-dim/70">{{ section.label }}</h2>
+                    <h2 class="mb-1 px-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">{{ section.label }}</h2>
                     <div class="space-y-1">
                         <template v-for="item in section.items" :key="item.key || item.label">
                             <button
                                 v-if="item.children"
                                 type="button"
-                                class="relative flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left transition-colors hover:bg-white/8 hover:text-on-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-fixed/30"
-                                :class="isActive(item) ? 'text-on-primary' : 'text-primary-fixed-dim'"
+                                class="relative flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left transition-colors hover:bg-surface-container-low/70 hover:text-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-inset"
+                                :class="isActive(item) ? 'text-primary font-semibold' : 'text-on-surface-variant'"
                                 :aria-expanded="Boolean(expanded[item.key])"
                                 @click="toggle(item.key)"
                             >
@@ -450,22 +450,22 @@ function logout() {
                             <Link
                                 v-else-if="item.href"
                                 :href="item.href"
-                                class="relative flex items-center gap-3 rounded-xl px-4 py-2.5 transition-colors"
-                                :class="isActive(item) ? 'bg-white/12 text-on-primary shadow-[inset_3px_0_0_var(--color-secondary)]' : 'text-primary-fixed-dim hover:bg-white/8 hover:text-on-primary'"
+                                class="relative flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200"
+                                :class="isActive(item) ? 'bg-surface-container-low font-semibold text-primary' : 'text-on-surface-variant hover:bg-surface-container-low/70 hover:text-on-surface'"
                                 @click="mobileMenuOpen = false"
                             >
                                 <AppIcon :name="item.icon" :filled="isActive(item)" /><span>{{ item.label }}</span>
                             </Link>
-                            <button v-else type="button" disabled class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-primary-fixed-dim/45" :title="`${item.label} belum tersedia`"><AppIcon :name="item.icon" /><span>{{ item.label }}</span></button>
+                            <button v-else type="button" disabled class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-on-surface-variant/60" :title="`${item.label} belum tersedia`"><AppIcon :name="item.icon" /><span>{{ item.label }}</span></button>
 
                             <Transition name="sidebar-menu">
-                                <div v-if="item.children && expanded[item.key]" class="ml-5 space-y-1 overflow-hidden border-l border-primary-container pl-2">
+                                <div v-if="item.children && expanded[item.key]" class="ml-5 space-y-1 overflow-hidden border-l border-outline-variant pl-2">
                                 <template v-for="child in item.children" :key="child.key || child.label">
                                     <button
                                         v-if="child.children"
                                         type="button"
-                                        class="relative flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-white/8 hover:text-on-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-fixed/30"
-                                        :class="isActive(child) ? 'text-on-primary' : 'text-primary-fixed-dim'"
+                                        class="relative flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface-container-low/70 hover:text-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-inset"
+                                        :class="isActive(child) ? 'text-primary font-semibold' : 'text-on-surface-variant'"
                                         :aria-expanded="Boolean(expanded[child.key])"
                                         @click="toggle(child.key)"
                                     >
@@ -476,25 +476,25 @@ function logout() {
                                     <Link
                                         v-else-if="child.href"
                                         :href="child.href"
-                                        class="relative flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors"
-                                        :class="isActive(child) ? 'bg-white/12 text-on-primary shadow-[inset_3px_0_0_var(--color-secondary)]' : 'text-primary-fixed-dim hover:bg-white/8 hover:text-on-primary'"
+                                        class="relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+                                        :class="isActive(child) ? 'bg-surface-container-low font-semibold text-primary' : 'text-on-surface-variant hover:bg-surface-container-low/70 hover:text-on-surface'"
                                         @click="mobileMenuOpen = false"
                                     >
                                         <AppIcon :name="child.icon" :filled="isActive(child)" class="text-xl" /><span>{{ child.label }}</span>
                                     </Link>
-                                    <button v-else type="button" disabled class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-primary-fixed-dim/45" :title="`${child.label} belum tersedia`"><AppIcon :name="child.icon" class="text-xl" /><span>{{ child.label }}</span></button>
+                                    <button v-else type="button" disabled class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-on-surface-variant/60" :title="`${child.label} belum tersedia`"><AppIcon :name="child.icon" class="text-xl" /><span>{{ child.label }}</span></button>
 
                                     <Transition name="sidebar-menu">
-                                        <div v-if="child.children && expanded[child.key]" class="ml-5 space-y-1 overflow-hidden border-l border-primary-container pl-2">
+                                        <div v-if="child.children && expanded[child.key]" class="ml-5 space-y-1 overflow-hidden border-l border-outline-variant pl-2">
                                             <template v-for="leaf in child.children" :key="leaf.label">
                                                 <Link
                                                     v-if="leaf.href"
                                                     :href="leaf.href"
                                                     class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-                                                    :class="isActive(leaf) ? 'bg-white/12 text-on-primary shadow-[inset_3px_0_0_var(--color-secondary)]' : 'text-primary-fixed-dim hover:bg-white/8 hover:text-on-primary'"
+                                                    :class="isActive(leaf) ? 'bg-surface-container-low font-semibold text-primary' : 'text-on-surface-variant hover:bg-surface-container-low/70 hover:text-on-surface'"
                                                     @click="mobileMenuOpen = false"
                                                 ><span class="size-1.5 rounded-full bg-current" />{{ leaf.label }}</Link>
-                                                <button v-else type="button" disabled class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-primary-fixed-dim/45" :title="`${leaf.label} belum tersedia`"><span class="size-1.5 rounded-full bg-current" />{{ leaf.label }}</button>
+                                                <button v-else type="button" disabled class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-on-surface-variant/60" :title="`${leaf.label} belum tersedia`"><span class="size-1.5 rounded-full bg-current" />{{ leaf.label }}</button>
                                             </template>
                                         </div>
                                     </Transition>
@@ -506,33 +506,33 @@ function logout() {
                 </section>
 
                 <section v-if="user?.is_superadmin">
-                    <h2 class="mb-1 px-4 text-[10px] font-bold uppercase tracking-[0.18em] text-primary-fixed-dim/70">Platform</h2>
-                <Link v-for="item in platformNavigation" :key="item.label" :href="item.href" class="relative flex items-center gap-3 rounded-xl px-4 py-2.5 transition-colors" :class="isActive(item) ? 'bg-white/12 text-on-primary shadow-[inset_3px_0_0_var(--color-secondary)]' : 'text-primary-fixed-dim hover:bg-white/8 hover:text-on-primary'" @click="mobileMenuOpen = false"><AppIcon :name="item.icon" :filled="isActive(item)" /><span>{{ item.label }}</span></Link>
+                    <h2 class="mb-1 px-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">Platform</h2>
+                <Link v-for="item in platformNavigation" :key="item.label" :href="item.href" class="relative flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200" :class="isActive(item) ? 'bg-surface-container-low font-semibold text-primary' : 'text-on-surface-variant hover:bg-surface-container-low/70 hover:text-on-surface'" @click="mobileMenuOpen = false"><AppIcon :name="item.icon" :filled="isActive(item)" /><span>{{ item.label }}</span></Link>
                 </section>
             </nav>
 
-            <div class="mt-4 border-t border-primary-container px-4 pt-4">
-                <div class="flex items-center gap-3 rounded-xl bg-primary-container/50 p-3">
-                    <Link href="/profile" class="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-fixed text-sm font-bold text-primary transition hover:opacity-85" aria-label="Buka Profil"><img v-if="user?.photo_url && !avatarError" :src="user.photo_url" :alt="user?.name || 'User'" class="size-full object-cover" @error="avatarError = true" /><span v-else>{{ user?.name?.charAt(0).toUpperCase() || 'U' }}</span></Link>
-                    <Link href="/profile" class="min-w-0 flex-1 group" aria-label="Buka Profil"><p class="truncate font-bold text-on-primary group-hover:underline">{{ user?.name || 'Pengguna' }}</p><p class="truncate text-xs text-primary-fixed-dim">{{ props.unitName || 'Unit belum dipilih' }}</p></Link>
-                    <AppIconButton name="logout" tone="neutral" size="sm" rounded="lg" aria-label="Keluar" class="text-primary-fixed-dim hover:bg-on-primary/10 hover:text-on-primary" @click="askLogout" />
+            <div class="mt-4 border-t border-outline-variant px-4 pt-4">
+                <div class="flex items-center gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest p-3">
+                    <Link href="/profile" class="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full border border-outline-variant bg-primary-fixed text-sm font-bold text-primary transition hover:opacity-85" aria-label="Buka Profil"><img v-if="user?.photo_url && !avatarError" :src="user.photo_url" :alt="user?.name || 'User'" class="size-full object-cover" @error="avatarError = true" /><span v-else>{{ user?.name?.charAt(0).toUpperCase() || 'U' }}</span></Link>
+                    <Link href="/profile" class="min-w-0 flex-1 group" aria-label="Buka Profil"><p class="truncate font-semibold text-on-surface group-hover:underline">{{ user?.name || 'Pengguna' }}</p><p class="truncate text-xs text-on-surface-variant">{{ props.unitName || 'Unit belum dipilih' }}</p></Link>
+                    <AppIconButton name="logout" tone="neutral" size="sm" rounded="lg" aria-label="Keluar" class="text-on-surface-variant hover:text-primary" @click="askLogout" />
                 </div>
             </div>
         </aside>
 
-        <header class="sticky top-0 z-30 flex h-14 items-center border-b border-outline-variant/70 bg-surface/85 px-4 backdrop-blur-md lg:ml-64 lg:px-6">
+        <header class="sticky top-0 z-30 flex h-14 items-center border-b border-outline-variant bg-surface/85 px-4 backdrop-blur-md lg:ml-64 lg:px-6">
             <AppIconButton name="menu" tone="primary" size="sm" rounded="lg" aria-label="Buka navigasi" class="mr-3 lg:hidden" @click="mobileMenuOpen = true" />
             <button
                 type="button"
-                class="flex w-full max-w-md items-center gap-3 rounded-full border border-outline-variant/60 bg-surface-container-lowest py-2 pr-3 pl-3 text-left text-sm text-on-surface-variant shadow-[0_1px_2px_rgb(6_45_77/4%)] transition hover:border-secondary/35 hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-secondary/25"
+                class="flex h-10 w-full max-w-md items-center gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-left text-sm text-on-surface-variant transition-colors duration-200 hover:border-primary/40 hover:bg-surface-container-low/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                 aria-label="Buka pencarian"
                 @click="openSearch"
             >
                 <AppIcon name="search" class="text-on-surface-variant" />
                                 <span class="min-w-0 flex-1 truncate">Cari anggota atau kelompok...</span>
-                <kbd class="hidden rounded-md border border-outline-variant bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-on-surface-variant sm:inline">Ctrl K</kbd>
+                <kbd class="hidden rounded border border-outline-variant bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-on-surface-variant sm:inline">Ctrl K</kbd>
             </button>
-            <p v-if="props.unitName" class="ml-6 hidden items-center gap-2 text-sm font-bold text-primary xl:flex"><AppIcon name="location_on" class="text-secondary" />{{ props.unitName }}</p>
+            <p v-if="props.unitName" class="ml-6 hidden items-center gap-2 text-sm font-semibold text-primary xl:flex"><AppIcon name="location_on" class="text-secondary" />{{ props.unitName }}</p>
             <div class="ml-auto flex items-center gap-1 pl-3">
                 <AppIconButton
                     name="palette"
@@ -562,7 +562,7 @@ function logout() {
         <main class="p-4 sm:p-6 lg:ml-64 lg:p-8">
             <div
                 v-if="impersonatedBy"
-                class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/40 bg-primary-container/30 px-4 py-3 text-sm text-primary shadow-sm"
+                class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary-fixed/40 px-4 py-3 text-sm text-primary"
             >
                 <div class="flex items-center gap-2.5">
                     <AppIcon name="admin_panel_settings" tone="primary" />
@@ -579,7 +579,7 @@ function logout() {
             </div>
             <div
                 v-if="isTrainingMode"
-                class="mb-6 flex items-center justify-between gap-3 rounded-xl border border-warning/40 bg-warning-container/30 px-4 py-3 text-sm text-primary shadow-sm"
+                class="mb-6 flex items-center justify-between gap-3 rounded-lg border border-warning/40 bg-warning-container/40 px-4 py-3 text-sm text-on-surface"
             >
                 <div class="flex items-center gap-2.5">
                     <span class="inline-block size-2.5 rounded-full bg-warning animate-pulse" />
@@ -625,7 +625,7 @@ function logout() {
                         role="dialog"
                         aria-modal="true"
                         aria-label="Pencarian"
-                        class="flex max-h-[min(36rem,75vh)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-2xl"
+                        class="flex max-h-[min(36rem,75vh)] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest shadow-xl"
                         @keydown="onPaletteKeydown"
                     >
                         <div class="flex shrink-0 items-center gap-2 border-b border-outline-variant px-3">
@@ -677,7 +677,7 @@ function logout() {
                                         role="option"
                                         class="mx-2 flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors"
                                         :class="flatResults[searchHighlight]?.href === item.href && flatResults[searchHighlight]?.title === item.title
-                                            ? 'bg-primary-container/40 text-primary'
+                                            ? 'bg-primary-fixed text-primary'
                                             : 'text-on-surface hover:bg-surface-container-low'"
                                         @mouseenter="searchHighlight = flatResults.findIndex((r) => r.href === item.href && r.title === item.title)"
                                         @click="pickResult(item)"

@@ -25,7 +25,8 @@ const { money } = useMoney();
             <!-- Header -->
             <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
-                    <h1 class="accent-bar pl-4 text-2xl font-bold text-primary">Dashboard Bisnis &amp; Platform</h1>
+                    <p class="eyebrow">Panel Admin Platform</p>
+                    <h1 class="mt-1 text-2xl font-semibold tracking-[-0.02em] text-on-surface">Dashboard Bisnis &amp; Platform</h1>
                     <p class="mt-1 text-on-surface-variant">Ringkasan performa finansial SaaS, pertumbuhan tenant, dan penagihan platform.</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -42,10 +43,10 @@ const { money } = useMoney();
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <AppCard class="stat-card">
                     <div class="flex items-center justify-between">
-                        <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Pendapatan Bulan Ini</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">Pendapatan Bulan Ini</p>
                         <AppIcon name="payments" tone="secondary" container-size="8" container-shape="pill" />
                     </div>
-                    <p class="mt-2 text-2xl font-extrabold text-secondary">{{ money(kpis.revenue_this_month) }}</p>
+                    <p class="mt-1.5 font-display text-3xl font-bold tracking-[-0.02em] text-secondary">{{ money(kpis.revenue_this_month) }}</p>
                     <div class="mt-1.5 flex items-center gap-2 text-xs text-on-surface-variant">
                         <AppBadge v-if="kpis.revenue_last_month > 0" :tone="kpis.revenue_growth >= 0 ? 'success' : 'error'">
                             {{ kpis.revenue_growth >= 0 ? '+' : '' }}{{ kpis.revenue_growth }}% MoM
@@ -56,10 +57,10 @@ const { money } = useMoney();
 
                 <AppCard class="stat-card">
                     <div class="flex items-center justify-between">
-                        <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Pendapatan YTD ({{ chart.year }})</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">Pendapatan YTD ({{ chart.year }})</p>
                         <AppIcon name="account_balance" tone="primary" container-size="8" container-shape="pill" />
                     </div>
-                    <p class="mt-2 text-2xl font-extrabold text-primary">{{ money(kpis.revenue_ytd) }}</p>
+                    <p class="mt-1.5 font-display text-3xl font-bold tracking-[-0.02em] text-primary">{{ money(kpis.revenue_ytd) }}</p>
                     <p class="mt-1.5 text-xs text-on-surface-variant">
                         Total Ditagihkan: <strong class="text-on-surface">{{ money(kpis.invoiced_ytd) }}</strong>
                     </p>
@@ -67,10 +68,10 @@ const { money } = useMoney();
 
                 <AppCard class="stat-card">
                     <div class="flex items-center justify-between">
-                        <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Tagihan Belum Bayar</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">Tagihan Belum Bayar</p>
                         <AppIcon name="pending_actions" tone="warning" container-size="8" container-shape="pill" />
                     </div>
-                    <p class="mt-2 text-2xl font-extrabold" :class="kpis.total_outstanding > 0 ? 'text-error' : 'text-primary'">
+                    <p class="mt-1.5 font-display text-3xl font-bold tracking-[-0.02em]" :class="kpis.total_outstanding > 0 ? 'text-error' : 'text-primary'">
                         {{ money(kpis.total_outstanding) }}
                     </p>
                     <p class="mt-1.5 text-xs text-on-surface-variant">
@@ -83,10 +84,10 @@ const { money } = useMoney();
 
                 <AppCard class="stat-card">
                     <div class="flex items-center justify-between">
-                        <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Total Tenant</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant">Total Tenant</p>
                         <AppIcon name="domain" tone="info" container-size="8" container-shape="pill" />
                     </div>
-                    <p class="mt-2 text-2xl font-extrabold text-primary">{{ kpis.tenants_active }} <span class="text-sm font-normal text-on-surface-variant">/ {{ kpis.tenants_total }} aktif</span></p>
+                    <p class="mt-1.5 font-display text-3xl font-bold tracking-[-0.02em] text-primary">{{ kpis.tenants_active }} <span class="font-sans text-sm font-medium text-on-surface-variant">/ {{ kpis.tenants_total }} aktif</span></p>
                     <p class="mt-1.5 text-xs text-on-surface-variant">
                         {{ kpis.users_total }} total pengguna sistem
                     </p>

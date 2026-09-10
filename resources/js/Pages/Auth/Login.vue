@@ -23,32 +23,32 @@ function submit() {
 
     <main class="flex min-h-screen bg-surface font-sans text-on-surface">
         <section class="bg-navy-gradient relative hidden w-[55%] flex-col overflow-hidden p-12 lg:flex" aria-label="akubumdes — BUMDesma/LKD">
-            <div class="pointer-events-none absolute -right-24 top-1/4 size-80 rounded-full bg-secondary/10 blur-3xl" aria-hidden="true" />
-            <div class="pointer-events-none absolute -left-24 bottom-0 size-96 rounded-full bg-primary-container/40 blur-3xl" aria-hidden="true" />
+            <div class="pointer-events-none absolute right-0 top-1/4 h-80 w-80 border-l border-t border-white/10" aria-hidden="true" />
+            <div class="pointer-events-none absolute bottom-24 left-10 h-24 w-1 bg-secondary" aria-hidden="true" />
 
             <div class="relative z-10 flex items-center gap-4">
-                <span class="grid size-14 place-items-center rounded-xl bg-white text-primary shadow-sm" aria-hidden="true">
+                <span class="grid size-14 place-items-center rounded-lg bg-white text-primary" aria-hidden="true">
                     <svg class="size-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="24" cy="24" r="20" stroke="#062d4d" stroke-width="2.5" />
-                        <path d="M32.5 15.5c-1.8 10.4-7.2 15.4-15.8 17.2 7.8-3.6 11.7-9 13.2-14.6-4.2 1-7.2 3.6-9.4 7.4" stroke="#04783f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="24" cy="24" r="20" stroke="#1e3a8a" stroke-width="2.5" />
+                        <path d="M32.5 15.5c-1.8 10.4-7.2 15.4-15.8 17.2 7.8-3.6 11.7-9 13.2-14.6-4.2 1-7.2 3.6-9.4 7.4" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </span>
                 <div>
-                    <p class="text-xl font-bold tracking-tight text-white">akubumdes</p>
-                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-primary-fixed-dim">BUMDesma/LKD Financial Management</p>
+                    <p class="font-display text-xl font-bold tracking-[-0.02em] text-white">akubumdes</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-on-primary-container/90">BUMDesma/LKD Financial Management</p>
                 </div>
             </div>
 
             <div class="relative z-10 mx-auto my-auto max-w-lg">
                 <svg class="mx-auto size-44" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <circle cx="100" cy="100" r="76" stroke="white" stroke-opacity="0.16" stroke-width="8" />
-                    <path d="M136 64c-6 38-26 58-62 66 30-14 45-34 51-56" stroke="#9af6b8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
-                    <rect x="62" y="118" width="12" height="34" rx="5" fill="white" fill-opacity="0.32" />
-                    <rect x="88" y="98" width="12" height="54" rx="5" fill="#9af6b8" />
-                    <rect x="114" y="80" width="12" height="72" rx="5" fill="white" />
+                    <path d="M136 64c-6 38-26 58-62 66 30-14 45-34 51-56" stroke="#4ade80" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+                    <rect x="62" y="118" width="12" height="34" rx="3" fill="white" fill-opacity="0.32" />
+                    <rect x="88" y="98" width="12" height="54" rx="3" fill="#22c55e" />
+                    <rect x="114" y="80" width="12" height="72" rx="3" fill="white" />
                 </svg>
-                <h2 class="mt-8 text-3xl font-bold leading-snug text-white">Transformasi Digital Ekonomi Desa</h2>
-                <p class="mt-4 max-w-md text-lg text-primary-fixed-dim">
+                <h2 class="mt-8 font-display text-3xl font-semibold leading-snug tracking-[-0.02em] text-white">Transformasi Digital Ekonomi Desa</h2>
+                <p class="mt-4 max-w-md text-lg text-on-primary-container/90">
                     Mewujudkan kemandirian finansial masyarakat melalui pengelolaan dana bergulir yang transparan dan akuntabel.
                 </p>
             </div>
@@ -66,16 +66,17 @@ function submit() {
         <section class="flex w-full flex-col justify-center bg-surface px-6 py-10 md:p-12 lg:w-[45%]">
             <div class="mx-auto w-full max-w-md">
                 <div class="mb-10 flex flex-col items-center text-center lg:hidden">
-                    <span class="grid size-14 place-items-center rounded-xl bg-primary-container text-on-primary shadow-sm" aria-hidden="true">
+                    <span class="grid size-14 place-items-center rounded-lg bg-primary-container text-on-primary" aria-hidden="true">
                         <AppIcon name="account_balance" class="text-3xl" />
                     </span>
-                    <p class="mt-3 text-2xl font-black text-primary">akubumdes</p>
-                    <p class="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-on-surface-variant">BUMDesma/LKD</p>
+                    <p class="mt-3 font-display text-2xl font-bold tracking-[-0.02em] text-primary">akubumdes</p>
+                    <p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-on-surface-variant">BUMDesma/LKD</p>
                 </div>
 
                 <header class="mb-10">
-                    <h1 class="text-3xl font-black tracking-tight text-primary">Masuk ke Akun Anda</h1>
-                    <p class="mt-2 text-base text-outline">Sistem Informasi Dana Bergulir Masyarakat</p>
+                    <p class="eyebrow">Sistem Informasi Dana Bergulir Masyarakat</p>
+                    <h1 class="mt-1 font-display text-3xl font-semibold tracking-[-0.02em] text-on-surface">Masuk ke Akun Anda</h1>
+                    <p class="mt-2 text-base text-on-surface-variant">Kelola keuangan BUMDesma/LKD Anda dari satu tempat.</p>
                 </header>
 
                 <div v-if="form.hasErrors" class="mb-6" role="alert" aria-live="assertive">
@@ -135,7 +136,7 @@ function submit() {
                     </AppButton>
                 </form>
 
-                <div class="mt-8 rounded-xl border border-outline-variant/50 bg-surface-container-lowest p-4 text-sm leading-relaxed text-on-surface-variant">
+                <div class="mt-8 rounded-lg border border-outline-variant bg-surface-container-lowest p-4 text-sm leading-relaxed text-on-surface-variant">
                     <p class="font-semibold text-primary">Butuh bantuan akses?</p>
                     <p class="mt-1">Hubungi Administrator Utama BUMDesma atau Dinas PMD setempat.</p>
                 </div>
