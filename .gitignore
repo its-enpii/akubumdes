@@ -36,3 +36,6 @@ test-results/
 **/.dart_tool/
 mobile/build/
 mobile/.flutter-plugins*
+
+# graphify AST index
+graphify-out/
