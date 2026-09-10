@@ -10,7 +10,7 @@ import AppIconButton from '../Components/AppIconButton.vue';
 import AppBadge from '../Components/AppBadge.vue';
 
 defineProps({
-    name: { type: String, default: 'SIDBM Next' },
+    name: { type: String, default: 'akubumdes' },
     status: { type: String, default: 'ok' },
 });
 
@@ -95,8 +95,8 @@ const steps = [
 
 const faqs = [
     {
-        q: 'Apa itu SIDBM Next dan siapa saja yang dapat menggunakannya?',
-        a: 'SIDBM Next adalah sistem informasi tata kelola keuangan terpadu yang dirancang khusus untuk BUMDesma LKD (Lembaga Keuangan Desa / Eks UPK PNPM-MPd), operasional keuangan desa, serta instansi pembina teknis di tingkat Kabupaten (Dinas PMD & Inspektorat).',
+        q: 'Apa itu akubumdes dan siapa saja yang dapat menggunakannya?',
+        a: 'akubumdes adalah sistem informasi tata kelola keuangan terpadu yang dirancang khusus untuk BUMDesma LKD (Lembaga Keuangan Desa / Eks UPK PNPM-MPd), operasional keuangan desa, serta instansi pembina teknis di tingkat Kabupaten (Dinas PMD & Inspektorat).',
     },
     {
         q: 'Apakah sistem ini sesuai dengan regulasi pemerintah dan standar akuntansi terkini?',
@@ -356,7 +356,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head title="SIDBM Next - Sistem Informasi Dana Bergulir Masyarakat" />
+    <Head title="akubumdes - Sistem Informasi Dana Bergulir Masyarakat" />
 
     <div class="min-h-screen bg-surface font-sans text-on-surface antialiased scroll-smooth selection:bg-primary selection:text-on-primary">
         <!-- Top Banner -->
@@ -376,7 +376,7 @@ onUnmounted(() => {
                         <AppIcon name="account_balance" class="text-2xl" />
                     </div>
                     <div>
-                        <span class="block text-lg font-black tracking-tight text-primary">SIDBM <span class="text-secondary">Next</span></span>
+                        <span class="block text-lg font-black tracking-tight text-primary">akubumdes</span>
                         <span class="block text-[10px] font-bold uppercase tracking-wider text-outline">BUMDesma LKD Platform</span>
                     </div>
                 </a>
@@ -715,7 +715,7 @@ onUnmounted(() => {
         <!-- Footer -->
         <footer class="border-t border-outline-variant/60 bg-surface-container-lowest py-8 text-center text-xs text-outline">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p>&copy; 2026 SIDBM Next &mdash; BUMDesma & LKD Financial Information System.</p>
+        <p>&copy; 2026 akubumdes &mdash; BUMDesma/LKD Financial Information System.</p>
                 <div class="flex items-center gap-4">
                     <a href="#" class="hover:text-primary transition-colors">Kebijakan Privasi</a>
                     <span>&bull;</span>

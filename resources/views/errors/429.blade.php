@@ -39,7 +39,7 @@
 @endsection
 
 @section('message')
-    Sistem mendeteksi terlalu banyak permintaan dalam waktu singkat. Pembatasan sementara ini diberlakukan demi menjaga stabilitas dan performa seluruh pengguna SIDBM Next.
+    Sistem mendeteksi terlalu banyak permintaan dalam waktu singkat. Pembatasan sementara ini diberlakukan demi menjaga stabilitas dan performa seluruh pengguna akubumdes.
 @endsection
 
 @section('recommendations')

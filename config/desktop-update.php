@@ -7,6 +7,6 @@ return [
     'latest_version' => env('DESKTOP_LATEST_VERSION', '1.0.0'),
     'min_version' => env('DESKTOP_MIN_VERSION', '1.0.0'),
     'download_url' => env('DESKTOP_DOWNLOAD_URL', 'https://github.com/its-enpii/new_sidbm/releases/latest/download'),
-    'release_notes_url' => env('DESKTOP_RELEASE_NOTES_URL', 'https://github.com/its-enpii/new_sidbm/releases/latest'),
+    'release_notes_url' => env('DESKTOP_RELEASE_NOTES_URL', 'https://github.com/its-enpii/new_akubumdes/releases/latest'),
     'sha512' => env('DESKTOP_SHA512'),
 ];

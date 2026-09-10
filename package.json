@@ -1,6 +1,6 @@
 {
     "version": "1.0.0",
-    "description": "SIDBM Next desktop client",
+    "description": "akubumdes desktop client",
     "private": true,
     "type": "module",
     "scripts": {

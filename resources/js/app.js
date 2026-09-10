@@ -18,7 +18,7 @@ if (typeof window !== 'undefined' && window.desktopAPI?.onNavigate) {
 }
 
 createInertiaApp({
-    title: (title) => title ? `${title} - SIDBM Next` : 'SIDBM Next',
+    title: (title) => title ? `${title} - akubumdes` : 'akubumdes',
     resolve: (name) => resolvePageComponent(
         `./Pages/${name}.vue`,
         import.meta.glob('./Pages/**/*.vue'),

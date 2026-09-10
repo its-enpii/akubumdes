@@ -235,7 +235,7 @@ const sections = [
         items: [{ label: 'Portal Saya', icon: 'account_circle', href: '/portal' }],
     },
     {
-        label: 'SIDBM',
+        label: 'akubumdes',
         items: [
             {
                 key: 'master-data',

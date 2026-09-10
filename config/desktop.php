@@ -8,7 +8,7 @@ return [
     | Desktop Mode Configuration
     |--------------------------------------------------------------------------
     |
-    | When enabled, SIDBM Next behaves as a desktop application client.
+    | When enabled, akubumdes behaves as a desktop application client.
     | Storage switches to local SQLite, external caches default to file,
     | and offline read-only guards are activated.
     |
@@ -28,7 +28,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'server' => [
-        'url' => rtrim((string) env('DESKTOP_SYNC_SERVER_URL', 'https://app.sidbm.id'), '/'),
+        'url' => rtrim((string) env('DESKTOP_SYNC_SERVER_URL', 'https://app.akubumdes.id'), '/'),
         'api_key' => (string) env('DESKTOP_SYNC_API_KEY', ''),
         'tenant_code' => (string) env('DESKTOP_TENANT_CODE', 'default'),
         'timeout_seconds' => (int) env('DESKTOP_SYNC_TIMEOUT', 30),
@@ -42,7 +42,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'window' => [
-        'title' => env('DESKTOP_APP_TITLE', 'SIDBM Next - Desktop Client'),
+        'title' => env('DESKTOP_APP_TITLE', 'akubumdes — Desktop Client'),
         'width' => (int) env('DESKTOP_WINDOW_WIDTH', 1440),
         'height' => (int) env('DESKTOP_WINDOW_HEIGHT', 900),
         'min_width' => 1024,

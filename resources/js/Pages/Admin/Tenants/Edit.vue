@@ -155,7 +155,7 @@ function submit() {
                             <div>
                                 <h2 class="font-semibold text-primary">Custom Domain</h2>
                                 <p class="text-xs text-on-surface-variant">
-                                    Daftarkan domain atau subdomain untuk tenant ini (misal: <code>bumdesma-sukamaju.id</code> atau <code>app.sukamaju.desa.id</code>). Arahkan DNS domain ke IP server SIDBM.
+                                    Daftarkan domain atau subdomain untuk tenant ini (misal: <code>bumdesma-sukamaju.id</code> atau <code>app.sukamaju.desa.id</code>). Arahkan DNS domain ke IP server akubumdes.
                                 </p>
                             </div>
                         </div>

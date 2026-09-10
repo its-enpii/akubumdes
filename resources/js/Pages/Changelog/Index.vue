@@ -202,7 +202,7 @@ const filteredReleases = computed(() => {
                                 <AppBadge tone="primary-soft" class="px-3 py-1 font-mono text-xs">v{{ latest_version }}</AppBadge>
                             </div>
                             <p class="mt-1 text-sm text-on-surface-variant max-w-2xl leading-relaxed">
-                                Dokumentasi lengkap fitur baru, peningkatan antarmuka, optimasi performa, dan perbaikan berkala pada sistem SIDBM Next.
+                                Dokumentasi lengkap fitur baru, peningkatan antarmuka, optimasi performa, dan perbaikan berkala pada sistem akubumdes.
                             </p>
                         </div>
                     </div>

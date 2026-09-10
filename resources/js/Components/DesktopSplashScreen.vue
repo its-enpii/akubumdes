@@ -13,7 +13,7 @@ const exitStatus = ref('Menyimpan sesi & mengamankan data...');
 let progressInterval = null;
 
 const tenantName = computed(() => {
-    return page.props.tenant?.name || page.props.unitName || 'SIDBM Next';
+    return page.props.tenant?.name || page.props.unitName || 'akubumdes';
 });
 
 function triggerExitScreen(detail = {}) {
@@ -27,10 +27,10 @@ onMounted(() => {
     isDesktop.value = Boolean(window.desktopAPI?.isDesktop) || Boolean(page.props.desktop?.is_desktop);
 
     // Only show opening splash screen on initial desktop app launch
-    const hasShownSplash = sessionStorage.getItem('sidbm_desktop_splash_shown');
+    const hasShownSplash = sessionStorage.getItem('akubumdes_desktop_splash_shown');
     if (isDesktop.value && !hasShownSplash) {
         showSplash.value = true;
-        sessionStorage.setItem('sidbm_desktop_splash_shown', 'true');
+        sessionStorage.setItem('akubumdes_desktop_splash_shown', 'true');
 
         // Progress bar simulation for smooth startup feeling
         progressInterval = setInterval(() => {
@@ -101,7 +101,7 @@ onUnmounted(() => {
                     Selamat Datang
                 </h1>
                 <p class="mt-1 text-sm font-semibold tracking-wide text-emerald-400">
-                    SIDBM Next Desktop
+                    akubumdes Desktop
                 </p>
                 <p class="mt-0.5 text-xs text-slate-400 max-w-xs truncate">
                     {{ tenantName }}

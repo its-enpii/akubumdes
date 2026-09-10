@@ -297,7 +297,7 @@ searchMembers();
               <AppSwitch
                 v-model="isActive"
                 label="Kelompok aktif"
-                description="Kelompok tersedia untuk proses SIDBM."
+                description="Kelompok tersedia untuk proses akubumdes."
                 icon="toggle_on"
               />
             </div>

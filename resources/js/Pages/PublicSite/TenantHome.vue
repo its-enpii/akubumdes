@@ -182,7 +182,7 @@ defineProps({
                 </p>
                 <p v-else class="mt-1.5 text-xs text-on-surface-variant">
                     Dikelola dengan
-                    <a href="/" class="font-semibold text-primary hover:underline">SIDBM Next</a>
+                    <a href="/" class="font-semibold text-primary hover:underline">akubumdes</a>
                     — Sistem Informasi Dana Bergulir Masyarakat
                 </p>
                 <div v-if="settings.social?.facebook || settings.social?.instagram || settings.social?.youtube" class="mt-3 flex justify-center gap-2">

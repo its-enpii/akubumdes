@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sidbm-next-v2';
+const CACHE_NAME = 'akubumdes-v2';
 const OFFLINE_URL = '/offline.html';
 
 const ASSETS_TO_CACHE = [

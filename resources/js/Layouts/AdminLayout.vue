@@ -8,7 +8,7 @@ import AppToast from '../Components/AppToast.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
-const appName = computed(() => page.props.appName || 'SIDBM Next');
+const appName = computed(() => page.props.appName || 'akubumdes');
 const currentPath = computed(() => page.url.split('?')[0]);
 const mobileMenuOpen = ref(false);
 const logoutForm = useForm({});

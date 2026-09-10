@@ -31,7 +31,7 @@ final class ErrorPagesTest extends TestCase
             $rendered = $view->render();
 
             $this->assertNotEmpty($rendered);
-            $this->assertStringContainsString('SIDBM', $rendered);
+            $this->assertStringContainsString('akubumdes', $rendered);
             $this->assertStringContainsString((string) $code, $rendered);
             $this->assertStringContainsString($title, $rendered);
             $this->assertStringContainsString("Test custom error message for {$code}", $rendered);
@@ -43,7 +43,7 @@ final class ErrorPagesTest extends TestCase
         $rendered = view('errors.layout')->render();
 
         $this->assertNotEmpty($rendered);
-        $this->assertStringContainsString('SIDBM Next', $rendered);
+        $this->assertStringContainsString('akubumdes', $rendered);
         $this->assertStringContainsString('BUMDesma LKD Financial System', $rendered);
     }
 

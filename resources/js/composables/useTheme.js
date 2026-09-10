@@ -10,7 +10,7 @@ export const THEMES = [
     { id: 'midnight', label: 'Malam' },
 ];
 
-const STORAGE_KEY = 'sidbm-theme';
+const STORAGE_KEY = 'akubumdes-theme';
 const DEFAULT_THEME = 'classic';
 const themeIds = new Set(THEMES.map((t) => t.id));
 

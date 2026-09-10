@@ -48,7 +48,7 @@ const errorDetails = computed(() => {
             tips: [
                 'Periksa status tagihan aktif di menu Billing.',
                 'Lakukan perpanjangan melalui opsi pembayaran yang tersedia.',
-                'Hubungi Admin SIDBM Next jika sudah melakukan pembayaran.',
+                'Hubungi Admin akubumdes jika sudah melakukan pembayaran.',
             ],
         },
         403: {
@@ -110,7 +110,7 @@ const errorDetails = computed(() => {
             title: 'Sistem Dalam Pemeliharaan',
             category: 'Pemeliharaan Sistem',
             icon: 'engineering',
-            desc: props.message || 'Kami sedang melakukan peningkatan performa sistem rutin. Layanan SIDBM Next akan segera aktif kembali.',
+            desc: props.message || 'Kami sedang melakukan peningkatan performa sistem rutin. Layanan akubumdes akan segera aktif kembali.',
             tips: [
                 'Pemeliharaan berkala biasanya berlangsung beberapa menit.',
                 'Seluruh data keuangan tetap aman.',
@@ -150,8 +150,8 @@ function reloadPage() {
                     <AppIcon name="account_balance" class="text-2xl" />
                 </div>
                 <div>
-                    <p class="text-lg font-extrabold leading-tight text-primary">SIDBM <span class="text-secondary">Next</span></p>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-secondary">BUMDesma LKD Financial System</p>
+                    <p class="text-lg font-extrabold leading-tight text-primary">akubumdes</p>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-secondary">BUMDesma/LKD Financial System</p>
                 </div>
             </Link>
 
@@ -229,7 +229,7 @@ function reloadPage() {
 
         <!-- Footer -->
         <footer class="relative z-10 text-center py-5 text-xs text-on-surface-variant border-t border-outline-variant/30">
-            <p>&copy; {{ new Date().getFullYear() }} <strong>SIDBM Next</strong> &bull; Tata Kelola Dana Bergulir BUMDesma LKD</p>
+            <p>&copy; {{ new Date().getFullYear() }} <strong>akubumdes</strong> &bull; Tata Kelola Dana Bergulir BUMDesma LKD</p>
         </footer>
     </div>
 </template>

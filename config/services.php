@@ -11,7 +11,7 @@ return [
         'base_url' => rtrim((string) env('WA_GATEWAY_BASE', ''), '/'),
         'api_key' => (string) env('WA_GATEWAY_API_KEY', ''),
         'timeout' => (int) env('WA_GATEWAY_TIMEOUT', 15),
-        'instance_prefix' => (string) env('WA_GATEWAY_INSTANCE_PREFIX', 'app-sidbm'),
+        'instance_prefix' => (string) env('WA_GATEWAY_INSTANCE_PREFIX', 'app-akubumdes'),
     ],
     'holding' => [
         'api_key' => env('HOLDING_API_KEY', env('HOLDING_API_TOKEN', env('HOLDING_SECRET', ''))),

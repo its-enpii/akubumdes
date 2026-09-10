@@ -53,7 +53,7 @@
     </li>
     <li class="recommendation-item">
         <span class="material-symbols-outlined recommendation-icon">check_circle</span>
-        <span>Jika telah melakukan pembayaran tetapi status belum aktif, hubungi Admin SIDBM Next.</span>
+        <span>Jika telah melakukan pembayaran tetapi status belum aktif, hubungi Admin akubumdes.</span>
     </li>
 @endsection
 

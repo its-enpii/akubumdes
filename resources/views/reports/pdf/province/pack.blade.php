@@ -41,7 +41,7 @@
 
     <!-- 1. COVER PAGE -->
     <div class="cover break">
-        <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px; color: #555;">SISTEM INFORMASI LEMBAGA KEUANGAN DESA (SIDBM)</div>
+        <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px; color: #555;">SISTEM INFORMASI LEMBAGA KEUANGAN DESA (akubumdes)</div>
         <h1>LAPORAN KEUANGAN KONSOLIDASI</h1>
         <h2>TINGKAT PROVINSI {{ $province }}</h2>
         
@@ -51,7 +51,7 @@
         </div>
 
         <h3>TIM SUPERVISI PROVINSI {{ $province }}</h3>
-        <p style="font-size: 11px; color: #666; margin-top: 100px;">Dokumen ini dihasilkan secara otomatis oleh Sistem SIDBM Platform</p>
+        <p style="font-size: 11px; color: #666; margin-top: 100px;">Dokumen ini dihasilkan secara otomatis oleh Sistem akubumdes Platform</p>
     </div>
 
     <!-- 2. NERACA KONSOLIDASI -->

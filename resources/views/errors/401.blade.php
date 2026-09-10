@@ -42,7 +42,7 @@
 @endsection
 
 @section('message')
-    Akses ke modul atau layanan ini membutuhkan identifikasi pengguna yang valid. Silakan masuk terlebih dahulu untuk melanjutkan pekerjaan Anda di SIDBM Next.
+    Akses ke modul atau layanan ini membutuhkan identifikasi pengguna yang valid. Silakan masuk terlebih dahulu untuk melanjutkan pekerjaan Anda di akubumdes.
 @endsection
 
 @section('recommendations')

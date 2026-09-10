@@ -13,7 +13,7 @@ return [
     | marketing page instead of a tenant site, e.g. the bare server host used
     | behind a load balancer when APP_URL already points at a friendly name.
     |
-    | Example: SITE_PLATFORM_HOSTS=sidbm.example.com,app.internal
+    | Example: SITE_PLATFORM_HOSTS=akubumdes.example.com,app.internal
     |
     */
 

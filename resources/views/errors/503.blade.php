@@ -43,7 +43,7 @@
 @endsection
 
 @section('message')
-    Kami sedang melakukan peningkatan performa dan pemeliharaan sistem rutin. Layanan SIDBM Next akan segera beroperasi normal kembali.
+    Kami sedang melakukan peningkatan performa dan pemeliharaan sistem rutin. Layanan akubumdes akan segera beroperasi normal kembali.
 @endsection
 
 @section('recommendations')

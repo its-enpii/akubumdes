@@ -616,7 +616,7 @@ const instanceColumns = [
           v-model="testForm.message"
           label="Pesan (opsional)"
           :rows="4"
-          placeholder="Tes koneksi WhatsApp Gateway SIDBM."
+          placeholder="Tes koneksi WhatsApp Gateway akubumdes."
         />
       </form>
       <template #footer>

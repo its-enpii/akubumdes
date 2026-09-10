@@ -94,7 +94,7 @@ function formatDateTime(value) {
                 <!-- Content authored by tenant admins through the rich editor. -->
                 <!-- eslint-disable-next-line vue/no-v-html -->
                 <div
-                    class="prose-sidbm mt-8"
+                    class="prose-akubumdes mt-8"
                     v-html="post.content"
                 />
 
@@ -115,7 +115,7 @@ function formatDateTime(value) {
                 </p>
                 <p class="mt-1.5 text-xs text-on-surface-variant">
                     Dikelola dengan
-                    <a href="/" class="font-semibold text-primary hover:underline">SIDBM Next</a>
+                    <a href="/" class="font-semibold text-primary hover:underline">akubumdes</a>
                     — Sistem Informasi Dana Bergulir Masyarakat
                 </p>
             </div>

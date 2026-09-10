@@ -555,61 +555,61 @@
 }
 
 /* Public site content rendered from the tenant rich editor (v-html). */
-.prose-sidbm {
+.prose-akubumdes {
     color: var(--color-on-surface, #1d1b20);
     font-size: 1rem;
     line-height: 1.75;
     word-break: break-word;
 }
 
-.prose-sidbm > * + * {
+.prose-akubumdes > * + * {
     margin-top: 1em;
 }
 
-.prose-sidbm h1,
-.prose-sidbm h2,
-.prose-sidbm h3,
-.prose-sidbm h4 {
+.prose-akubumdes h1,
+.prose-akubumdes h2,
+.prose-akubumdes h3,
+.prose-akubumdes h4 {
     color: var(--color-primary, #4c5f9e);
     font-weight: 700;
     line-height: 1.3;
 }
 
-.prose-sidbm h1 { font-size: 1.75rem; margin-top: 1.5em; }
-.prose-sidbm h2 { font-size: 1.4rem; margin-top: 1.5em; }
-.prose-sidbm h3 { font-size: 1.2rem; margin-top: 1.25em; }
-.prose-sidbm h4 { font-size: 1.05rem; margin-top: 1.25em; }
+.prose-akubumdes h1 { font-size: 1.75rem; margin-top: 1.5em; }
+.prose-akubumdes h2 { font-size: 1.4rem; margin-top: 1.5em; }
+.prose-akubumdes h3 { font-size: 1.2rem; margin-top: 1.25em; }
+.prose-akubumdes h4 { font-size: 1.05rem; margin-top: 1.25em; }
 
-.prose-sidbm a {
+.prose-akubumdes a {
     color: var(--color-primary, #4c5f9e);
     font-weight: 600;
     text-decoration: underline;
 }
 
-.prose-sidbm ul,
-.prose-sidbm ol {
+.prose-akubumdes ul,
+.prose-akubumdes ol {
     padding-left: 1.5rem;
 }
 
-.prose-sidbm ul { list-style: disc; }
-.prose-sidbm ol { list-style: decimal; }
+.prose-akubumdes ul { list-style: disc; }
+.prose-akubumdes ol { list-style: decimal; }
 
-.prose-sidbm li + li { margin-top: 0.35em; }
+.prose-akubumdes li + li { margin-top: 0.35em; }
 
-.prose-sidbm img {
+.prose-akubumdes img {
     height: auto;
     max-width: 100%;
     border-radius: 0.75rem;
 }
 
-.prose-sidbm blockquote {
+.prose-akubumdes blockquote {
     border-left: 4px solid var(--color-primary, #4c5f9e);
     padding-left: 1rem;
     font-style: italic;
     color: var(--color-on-surface-variant, #49454f);
 }
 
-.prose-sidbm pre {
+.prose-akubumdes pre {
     overflow-x: auto;
     border-radius: 0.75rem;
     background: var(--color-surface-container, #f0edf7);
@@ -617,19 +617,22 @@
     font-size: 0.875rem;
 }
 
-.prose-sidbm table {
+.prose-akubumdes table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.prose-sidbm th,
-.prose-sidbm td {
+.prose-akubumdes th,
+.prose-akubumdes td {
     border: 1px solid var(--color-outline-variant, #cac4d0);
     padding: 0.5rem 0.75rem;
     text-align: left;
 }
 
-.prose-sidbm th {
+.prose-akubumdes th {
     background: var(--color-surface-container, #f0edf7);
     font-weight: 700;
+}
+.bg-navy-gradient {
+    background: linear-gradient(135deg, var(--color-primary, #002746) 0%, var(--color-primary-container, #0b3d66) 100%);
 }

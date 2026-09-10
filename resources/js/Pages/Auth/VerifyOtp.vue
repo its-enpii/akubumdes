@@ -26,7 +26,7 @@ function resend() {
 </script>
 
 <template>
-    <Head title="Verifikasi OTP - SIDBM Next" />
+    <Head title="Verifikasi OTP - akubumdes" />
 
     <main class="flex min-h-screen items-center justify-center bg-surface p-6 font-sans text-on-surface sm:p-12">
         <div class="w-full max-w-md space-y-6">

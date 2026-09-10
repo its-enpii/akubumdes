@@ -275,7 +275,7 @@ onBeforeUnmount(() => {
                         @click="open = false"
                     >
                         <AppIcon name="receipt" class="text-base" />
-                        Tagihan SIDBM
+                        Tagihan akubumdes
                     </Link>
                 </div>
             </div>

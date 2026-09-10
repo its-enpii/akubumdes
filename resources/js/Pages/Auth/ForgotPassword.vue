@@ -16,7 +16,7 @@ function submit() {
 </script>
 
 <template>
-    <Head title="Lupa Password - SIDBM Next" />
+    <Head title="Lupa Password - akubumdes" />
 
     <main class="flex min-h-screen items-center justify-center bg-surface p-6 font-sans text-on-surface sm:p-12">
         <div class="w-full max-w-md space-y-6">

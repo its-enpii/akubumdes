@@ -134,7 +134,7 @@ onUnmounted(() => {
 });
 
 const tenantName = computed(() => {
-    return page.props.tenant?.name || page.props.unitName || 'SIDBM Next Desktop';
+    return page.props.tenant?.name || page.props.unitName || 'akubumdes Desktop';
 });
 </script>
 
@@ -150,7 +150,7 @@ const tenantName = computed(() => {
                 <div class="flex h-5 w-5 items-center justify-center rounded bg-emerald-600 text-[10px] font-black text-white shadow-sm">
                     S
                 </div>
-                <span class="hidden sm:inline">SIDBM</span>
+                <span class="hidden sm:inline">akubumdes</span>
             </div>
 
             <div class="h-3 w-px bg-slate-800"></div>

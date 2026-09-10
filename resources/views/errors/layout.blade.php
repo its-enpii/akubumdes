@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#002746">
-    <meta name="apple-mobile-web-app-title" content="SIDBM Next">
+    <meta name="apple-mobile-web-app-title" content="akubumdes">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="/build/assets/icon-192.png">
 
-    <title>@yield('title', 'Terjadi Kesalahan') - {{ config('app.name', 'SIDBM Next') }}</title>
+    <title>@yield('title', 'Terjadi Kesalahan') - {{ config('app.name', 'akubumdes') }}</title>
 
     <!-- Google Fonts & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
     <script>
         (function () {
             try {
-                var t = localStorage.getItem('sidbm-theme');
+                var t = localStorage.getItem('akubumdes-theme');
                 var ok = { classic:1, forest:1, amber:1, violet:1, ocean:1, rose:1, midnight:1 };
                 if (t && ok[t]) document.documentElement.setAttribute('data-theme', t);
             } catch (e) {}
@@ -595,12 +595,12 @@
 
     <!-- Top Navigation Brand Bar -->
     <header class="error-navbar">
-        <a href="/" class="brand-link" title="SIDBM Next">
+        <a href="/" class="brand-link" title="akubumdes">
             <div class="brand-logo-icon">
                 <span class="material-symbols-outlined" style="font-size: 1.5rem;">account_balance</span>
             </div>
             <div>
-                <p class="brand-text-title">SIDBM <span style="color: var(--color-secondary);">Next</span></p>
+                <p class="brand-text-title">akubumdes</p>
                 <p class="brand-text-badge">BUMDesma LKD Financial System</p>
             </div>
         </a>
@@ -728,7 +728,7 @@
 
     <!-- Footer -->
     <footer class="error-footer">
-        <p>&copy; {{ date('Y') }} <strong>SIDBM Next</strong> &bull; Tata Kelola Dana Bergulir BUMDesma LKD &bull; Standar SAK EP & PP No. 11/2021</p>
+        <p>&copy; {{ date('Y') }} <strong>akubumdes</strong> &bull; Tata Kelola Dana Bergulir BUMDesma LKD &bull; Standar SAK EP & PP No. 11/2021</p>
     </footer>
 
     <!-- Toast Component -->
@@ -750,7 +750,7 @@
 
         function copyDiagnosticInfo() {
             var info = [
-                '=== SIDBM Next Error Report ===',
+                '=== akubumdes Error Report ===',
                 'Status Code: @yield("code", "500")',
                 'Error Title: @yield("title", "Terjadi Kesalahan")',
                 'Path: ' + window.location.pathname,
