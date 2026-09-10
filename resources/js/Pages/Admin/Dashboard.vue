@@ -25,7 +25,7 @@ const { money } = useMoney();
             <!-- Header -->
             <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
-                    <h1 class="text-2xl font-bold text-primary">Dashboard Bisnis &amp; Platform</h1>
+                    <h1 class="accent-bar pl-4 text-2xl font-bold text-primary">Dashboard Bisnis &amp; Platform</h1>
                     <p class="mt-1 text-on-surface-variant">Ringkasan performa finansial SaaS, pertumbuhan tenant, dan penagihan platform.</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -40,7 +40,7 @@ const { money } = useMoney();
 
             <!-- Top Business KPIs -->
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <AppCard>
+                <AppCard class="stat-card">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Pendapatan Bulan Ini</p>
                         <AppIcon name="payments" tone="secondary" container-size="8" container-shape="pill" />
@@ -54,7 +54,7 @@ const { money } = useMoney();
                     </div>
                 </AppCard>
 
-                <AppCard>
+                <AppCard class="stat-card">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Pendapatan YTD ({{ chart.year }})</p>
                         <AppIcon name="account_balance" tone="primary" container-size="8" container-shape="pill" />
@@ -65,7 +65,7 @@ const { money } = useMoney();
                     </p>
                 </AppCard>
 
-                <AppCard>
+                <AppCard class="stat-card">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Tagihan Belum Bayar</p>
                         <AppIcon name="pending_actions" tone="warning" container-size="8" container-shape="pill" />
@@ -81,7 +81,7 @@ const { money } = useMoney();
                     </p>
                 </AppCard>
 
-                <AppCard>
+                <AppCard class="stat-card">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Total Tenant</p>
                         <AppIcon name="domain" tone="info" container-size="8" container-shape="pill" />

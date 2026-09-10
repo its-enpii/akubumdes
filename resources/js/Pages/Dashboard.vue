@@ -100,7 +100,7 @@ const journalColumns = [
         class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
         aria-label="KPI utama"
       >
-        <AppCard v-for="card in cards" :key="card.key" bordered>
+        <AppCard v-for="card in cards" :key="card.key" class="stat-card">
           <div class="mb-3 flex items-start justify-between gap-3">
             <div
               class="grid size-10 place-items-center rounded-lg"
@@ -117,7 +117,7 @@ const journalColumns = [
             >
           </div>
           <p
-            class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+            class="text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant"
           >
             {{ card.label }}
           </p>
@@ -141,7 +141,7 @@ const journalColumns = [
             class="flex shrink-0 items-center justify-between border-b border-outline-variant px-6 py-4"
           >
             <div>
-              <h2 class="text-lg font-bold text-primary">Jurnal Terbaru</h2>
+          <h2 class="accent-bar pl-4 text-lg font-bold text-primary">Jurnal Terbaru</h2>
               <p class="text-sm text-on-surface-variant">
                 Posted, {{ recent_journals.length }} entri terakhir
               </p>

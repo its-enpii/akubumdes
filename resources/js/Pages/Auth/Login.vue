@@ -29,8 +29,8 @@ function submit() {
             <div class="relative z-10 flex items-center gap-4">
                 <span class="grid size-14 place-items-center rounded-xl bg-white text-primary shadow-sm" aria-hidden="true">
                     <svg class="size-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="24" cy="24" r="20" stroke="#002746" stroke-width="2.5" />
-                        <path d="M32.5 15.5c-1.8 10.4-7.2 15.4-15.8 17.2 7.8-3.6 11.7-9 13.2-14.6-4.2 1-7.2 3.6-9.4 7.4" stroke="#006d3d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="24" cy="24" r="20" stroke="#062d4d" stroke-width="2.5" />
+                        <path d="M32.5 15.5c-1.8 10.4-7.2 15.4-15.8 17.2 7.8-3.6 11.7-9 13.2-14.6-4.2 1-7.2 3.6-9.4 7.4" stroke="#04783f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </span>
                 <div>

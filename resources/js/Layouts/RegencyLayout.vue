@@ -53,13 +53,15 @@ function logout() {
         </Transition>
 
         <aside
-            class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-primary py-6 shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0"
+            class="bg-navy-gradient fixed inset-y-0 left-0 z-50 flex w-64 flex-col py-6 shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0"
             :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
         >
-            <div class="mb-8 px-6">
-                <p class="text-xs font-bold uppercase tracking-[0.2em] text-on-primary-container">Portal Kabupaten</p>
-                <p class="mt-1 text-lg font-bold text-on-primary">{{ user?.regency_name || 'Kabupaten' }}</p>
-                <p class="text-xs text-primary-fixed-dim">Konsolidasi Multi-Kecamatan</p>
+            <div class="mb-8 flex items-center gap-3 px-6">
+                <div class="grid size-10 shrink-0 place-items-center rounded-xl bg-white/95 text-primary shadow-lg shadow-black/10"><AppIcon name="eco" class="text-2xl text-secondary" /></div>
+                <div class="min-w-0">
+                    <p class="text-lg font-extrabold leading-none tracking-[-0.03em] text-on-primary">akubumdes</p>
+                    <p class="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-fixed-dim">Portal Kabupaten</p>
+                </div>
             </div>
 
             <nav class="flex-1 space-y-1 overflow-y-auto px-3">
@@ -67,8 +69,8 @@ function logout() {
                     v-for="item in navigation"
                     :key="item.label"
                     :href="item.href"
-                    class="flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors"
-                    :class="isActive(item) ? 'bg-primary-container text-on-primary font-semibold' : 'text-primary-fixed-dim hover:bg-primary-container hover:text-on-primary'"
+                    class="relative flex items-center gap-3 rounded-xl px-4 py-2.5 transition-colors"
+                    :class="isActive(item) ? 'bg-white/12 text-on-primary shadow-[inset_3px_0_0_var(--color-secondary)]' : 'text-primary-fixed-dim hover:bg-white/8 hover:text-on-primary'"
                     @click="mobileMenuOpen = false"
                 >
                     <AppIcon :name="item.icon" :filled="isActive(item)" />
@@ -88,11 +90,11 @@ function logout() {
             </div>
         </aside>
 
-        <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-outline-variant bg-surface px-4 lg:ml-64 lg:px-6">
+        <header class="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-outline-variant/70 bg-surface/85 px-4 backdrop-blur-md lg:ml-64 lg:px-6">
             <div class="flex items-center gap-3">
                 <AppIconButton name="menu" tone="primary" size="sm" rounded="lg" aria-label="Buka navigasi" class="lg:hidden" @click="mobileMenuOpen = true" />
                 <div>
-                    <p class="text-sm font-bold text-primary">Monitoring & Konsolidasi Keuangan Kabupaten</p>
+                    <p class="accent-bar pl-4 text-sm font-bold text-primary">Monitoring &amp; Konsolidasi Keuangan Kabupaten</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">

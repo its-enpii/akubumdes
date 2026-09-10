@@ -376,8 +376,8 @@ onUnmounted(() => {
                         <AppIcon name="account_balance" class="text-2xl" />
                     </div>
                     <div>
-                        <span class="block text-lg font-black tracking-tight text-primary">akubumdes</span>
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-outline">BUMDesma LKD Platform</span>
+                <span class="block text-lg font-black tracking-[-0.03em] text-primary">akubumdes</span>
+                <span class="block text-[10px] font-bold uppercase tracking-[0.16em] text-on-surface-variant">BUMDesma LKD Platform</span>
                     </div>
                 </a>
 
@@ -646,7 +646,7 @@ onUnmounted(() => {
             <section id="solusi" class="reveal-group py-20 bg-surface-container-low/50 scroll-mt-20 border-y border-outline-variant/60">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-14">
                     <div class="text-center space-y-4 max-w-2xl mx-auto">
-                        <AppBadge tone="secondary" class="font-bold">Alur Kerja Sistem</AppBadge>
+                        <AppBadge tone="success" class="font-bold">Alur Kerja Sistem</AppBadge>
                         <h2 class="text-3xl sm:text-4xl font-black text-primary tracking-tight">
                             4 Langkah Mudah Implementasi di BUMDesma
                         </h2>

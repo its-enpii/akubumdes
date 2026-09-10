@@ -250,7 +250,7 @@ watch(() => props.modelValue, (value) => {
                 :aria-invalid="Boolean(error)"
                 :aria-required="required"
                 :disabled="disabled"
-                class="flex h-14 w-full items-center justify-between rounded-xl border bg-surface-container-lowest px-4 pr-16 text-left text-primary transition-all duration-150 active:scale-[0.99] focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                class="flex h-13 w-full items-center justify-between rounded-xl border bg-surface-container-lowest px-4 pr-16 text-left text-primary shadow-[0_1px_2px_rgb(6_45_77/4%)] transition-all duration-150 active:scale-[0.99] focus:border-secondary focus:ring-4 focus:ring-secondary/12 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
                 :class="error ? 'border-error' : 'border-outline-variant'"
                 v-bind="$attrs"
                 @click="open ? closeMenu() : openMenu()"
@@ -319,7 +319,7 @@ watch(() => props.modelValue, (value) => {
                                                 <span class="font-semibold" :class="String(row.option[valueKey]) === String(modelValue) ? 'text-primary' : 'text-on-surface'">
                                                     {{ row.option[labelKey] }}
                                                 </span>
-                                                <span v-if="row.option.badge" class="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                                                <span v-if="row.option.badge" class="shrink-0 rounded-full bg-secondary-container px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-[#046137]">
                                                     {{ row.option.badge }}
                                                 </span>
                                             </div>
