@@ -9,18 +9,18 @@
 
 @section('illustration')
 <svg width="240" height="200" viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="120" cy="100" r="85" fill="#006D3D" fill-opacity="0.04" />
-    <circle cx="120" cy="100" r="65" stroke="#006D3D" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="4 4" />
+    <circle cx="120" cy="100" r="85" fill="#059669" fill-opacity="0.04" />
+    <circle cx="120" cy="100" r="65" stroke="#059669" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="4 4" />
     <g filter="url(#drop-shadow-503)">
         <rect x="55" y="45" width="130" height="110" rx="18" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2" />
         <g transform="translate(120, 95)">
-            <circle cx="0" cy="0" r="28" fill="#002746" />
-            <rect x="-4" y="-36" width="8" height="72" rx="3" fill="#002746" />
-            <rect x="-4" y="-36" width="8" height="72" rx="3" fill="#002746" transform="rotate(45)" />
-            <rect x="-4" y="-36" width="8" height="72" rx="3" fill="#002746" transform="rotate(90)" />
-            <rect x="-4" y="-36" width="8" height="72" rx="3" fill="#002746" transform="rotate(135)" />
+            <circle cx="0" cy="0" r="28" fill="#115E59" />
+            <rect x="-4" y="-36" width="8" height="72" rx="3" fill="#115E59" />
+            <rect x="-4" y="-36" width="8" height="72" rx="3" fill="#115E59" transform="rotate(45)" />
+            <rect x="-4" y="-36" width="8" height="72" rx="3" fill="#115E59" transform="rotate(90)" />
+            <rect x="-4" y="-36" width="8" height="72" rx="3" fill="#115E59" transform="rotate(135)" />
             <circle cx="0" cy="0" r="14" fill="#FFFFFF" />
-            <circle cx="0" cy="0" r="6" fill="#006D3D" />
+            <circle cx="0" cy="0" r="6" fill="#059669" />
         </g>
     </g>
     <g transform="translate(155, 40)">

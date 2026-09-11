@@ -5,7 +5,7 @@
 @source "../js/**/*.js";
 @source "../js/**/*.vue";
 
-/* Semantic tokens — default = classic (Swiss minimalism: royal blue + green) */
+/* Semantic tokens — default = classic (Swiss minimalism: deep teal + emerald) */
 @theme {
     --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
     --font-display: "Outfit", "Work Sans", ui-sans-serif, system-ui, sans-serif;
@@ -23,16 +23,16 @@
     --color-on-surface-variant: #475569;
     --color-outline: #64748b;
     --color-outline-variant: #e2e8f0;
-    --color-primary: #1e3a8a;
-    --color-primary-deep: #172554;
-    --color-primary-container: #2748a3;
+    --color-primary: #0f766e;
+    --color-primary-deep: #134e4a;
+    --color-primary-container: #115e59;
     --color-on-primary: #ffffff;
-    --color-on-primary-container: #d8e2ff;
-    --color-on-primary-container-soft: rgb(216 226 255 / 16%);
-    --color-primary-fixed: #dce6fa;
-    --color-primary-fixed-dim: #a9bde8;
-    --color-secondary: #16a34a;
-    --color-secondary-container: #dcf7e5;
+    --color-on-primary-container: #99f6e4;
+    --color-on-primary-container-soft: rgb(153 246 228 / 16%);
+    --color-primary-fixed: #ccfbf1;
+    --color-primary-fixed-dim: #5eead4;
+    --color-secondary: #059669;
+    --color-secondary-container: #d1fae5;
     --color-on-secondary: #ffffff;
     --color-error: #dc2626;
     --color-error-container: #fee2e2;
@@ -234,7 +234,7 @@
     --color-shadow: rgb(74 21 40 / 6%);
 }
 
-/* Midnight — dark UI (slate midnight, bright royal blue, fresh green) */
+/* Midnight — dark UI (slate midnight, bright teal, fresh emerald) */
 [data-theme="midnight"] {
     color-scheme: dark;
     --color-surface: #0b1220;
@@ -247,17 +247,17 @@
     --color-on-surface-variant: #9dabc2;
     --color-outline: #74869f;
     --color-outline-variant: #2c3950;
-    --color-primary: #3b82f6;
-    --color-primary-deep: #1d4ed8;
-    --color-primary-container: #1e3a8a;
+    --color-primary: #2dd4bf;
+    --color-primary-deep: #0f766e;
+    --color-primary-container: #134e4a;
     --color-on-primary: #ffffff;
-    --color-on-primary-container: #bfd6fe;
-    --color-on-primary-container-soft: rgb(191 214 254 / 14%);
-    --color-primary-fixed: #1e3a8a;
-    --color-primary-fixed-dim: #6d9df1;
-    --color-secondary: #22c55e;
-    --color-secondary-container: #143824;
-    --color-on-secondary: #04220f;
+    --color-on-primary-container: #99f6e4;
+    --color-on-primary-container-soft: rgb(153 246 228 / 14%);
+    --color-primary-fixed: #134e4a;
+    --color-primary-fixed-dim: #5eead4;
+    --color-secondary: #34d399;
+    --color-secondary-container: #11362b;
+    --color-on-secondary: #052e1f;
     --color-error: #f87171;
     --color-error-container: #7f1d1d;
     --color-on-error: #ffffff;
@@ -335,7 +335,7 @@
 
 /* Swiss utilities — garis, bukan shadow */
 @utility bg-navy-gradient {
-    background: var(--color-primary-deep);
+    background: linear-gradient(135deg, #134e4a 0%, #0f766e 58%, #042f2e 100%);
 }
 
 @utility accent-bar {
@@ -418,8 +418,8 @@
     border-radius: 9999px;
 }
 
-.theme-swatch[data-for="classic"] > i:nth-child(1) { background: #1e3a8a; }
-.theme-swatch[data-for="classic"] > i:nth-child(2) { background: #16a34a; }
+.theme-swatch[data-for="classic"] > i:nth-child(1) { background: #0f766e; }
+.theme-swatch[data-for="classic"] > i:nth-child(2) { background: #059669; }
 .theme-swatch[data-for="classic"] > i:nth-child(3) { background: #f8fafc; }
 
 .theme-swatch[data-for="forest"] > i:nth-child(1) { background: #0b3d2a; }
@@ -442,8 +442,8 @@
 .theme-swatch[data-for="rose"] > i:nth-child(2) { background: #0f6b5c; }
 .theme-swatch[data-for="rose"] > i:nth-child(3) { background: #fcf6f7; }
 
-.theme-swatch[data-for="midnight"] > i:nth-child(1) { background: #3b82f6; }
-.theme-swatch[data-for="midnight"] > i:nth-child(2) { background: #22c55e; }
+.theme-swatch[data-for="midnight"] > i:nth-child(1) { background: #2dd4bf; }
+.theme-swatch[data-for="midnight"] > i:nth-child(2) { background: #34d399; }
 .theme-swatch[data-for="midnight"] > i:nth-child(3) { background: #0b1220; }
 
 /* TipTap rich editor — chrome only via semantic tokens */

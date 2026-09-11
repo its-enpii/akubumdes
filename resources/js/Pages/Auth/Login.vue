@@ -29,8 +29,8 @@ function submit() {
             <div class="relative z-10 flex items-center gap-4">
                 <span class="grid size-14 place-items-center rounded-lg bg-white text-primary" aria-hidden="true">
                     <svg class="size-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="24" cy="24" r="20" stroke="#1e3a8a" stroke-width="2.5" />
-                        <path d="M32.5 15.5c-1.8 10.4-7.2 15.4-15.8 17.2 7.8-3.6 11.7-9 13.2-14.6-4.2 1-7.2 3.6-9.4 7.4" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="24" cy="24" r="20" stroke="#0f766e" stroke-width="2.5" />
+                        <path d="M32.5 15.5c-1.8 10.4-7.2 15.4-15.8 17.2 7.8-3.6 11.7-9 13.2-14.6-4.2 1-7.2 3.6-9.4 7.4" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </span>
                 <div>
@@ -42,9 +42,9 @@ function submit() {
             <div class="relative z-10 mx-auto my-auto max-w-lg">
                 <svg class="mx-auto size-44" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <circle cx="100" cy="100" r="76" stroke="white" stroke-opacity="0.16" stroke-width="8" />
-                    <path d="M136 64c-6 38-26 58-62 66 30-14 45-34 51-56" stroke="#4ade80" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M136 64c-6 38-26 58-62 66 30-14 45-34 51-56" stroke="#5eead4" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
                     <rect x="62" y="118" width="12" height="34" rx="3" fill="white" fill-opacity="0.32" />
-                    <rect x="88" y="98" width="12" height="54" rx="3" fill="#22c55e" />
+                    <rect x="88" y="98" width="12" height="54" rx="3" fill="#34d399" />
                     <rect x="114" y="80" width="12" height="72" rx="3" fill="white" />
                 </svg>
                 <h2 class="mt-8 font-display text-3xl font-semibold leading-snug tracking-[-0.02em] text-white">Transformasi Digital Ekonomi Desa</h2>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#002746">
+    <meta name="theme-color" content="#0F766E">
     <meta name="apple-mobile-web-app-title" content="akubumdes">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="/build/assets/icon-192.png">
@@ -28,12 +28,12 @@
     <style>
         :root {
             --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --color-primary: #002746;
-            --color-primary-deep: #001d36;
-            --color-primary-container: #0b3d66;
+            --color-primary: #115E59;
+            --color-primary-deep: #042F2E;
+            --color-primary-container: #134E4A;
             --color-on-primary: #ffffff;
-            --color-secondary: #006d3d;
-            --color-secondary-container: #97f3b5;
+            --color-secondary: #059669;
+            --color-secondary-container: #a7f3d0;
             --color-on-secondary: #ffffff;
             --color-surface: #f8fafc;
             --color-card: #ffffff;
@@ -43,7 +43,7 @@
             --color-error: #ba1a1a;
             --color-error-container: #ffdad6;
             --color-warning: #d97706;
-            --color-info: #0284c7;
+            --color-info: #0d9488;
         }
 
         [data-theme="forest"] {
@@ -59,7 +59,7 @@
             --color-primary: #3b2818;
             --color-primary-deep: #291b10;
             --color-primary-container: #5d3f27;
-            --color-secondary: #006d3d;
+            --color-secondary: #059669;
             --color-secondary-container: #a3f7c4;
             --color-surface: #fbf8f3;
         }

@@ -21,7 +21,7 @@ const tones = {
     error: 'bg-error text-on-error',
     primary: 'bg-primary text-on-primary',
     // Soft (medium-emphasis — tinted bg, strong fg)
-    'success-soft': 'bg-secondary-container text-[#166534]',
+    'success-soft': 'bg-secondary-container text-[#065f46]',
     'warning-soft': 'bg-tertiary-container text-[#92400e]',
     'error-soft': 'bg-error-container text-[#991b1b]',
     'info-soft': 'bg-primary-fixed text-primary',

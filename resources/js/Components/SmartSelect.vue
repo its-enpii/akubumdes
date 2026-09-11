@@ -319,7 +319,7 @@ watch(() => props.modelValue, (value) => {
                                                 <span class="font-semibold" :class="String(row.option[valueKey]) === String(modelValue) ? 'text-primary' : 'text-on-surface'">
                                                     {{ row.option[labelKey] }}
                                                 </span>
-                                                <span v-if="row.option.badge" class="shrink-0 rounded-full bg-secondary-container px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-[#046137]">
+                                                <span v-if="row.option.badge" class="shrink-0 rounded-full bg-secondary-container px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-[#065f46]">
                                                     {{ row.option.badge }}
                                                 </span>
                                             </div>

@@ -61,10 +61,10 @@ function compactNumber(val) {
 
 function getMarkerColor(kec) {
     if (activeMetric.value === 'assets') {
-        return { bg: '#002746', border: '#81a8d7', label: 'Aset' };
+        return { bg: '#115e59', border: '#5eead4', label: 'Aset' };
     }
 
-    return { bg: '#0b3d66', border: '#a2cafa', label: 'Perputaran' };
+    return { bg: '#0f766e', border: '#99f6e4', label: 'Perputaran' };
 }
 
 function getMetricValueFormatted(kec) {

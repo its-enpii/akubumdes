@@ -14,8 +14,8 @@
     <g filter="url(#drop-shadow-403)">
         <path d="M120 30L175 52V104C175 142 148 168 120 178C92 168 65 142 65 104V52L120 30Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2" />
         <path d="M120 42L162 59V101C162 132 141 153 120 162C99 153 78 132 78 101V59L120 42Z" fill="linear-gradient(180deg, rgba(0, 39, 70, 0.05) 0%, rgba(186, 26, 26, 0.08) 100%)" />
-        <rect x="100" y="96" width="40" height="34" rx="8" fill="#002746" />
-        <path d="M107 96V84C107 76.8203 112.82 71 120 71C127.18 71 133 76.8203 133 84V96" stroke="#002746" stroke-width="5" stroke-linecap="round" />
+        <rect x="100" y="96" width="40" height="34" rx="8" fill="#115E59" />
+        <path d="M107 96V84C107 76.8203 112.82 71 120 71C127.18 71 133 76.8203 133 84V96" stroke="#115E59" stroke-width="5" stroke-linecap="round" />
         <circle cx="120" cy="110" r="3.5" fill="#FFFFFF" />
         <path d="M118 110L117 122H123L122 110H118Z" fill="#FFFFFF" />
     </g>
@@ -24,7 +24,7 @@
         <path d="M9 14H19" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" />
     </g>
     <g transform="translate(48, 120)">
-        <rect width="32" height="22" rx="6" fill="#006D3D" />
+        <rect width="32" height="22" rx="6" fill="#059669" />
         <text x="16" y="15" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="Inter, sans-serif" text-anchor="middle">ROLE</text>
     </g>
     <defs>

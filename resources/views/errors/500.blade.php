@@ -13,8 +13,8 @@
     <circle cx="120" cy="100" r="65" stroke="#BA1A1A" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="4 4" />
     <g filter="url(#drop-shadow-500)">
         <rect x="58" y="44" width="124" height="32" rx="8" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2" />
-        <circle cx="74" cy="60" r="4" fill="#006D3D" />
-        <circle cx="86" cy="60" r="4" fill="#006D3D" />
+        <circle cx="74" cy="60" r="4" fill="#059669" />
+        <circle cx="86" cy="60" r="4" fill="#059669" />
         <line x1="102" y1="60" x2="166" y2="60" stroke="#E2E8F0" stroke-width="3" stroke-linecap="round" />
 
         <rect x="58" y="84" width="124" height="32" rx="8" fill="#FFFFFF" stroke="#BA1A1A" stroke-width="2" />
@@ -24,8 +24,8 @@
         <circle cx="166" cy="100" r="5" fill="#BA1A1A" />
 
         <rect x="58" y="124" width="124" height="32" rx="8" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2" />
-        <circle cx="74" cy="140" r="4" fill="#006D3D" />
-        <circle cx="86" cy="140" r="4" fill="#006D3D" />
+        <circle cx="74" cy="140" r="4" fill="#059669" />
+        <circle cx="86" cy="140" r="4" fill="#059669" />
         <line x1="102" y1="140" x2="166" y2="140" stroke="#E2E8F0" stroke-width="3" stroke-linecap="round" />
     </g>
     <g transform="translate(155, 70)">
