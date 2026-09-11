@@ -79,7 +79,7 @@ const steps = [
     {
         num: '02',
         title: 'Migrasi & Saldo Awal',
-        desc: 'Fasilitas Import Wizard pintar untuk memindahkan data master kelompok, anggota, dan saldo awal dari sistem sebelumnya.',
+        desc: 'Fasilitas Import Wizard pintar untuk memindahkan saldo awal dan data akuntansi dari sistem sebelumnya.',
     },
     {
         num: '03',
@@ -108,7 +108,7 @@ const faqs = [
     },
     {
         q: 'Apakah data lama dari format Excel atau database Access dapat dipindahkan?',
-        a: 'Tersedia modul Import Wizard dan migrasi data pintar yang memudahkan pengurus memasukkan data master desa, data anggota, serta saldo awal akun secara cepat tanpa harus input manual satu per satu.',
+        a: 'Tersedia modul Import Wizard dan migrasi data pintar yang memudahkan pengurus memasukkan data master desa serta saldo awal akun secara cepat tanpa harus input manual satu per satu.',
     },
     {
         q: 'Bagaimana cara BUMDesma mendaftarkan unit atau berkonsultasi implementasi?',

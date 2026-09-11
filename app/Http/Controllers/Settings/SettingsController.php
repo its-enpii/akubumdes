@@ -6,13 +6,13 @@ namespace App\Http\Controllers\Settings;
 
 use App\Domain\Documents\Services\SignatureImageService;
 use App\Domain\Documents\Services\SignatureTemplateService;
-use App\Domain\Membership\Models\OrganizationProfile;
 use App\Http\Requests\Settings\IdentityRequest;
 use App\Http\Requests\Settings\LogoUploadRequest;
 use App\Http\Requests\Settings\OfflineAccessRequest;
 use App\Http\Requests\Settings\SignatureImageUploadRequest;
 use App\Http\Requests\Settings\SignaturesRequest;
 use App\Http\Requests\Settings\WhatsappRequest;
+use App\Models\Tenant\OrganizationProfile;
 use App\Services\OfflineAccessService;
 use App\Services\TenantSettingService;
 use App\Services\WhatsappGatewayService;

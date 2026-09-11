@@ -22,7 +22,7 @@ final class OrchestratorSignatureTest extends TestCase
         Config::set('assistant.signature_max_skew_ms', 300_000);
 
         $body = json_encode([
-            'tool' => 'search_members',
+            'tool' => 'list_accounts',
             'external_user_id' => '1',
             'params' => ['query' => 'budi'],
             'ts' => 1,
@@ -32,7 +32,7 @@ final class OrchestratorSignatureTest extends TestCase
         $keyHash = hash('sha256', $plaintext);
         $sig = hash_hmac('sha256', $ts.'.'.$body, $keyHash);
 
-        $request = Request::create('/api/assistant/tools/search_members', 'POST', [], [], [], [
+        $request = Request::create('/api/assistant/tools/list_accounts', 'POST', [], [], [], [
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_ORCHESTRATOR_SIGNATURE' => $sig,
             'HTTP_X_ORCHESTRATOR_TIMESTAMP' => $ts,
@@ -59,7 +59,7 @@ final class OrchestratorSignatureTest extends TestCase
         Config::set('assistant.shared_secret', $plaintext);
         Config::set('assistant.signature_max_skew_ms', 300_000);
 
-        $body = '{"tool":"search_groups","external_user_id":"1","params":{"query":"mawar"}}';
+        $body = '{"tool":"list_accounts","external_user_id":"1","params":{}}';
         $ts = (string) (int) floor(microtime(true) * 1000);
         $keyHash = hash('sha256', $plaintext);
         $sig = hash_hmac('sha256', $ts.'.'.$body, $keyHash);
@@ -89,7 +89,7 @@ final class OrchestratorSignatureTest extends TestCase
         Config::set('assistant.shared_secret', 'tk_test_secret_key_for_unit');
         Config::set('assistant.signature_max_skew_ms', 300_000);
 
-        $body = '{"tool":"search_members","external_user_id":"1","params":{}}';
+        $body = '{"tool":"list_accounts","external_user_id":"1","params":{}}';
         $ts = (string) (int) floor(microtime(true) * 1000);
 
         $request = Request::create('/api/assistant/tools', 'POST', [], [], [], [

@@ -6,12 +6,10 @@ namespace App\Tenancy\Services;
 
 use App\Models\Tenant\ActivityType;
 use App\Models\Tenant\BusinessType;
-use App\Models\Tenant\GroupFunction;
-use App\Models\Tenant\GroupLevel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-final readonly class TenantGroupMasterDataProvisioner
+final readonly class TenantMasterDataProvisioner
 {
     public function ensureDefaults(): void
     {
@@ -30,17 +28,6 @@ final readonly class TenantGroupMasterDataProvisioner
                 'home_industry' => 'Industri Rumah Tangga',
                 'service' => 'Jasa',
                 'craft' => 'Kerajinan',
-            ]);
-            GroupLevel::query()->where('code', 'independent')->update(['is_active' => false]);
-            $this->ensure(GroupLevel::class, [
-                'beginner' => 'Pemula',
-                'developing' => 'Berkembang',
-                'ready' => 'Siap',
-            ]);
-            GroupFunction::query()->whereIn('code', ['business', 'social', 'production'])->update(['is_active' => false]);
-            $this->ensure(GroupFunction::class, [
-                'channeling' => 'Channeling',
-                'executing' => 'Executing',
             ]);
         });
     }

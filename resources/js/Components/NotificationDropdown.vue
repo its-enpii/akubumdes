@@ -270,12 +270,11 @@ onBeforeUnmount(() => {
                         Pengingat WhatsApp
                     </Link>
                     <Link
-                        href="/billing/invoices"
+                        href="/dashboard"
                         class="text-on-surface-variant hover:text-primary hover:underline flex items-center gap-1.5"
                         @click="open = false"
                     >
                         <AppIcon name="receipt" class="text-base" />
-                        Tagihan akubumdes
                     </Link>
                 </div>
             </div>

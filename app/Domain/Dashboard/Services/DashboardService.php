@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace App\Domain\Dashboard\Services;
 
 use App\Domain\Accounting\Models\JournalEntry;
-use App\Domain\Membership\Models\Group;
-use App\Domain\Membership\Models\Member;
-use App\Domain\Membership\Models\OrganizationProfile;
+use App\Models\Tenant\OrganizationProfile;
 use App\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Ringkasan operasional tenant dari journal, anggota, dan kelompok.
+ * Ringkasan operasional tenant dari journal.
  */
 final class DashboardService
 {
@@ -43,8 +41,6 @@ final class DashboardService
         $profile = OrganizationProfile::query()->first(['short_name', 'legal_name']);
 
         $cashBalance = $this->cashBalance();
-        $memberCount = (int) Member::query()->where('status', 'active')->count();
-        $groupCount = (int) Group::query()->where('status', 'active')->count();
 
         return [
             'unit_name' => $profile?->short_name ?: $profile?->legal_name,
@@ -59,20 +55,11 @@ final class DashboardService
                     'hint' => 'Akun 1.1.01* (posted)',
                     'tone' => null,
                 ],
-                [
-                    'key' => 'members',
-                    'label' => 'Anggota Aktif',
-                    'icon' => 'groups',
-                    'value' => $memberCount,
-                    'format' => 'number',
-                    'hint' => $groupCount.' kelompok aktif',
-                    'tone' => null,
-                ],
             ],
             'recent_journals' => $this->recentJournals(),
             'counts' => [
-                'members' => $memberCount,
-                'groups' => $groupCount,
+                'members' => 0,
+                'groups' => 0,
             ],
         ];
     }

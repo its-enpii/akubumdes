@@ -11,7 +11,7 @@ use App\Models\Platform\TenantPlacement;
 use App\Tenancy\Services\DefaultChartOfAccountsProvisioner;
 use App\Tenancy\Services\FiscalPeriodProvisioner;
 use App\Tenancy\Services\ShardConnectionManager;
-use App\Tenancy\Services\TenantGroupMasterDataProvisioner;
+use App\Tenancy\Services\TenantMasterDataProvisioner;
 use App\Tenancy\Services\TenantRegistrySynchronizer;
 use App\Tenancy\TenantContext;
 use Illuminate\Console\Command;
@@ -35,7 +35,7 @@ final class BootstrapLocalEnvironment extends Command
         ShardConnectionManager $connections,
         TenantRegistrySynchronizer $registry,
         TenantContext $context,
-        TenantGroupMasterDataProvisioner $groupMasterData,
+        TenantMasterDataProvisioner $groupMasterData,
     ): int {
         if (! app()->environment(['local', 'testing'])) {
             throw new RuntimeException('sidbm:bootstrap-local is restricted to local/testing.');

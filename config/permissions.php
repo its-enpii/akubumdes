@@ -10,11 +10,6 @@ use App\Http\Requests\Accounting\JournalEntryRequest;
 use App\Http\Requests\Accounting\ManualOpeningBalanceRequest;
 use App\Http\Requests\Assets\AssetRequest;
 use App\Http\Requests\Budgeting\SaveBudgetMonthRequest;
-use App\Http\Requests\MasterData\GroupRequest;
-use App\Http\Requests\MasterData\MemberRequest;
-use App\Http\Requests\MasterData\OtherInstitutionRequest;
-use App\Http\Requests\MasterData\QuickMemberRequest;
-use App\Http\Requests\MasterData\VillageRequest;
 use App\Http\Requests\Settings\IdentityRequest;
 use App\Http\Requests\Settings\LogoUploadRequest;
 use App\Http\Requests\Settings\OfflineAccessRequest;
@@ -29,14 +24,6 @@ use App\Http\Requests\Website\SiteSettingRequest;
 
 return [
     'permissions' => [
-        'members.view',
-        'members.manage',
-        'groups.view',
-        'groups.manage',
-        'villages.view',
-        'villages.manage',
-        'institutions.view',
-        'institutions.manage',
         'website.view',
         'website.manage',
         'journals.view',
@@ -51,14 +38,11 @@ return [
         'budgeting.view',
         'budgeting.manage',
         'messages.send',
-        'billing.view',
-        'billing.pay',
         'regency.view_reports',
         'province.view_reports',
         'village_user.access',
         'settings.manage',
         'assistant.use',
-        'portal.self',
         'users.view',
         'users.manage',
         'roles.view',
@@ -75,10 +59,6 @@ return [
             'name' => 'Kasir / Teller',
             'is_system' => true,
             'permissions' => [
-                'members.view',
-                'groups.view',
-                'villages.view',
-                'institutions.view',
                 'journals.view',
                 'journals.create',
                 'assets.view',
@@ -86,8 +66,6 @@ return [
                 'tax.view',
                 'budgeting.view',
                 'messages.send',
-                'billing.view',
-                'billing.pay',
                 'assistant.use',
             ],
         ],
@@ -95,10 +73,6 @@ return [
             'name' => 'Verifikator',
             'is_system' => true,
             'permissions' => [
-                'members.view',
-                'groups.view',
-                'villages.view',
-                'institutions.view',
                 'journals.view',
                 'assets.view',
                 'reports.view',
@@ -109,17 +83,12 @@ return [
             'name' => 'Viewer',
             'is_system' => true,
             'permissions' => [
-                'members.view',
-                'groups.view',
-                'villages.view',
-                'institutions.view',
                 'journals.view',
                 'assets.view',
                 'period_close.view',
                 'reports.view',
                 'tax.view',
                 'budgeting.view',
-                'billing.view',
                 'assistant.use',
             ],
         ],
@@ -137,30 +106,13 @@ return [
             'name' => 'Operator Desa',
             'is_system' => true,
             'permissions' => [
-                'members.view',
-                'members.manage',
-                'groups.view',
-                'groups.manage',
                 'reports.view',
                 'village_user.access',
             ],
         ],
-        'anggota' => [
-            'name' => 'Anggota',
-            'is_system' => true,
-            'permissions' => ['portal.self'],
-        ],
     ],
 
     'nav_map' => [
-        '/portal' => 'portal.self',
-        '/master-data/villages' => 'villages.view',
-        '/master-data/members/create' => 'members.manage',
-        '/master-data/members' => 'members.view',
-        '/master-data/groups/create' => 'groups.manage',
-        '/master-data/groups' => 'groups.view',
-        '/master-data/institutions/create' => 'institutions.manage',
-        '/master-data/institutions' => 'institutions.view',
         '/accounting/journals' => 'journals.view',
         '/accounting/assets' => 'assets.view',
         '/accounting/journal-entries' => 'journals.create',
@@ -169,7 +121,6 @@ return [
         '/accounting/tax-estimate' => 'tax.view',
         '/accounting/reports' => 'reports.view',
         '/budgeting' => 'budgeting.view',
-        '/billing/invoices' => 'billing.view',
         '/access/users' => 'users.view',
         '/access/roles' => 'roles.view',
         '/website' => 'website.view',
@@ -182,9 +133,6 @@ return [
         JournalEntryRequest::class => 'journals.create',
         ManualOpeningBalanceRequest::class => 'journals.create',
         AggregateJournalRequest::class => 'journals.create',
-        MemberRequest::class => 'members.manage',
-        QuickMemberRequest::class => 'members.manage',
-        GroupRequest::class => 'groups.manage',
         SaveBudgetMonthRequest::class => 'budgeting.manage',
         IdentityRequest::class => 'settings.manage',
         LogoUploadRequest::class => 'settings.manage',
@@ -195,8 +143,6 @@ return [
         SignaturesRequest::class => 'settings.manage',
         SignatureImageUploadRequest::class => 'settings.manage',
         AssetRequest::class => 'assets.manage',
-        VillageRequest::class => 'villages.manage',
-        OtherInstitutionRequest::class => 'institutions.manage',
         SitePageRequest::class => 'website.manage',
         SitePostRequest::class => 'website.manage',
         SiteSettingRequest::class => 'website.manage',
@@ -206,8 +152,6 @@ return [
     ],
 
     'tool_map' => [
-        'search_members' => 'members.view',
-        'search_groups' => 'groups.view',
         'list_accounts' => 'journals.view',
         'search_journals' => 'journals.view',
         'search_assets' => 'assets.view',

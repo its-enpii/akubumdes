@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Membership\Models;
+namespace App\Models\Tenant;
 
-use App\Models\Tenant\TenantModel;
 use Carbon\CarbonImmutable;
 
 final class OrganizationProfile extends TenantModel

@@ -174,7 +174,6 @@ const form = useForm({
   skip_fiscal: false,
   skip_coa: false,
   skip_accounting: false,
-  skip_membership: false,
   skip_sequences: false,
   continue_on_error: false,
   no_fail_fast: false,
@@ -293,7 +292,6 @@ const retryRun = (run) => {
   form.skip_fiscal = Boolean(opts.skip_fiscal);
   form.skip_coa = Boolean(opts.skip_coa);
   form.skip_accounting = Boolean(opts.skip_accounting);
-  form.skip_membership = Boolean(opts.skip_membership);
   form.skip_sequences = Boolean(opts.skip_sequences);
 
   submitCutover();
@@ -692,11 +690,6 @@ const runColumns = [
                         v-model="form.skip_accounting"
                         label="Lompati Jurnal Akuntansi"
                         description="Skip Accounting Jurnal"
-                      />
-                      <AppSwitch
-                        v-model="form.skip_membership"
-                        label="Lompati Keanggotaan"
-                        description="Skip Keanggotaan"
                       />
                       <AppSwitch
                         v-model="form.skip_sequences"

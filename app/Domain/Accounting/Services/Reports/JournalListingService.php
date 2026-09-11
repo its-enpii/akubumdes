@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Accounting\Services\Reports;
 
 use App\Domain\Accounting\Services\AccountBalanceQuery;
-use App\Domain\Membership\Models\OrganizationProfile;
+use App\Models\Tenant\OrganizationProfile;
 use App\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;

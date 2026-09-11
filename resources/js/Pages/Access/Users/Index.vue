@@ -109,7 +109,6 @@ function confirmDelete(user) {
                                 {{ row.role_name }}
                             </span>
                             <span v-else class="text-xs italic text-on-surface-variant">Akses Penuh (Legacy)</span>
-                            <span v-if="row.role_code === 'anggota' && row.member_name" class="ml-1 text-xs text-on-surface-variant">· {{ row.member_name }}</span>
                         </template>
 
                         <template #cell-tenure="{ row }">

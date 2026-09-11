@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\PublicSite;
 
-use App\Domain\Membership\Models\OrganizationProfile;
 use App\Domain\Website\Models\SiteMessage;
 use App\Domain\Website\Models\SitePage;
 use App\Domain\Website\Models\SitePost;
 use App\Domain\Website\Models\SiteSetting;
 use App\Http\Requests\PublicSite\SiteMessageRequest;
+use App\Models\Tenant\OrganizationProfile;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -267,7 +267,6 @@ final class PublicSiteController
             'Disallow: /login',
             'Disallow: /dashboard',
             'Disallow: /website',
-            'Disallow: /master-data',
             'Disallow: /accounting',
             'Disallow: /settings',
             'Disallow: /admin',

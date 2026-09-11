@@ -329,7 +329,7 @@ final readonly class TenantDataPurifierService
 
     /**
      * Resets training transactions based on training session window.
-     * Keeps opening balances, members, groups, COA, etc. completely untouched.
+     * Keeps opening balances, organization units, and COA completely untouched.
      */
     public function resetTrainingTransactions(Tenant $tenant): array
     {

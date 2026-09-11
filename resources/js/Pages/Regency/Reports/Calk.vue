@@ -45,8 +45,6 @@ const calkColumns = [
   { key: "district_code", label: "Kode" },
   { key: "name", label: "Nama Kecamatan" },
   { key: "cash", label: "Kas & Bank", align: "right" },
-  { key: "groups_count", label: "Kelompok", align: "right" },
-  { key: "members_count", label: "Anggota", align: "right" },
 ];
 </script>
 

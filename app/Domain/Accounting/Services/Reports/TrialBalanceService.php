@@ -6,7 +6,7 @@ namespace App\Domain\Accounting\Services\Reports;
 
 use App\Domain\Accounting\Models\Account;
 use App\Domain\Accounting\Services\AccountBalanceQuery;
-use App\Domain\Membership\Models\OrganizationProfile;
+use App\Models\Tenant\OrganizationProfile;
 use Carbon\CarbonImmutable;
 
 final readonly class TrialBalanceService

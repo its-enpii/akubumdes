@@ -27,7 +27,7 @@ final class DownloadReportHandler extends ToolHandlerBase
             'properties' => [
                 'report_type' => [
                     'type' => 'string',
-                    'description' => 'Jenis laporan: balance_sheet (neraca), income_statement (laba rugi), cash_flow (arus kas), trial_balance (neraca saldo), equity_change (perubahan modal), calk, general_ledger (buku besar), journals (jurnal transaksi), financial_health, fixed_assets, portfolio, schedule_vs_actual, lpp_desa, lpp_kelompok, kolek_desa, cadangan_penghapusan, members, groups.',
+                    'description' => 'Jenis laporan: balance_sheet (neraca), income_statement (laba rugi), cash_flow (arus kas), trial_balance (neraca saldo), equity_change (perubahan modal), calk, general_ledger (buku besar), journals (jurnal transaksi), financial_health, fixed_assets.',
                 ],
                 'format' => [
                     'type' => 'string',

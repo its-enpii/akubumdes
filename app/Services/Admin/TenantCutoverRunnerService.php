@@ -242,13 +242,6 @@ final class TenantCutoverRunnerService
                 'skip' => ! empty($options['skip_accounting']),
             ],
             [
-                'name' => 'membership',
-                'label' => 'Migrasi Data Keanggotaan & Kelompok',
-                'command' => 'legacy:migrate-membership',
-                'params' => array_merge(['tenant' => $tenantCode, 'suffix' => $suffix], $commonFlags),
-                'skip' => ! empty($options['skip_membership']),
-            ],
-            [
                 'name' => 'initialize-sequences',
                 'label' => 'Inisialisasi Sequence / Nomor Otomatis',
                 'command' => 'tenancy:initialize-sequences',

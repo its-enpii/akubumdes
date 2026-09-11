@@ -106,13 +106,13 @@ final class TenantAccessManagementTest extends TestCase
         $role1 = Role::query()->create([
             'name' => 'Role A',
             'code' => 'role_a',
-            'permissions' => ['members.view'],
+            'permissions' => ['reports.view'],
         ]);
 
         $role2 = Role::query()->create([
             'name' => 'Role B',
             'code' => 'role_b',
-            'permissions' => ['members.view'],
+            'permissions' => ['reports.view'],
         ]);
 
         $user = $this->createRegularUser('testuser_edit');
@@ -188,23 +188,23 @@ final class TenantAccessManagementTest extends TestCase
     {
         // 1. Create custom role
         $createResponse = $this->actingAs($this->tenantAdmin)->post('/access/roles', [
-            'name' => 'Verifikator Anggota',
-            'code' => 'verifikator_anggota',
-            'description' => 'Khusus verifikasi data anggota',
-            'permissions' => ['members.view', 'members.manage'],
+            'name' => 'Verifikator Laporan',
+            'code' => 'verifikator_laporan',
+            'description' => 'Khusus verifikasi laporan',
+            'permissions' => ['reports.view', 'reports.manage'],
         ]);
         $this->initializeTenantContext();
         $createResponse->assertRedirect('/access/roles');
 
         $this->initializeTenantContext();
-        $role = Role::query()->where('code', 'verifikator_anggota')->first();
+        $role = Role::query()->where('code', 'verifikator_laporan')->first();
         $this->assertNotNull($role);
-        $this->assertSame(['members.view', 'members.manage'], $role->permissions);
+        $this->assertSame(['reports.view', 'reports.manage'], $role->permissions);
 
         // 2. Update custom role
         $updateResponse = $this->actingAs($this->tenantAdmin)->put("/access/roles/{$role->row_id}", [
             'name' => 'Verifikator & Surveyor',
-            'code' => 'verifikator_anggota',
+            'code' => 'verifikator_laporan',
             'description' => 'Update deskripsi',
         ]);
         $updateResponse->assertRedirect('/access/roles');
@@ -218,7 +218,7 @@ final class TenantAccessManagementTest extends TestCase
         $deleteResponse->assertRedirect('/access/roles');
 
         $this->initializeTenantContext();
-        $this->assertNull(Role::query()->where('code', 'verifikator_anggota')->first());
+        $this->assertNull(Role::query()->where('code', 'verifikator_laporan')->first());
     }
 
     public function test_cannot_delete_role_assigned_to_active_users(): void
@@ -226,7 +226,7 @@ final class TenantAccessManagementTest extends TestCase
         $role = Role::query()->create([
             'name' => 'Role Terpakai',
             'code' => 'role_terpakai',
-            'permissions' => ['members.view'],
+            'permissions' => ['reports.view'],
         ]);
 
         $user = $this->createRegularUser('assigned_user');

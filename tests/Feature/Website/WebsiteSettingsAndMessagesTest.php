@@ -491,7 +491,6 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
         $txt = $response->getContent();
         self::assertStringContainsString('Disallow: /website', $txt);
         self::assertStringContainsString('Disallow: /dashboard', $txt);
-        self::assertStringContainsString('Disallow: /master-data', $txt);
         self::assertStringContainsString('Sitemap: ', $txt);
         self::assertStringContainsString('/sitemap.xml', $txt);
     }

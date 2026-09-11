@@ -31,18 +31,12 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Assets\AssetController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Billing\InvoiceController as TenantInvoiceController;
 use App\Http\Controllers\Budgeting\BudgetController;
 use App\Http\Controllers\ChangelogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DesktopClientController;
 use App\Http\Controllers\ImpersonationController;
-use App\Http\Controllers\MasterData\GroupController;
-use App\Http\Controllers\MasterData\MemberController;
-use App\Http\Controllers\MasterData\OtherInstitutionController;
-use App\Http\Controllers\MasterData\VillageController;
 use App\Http\Controllers\Notifications\NotificationCenterController;
-use App\Http\Controllers\Portal\PortalMemberController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Province\ProvinceDashboardController;
 use App\Http\Controllers\Province\ProvinceReportController;
@@ -311,26 +305,11 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
     Route::get('/changelog', [ChangelogController::class, 'index'])->name('changelog');
     Route::get('/search', SearchController::class)->name('search');
 
-    Route::prefix('portal')
-        ->name('portal.')
-        ->middleware('permission:portal.self')
-        ->group(function (): void {
-            Route::get('/', [PortalMemberController::class, 'index'])->name('index');
-        });
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/account', [ProfileController::class, 'updateAccount'])->name('profile.account.update');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo.update');
     Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
-
-    Route::prefix('billing')->name('billing.')->group(function (): void {
-        Route::get('/invoices', [TenantInvoiceController::class, 'index'])->name('invoices.index');
-        Route::get('/invoices/{invoice}', [TenantInvoiceController::class, 'show'])->name('invoices.show');
-        Route::post('/invoices/{invoice}/checkout/tripay', [TenantInvoiceController::class, 'checkoutTripay'])->name('invoices.checkout.tripay');
-        Route::post('/invoices/{invoice}/pay', [TenantInvoiceController::class, 'pay'])->name('invoices.pay');
-        Route::post('/invoices/{invoice}/check-status', [TenantInvoiceController::class, 'checkStatus'])->name('invoices.check-status');
-    });
 
     // Website (public site content: blog & static pages)
     Route::prefix('website')->name('website.')->group(function (): void {
@@ -359,65 +338,6 @@ Route::middleware(['auth', 'tenant', 'subscription.active'])->group(function ():
         Route::get('/messages', [WebsiteMessageController::class, 'index'])->name('messages.index');
         Route::post('/messages/{message}/read', [WebsiteMessageController::class, 'markRead'])->name('messages.read');
         Route::delete('/messages/{message}', [WebsiteMessageController::class, 'destroy'])->name('messages.destroy');
-    });
-
-    // Master Data
-    Route::prefix('master-data')->name('master-data.')->group(function (): void {
-        Route::get('/members', [MemberController::class, 'index'])->name('members.index');
-        Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
-        Route::get('/members/lookup', [MemberController::class, 'lookup'])->name('members.lookup');
-        Route::get('/members/export', [MemberController::class, 'export'])->name('members.export');
-        Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
-        Route::post('/members', [MemberController::class, 'store'])->name('members.store');
-        Route::get('/members/{member}', [MemberController::class, 'show'])->name('members.show');
-        Route::post('/members/{member}/identity-photo', [MemberController::class, 'uploadIdentityPhoto'])->name('members.identity-photo.store');
-        Route::delete('/members/{member}/identity-photo', [MemberController::class, 'destroyIdentityPhoto'])->name('members.identity-photo.destroy');
-        Route::get('/members/{member}/edit', [MemberController::class, 'edit'])->name('members.edit');
-        Route::put('/members/{member}', [MemberController::class, 'update'])->name('members.update');
-        Route::delete('/members/{member}', [MemberController::class, 'destroy'])->name('members.destroy');
-
-        Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
-        Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
-        Route::get('/groups/lookup', [GroupController::class, 'lookup'])->name('groups.lookup');
-        Route::get('/groups/export', [GroupController::class, 'export'])->name('groups.export');
-        Route::post('/groups/import', [GroupController::class, 'import'])->name('groups.import');
-        Route::get('/groups/member-options', [GroupController::class, 'memberOptions'])->name('groups.member-options');
-        Route::post('/groups/members', [GroupController::class, 'storeMember'])->name('groups.members.store');
-        Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
-        Route::get('/groups/{group}', [GroupController::class, 'show'])->whereNumber('group')->name('groups.show');
-        Route::get('/groups/{group}/edit', [GroupController::class, 'edit'])->whereNumber('group')->name('groups.edit');
-        Route::put('/groups/{group}', [GroupController::class, 'update'])->whereNumber('group')->name('groups.update');
-        Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->whereNumber('group')->name('groups.destroy');
-
-        Route::get('/villages', [VillageController::class, 'index'])->name('villages.index');
-        Route::get('/villages/{village}/edit', [VillageController::class, 'edit'])->name('villages.edit');
-        Route::put('/villages/{village}', [VillageController::class, 'update'])->name('villages.update');
-
-        Route::get('/institutions', [OtherInstitutionController::class, 'index'])->name('institutions.index');
-        Route::get('/institutions/create', [OtherInstitutionController::class, 'create'])->name('institutions.create');
-        Route::get('/institutions/export', [OtherInstitutionController::class, 'export'])->name('institutions.export');
-        Route::post('/institutions/import', [OtherInstitutionController::class, 'import'])->name('institutions.import');
-        Route::post('/institutions', [OtherInstitutionController::class, 'store'])->name('institutions.store');
-        Route::get('/institutions/{institution}', [OtherInstitutionController::class, 'show'])->name('institutions.show');
-        Route::get('/institutions/{institution}/edit', [OtherInstitutionController::class, 'edit'])->name('institutions.edit');
-        Route::put('/institutions/{institution}', [OtherInstitutionController::class, 'update'])->name('institutions.update');
-    });
-
-    // Membership Aliases
-    Route::prefix('membership')->name('membership.')->group(function (): void {
-        Route::get('/members', [MemberController::class, 'index'])->name('members.index');
-        Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
-        Route::post('/members', [MemberController::class, 'store'])->name('members.store');
-        Route::get('/members/{member}', [MemberController::class, 'show'])->name('members.show');
-        Route::get('/members/{member}/edit', [MemberController::class, 'edit'])->name('members.edit');
-        Route::put('/members/{member}', [MemberController::class, 'update'])->name('members.update');
-
-        Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
-        Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
-        Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
-        Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
-        Route::get('/groups/{group}/edit', [GroupController::class, 'edit'])->name('groups.edit');
-        Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
     });
 
     // Accounting

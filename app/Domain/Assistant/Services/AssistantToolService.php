@@ -44,8 +44,6 @@ final class AssistantToolService
         }
 
         return match ($tool) {
-            'search_members' => $this->searchMembers($params),
-            'search_groups' => $this->searchGroups($params),
             'list_accounts' => $this->listAccounts($params),
             'search_journals' => $this->searchJournals($params),
             'search_assets' => $this->searchAssets($params),
@@ -64,8 +62,6 @@ final class AssistantToolService
     public function execute(string $tool, array $params, User $actor): array
     {
         return match ($tool) {
-            'search_members' => $this->searchMembers($params),
-            'search_groups' => $this->searchGroups($params),
             'list_accounts' => $this->listAccounts($params),
             'search_journals' => $this->searchJournals($params),
             'search_assets' => $this->searchAssets($params),
@@ -159,106 +155,6 @@ final class AssistantToolService
             ...$detail,
             'href' => '/accounting/assets/'.$asset->row_id,
         ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $params
-     * @return array<string, mixed>
-     * @return array{items: list<array<string, mixed>>, match_count: int, needs_clarification: bool}
-     */
-    public function searchMembers(array $params): array
-    {
-        $q = trim((string) ($params['query'] ?? ''));
-        if (mb_strlen($q) < 2) {
-            throw ValidationException::withMessages(['query' => 'query min 2 characters']);
-        }
-
-        $tenantId = $this->context->id();
-        $groupQ = trim((string) ($params['group_query'] ?? $params['group_name'] ?? ''));
-
-        $query = DB::connection('tenant')
-            ->table('members as m')
-            ->join('people as p', function ($join) use ($tenantId): void {
-                $join->on('p.row_id', '=', 'm.person_row_id')
-                    ->where('p.tenant_id', '=', $tenantId);
-            })
-            ->where('m.tenant_id', $tenantId)
-            ->whereNull('m.deleted_at')
-            ->where(function ($w) use ($q): void {
-                $w->where('p.full_name', 'like', '%'.$q.'%')
-                    ->orWhere('p.national_identity_number', 'like', '%'.$q.'%')
-                    ->orWhere('p.phone', 'like', '%'.$q.'%');
-            });
-
-        if ($groupQ !== '') {
-            $query->join('group_members as gm', function ($join) use ($tenantId): void {
-                $join->on('gm.member_row_id', '=', 'm.row_id')
-                    ->where('gm.tenant_id', '=', $tenantId)
-                    ->whereNull('gm.left_at');
-            })->join('groups as g', function ($join) use ($tenantId): void {
-                $join->on('g.row_id', '=', 'gm.group_row_id')
-                    ->where('g.tenant_id', '=', $tenantId)
-                    ->whereNull('g.deleted_at');
-            })->where(function ($w) use ($groupQ): void {
-                $w->where('g.name', 'like', '%'.$groupQ.'%')
-                    ->orWhere('g.code', 'like', '%'.$groupQ.'%');
-            });
-        }
-
-        $rows = $query
-            ->orderBy('p.full_name')
-            ->limit(20)
-            ->get([
-                'm.row_id as member_row_id',
-                'm.id as member_id',
-                'm.status',
-                'p.full_name',
-                'p.national_identity_number as nik',
-                'p.phone',
-            ]);
-
-        $items = $rows->map(fn ($r): array => [
-            'member_row_id' => (int) $r->member_row_id,
-            'member_id' => (int) $r->member_id,
-            'status' => (string) $r->status,
-            'name' => (string) $r->full_name,
-            'nik' => (string) ($r->nik ?? ''),
-            'phone' => $r->phone ? (string) $r->phone : null,
-        ])->all();
-
-        return $this->withMatchMeta($items);
-    }
-
-    public function searchGroups(array $params): array
-    {
-        $q = trim((string) ($params['query'] ?? ''));
-        if (mb_strlen($q) < 2) {
-            throw ValidationException::withMessages(['query' => 'query min 2 characters']);
-        }
-
-        $tenantId = $this->context->id();
-        $rows = DB::connection('tenant')
-            ->table('groups as g')
-            ->where('g.tenant_id', $tenantId)
-            ->whereNull('g.deleted_at')
-            ->where(function ($w) use ($q): void {
-                $w->where('g.name', 'like', '%'.$q.'%')
-                    ->orWhere('g.code', 'like', '%'.$q.'%');
-            })
-            ->orderBy('g.name')
-            ->limit(20)
-            ->get(['g.row_id', 'g.id', 'g.code', 'g.name', 'g.status', 'g.phone']);
-
-        $items = $rows->map(fn ($r): array => [
-            'group_row_id' => (int) $r->row_id,
-            'group_id' => (int) $r->id,
-            'code' => (string) ($r->code ?? ''),
-            'name' => (string) $r->name,
-            'status' => (string) $r->status,
-            'phone' => $r->phone ? (string) $r->phone : null,
-        ])->all();
-
-        return $this->withMatchMeta($items);
     }
 
     /**
@@ -1372,38 +1268,6 @@ final class AssistantToolService
     }
 
     /**
-     * @return list<array{member_row_id: int, name: string, status: string}>
-     */
-    private function groupMemberItems(int $groupRowId): array
-    {
-        if ($groupRowId <= 0) {
-            return [];
-        }
-        $tenantId = $this->context->id();
-
-        return DB::connection('tenant')
-            ->table('group_members as gm')
-            ->join('members as m', function ($join) use ($tenantId): void {
-                $join->on('m.row_id', '=', 'gm.member_row_id')->where('m.tenant_id', '=', $tenantId);
-            })
-            ->join('people as p', function ($join) use ($tenantId): void {
-                $join->on('p.row_id', '=', 'm.person_row_id')->where('p.tenant_id', '=', $tenantId);
-            })
-            ->where('gm.tenant_id', $tenantId)
-            ->where('gm.group_row_id', $groupRowId)
-            ->whereNull('gm.left_at')
-            ->whereNull('m.deleted_at')
-            ->orderBy('p.full_name')
-            ->limit(50)
-            ->get(['m.row_id', 'p.full_name', 'm.status'])
-            ->map(fn ($r): array => [
-                'member_row_id' => (int) $r->row_id,
-                'name' => (string) $r->full_name,
-                'status' => (string) $r->status,
-            ])->all();
-    }
-
-    /**
      * Score name/code against free-text hint. No tenant-specific bank aliases —
      * only actual account name/code tokens from the COA.
      */
@@ -1572,8 +1436,6 @@ final class AssistantToolService
             'kesehatan_keuangan', 'financial_health' => 'financial_health',
             'aset_tetap', 'fixed_assets', 'inventaris' => 'fixed_assets',
             'aset_takberwujud', 'intangible_assets' => 'intangible_assets',
-            'anggota', 'members' => 'members',
-            'kelompok', 'groups' => 'groups',
             default => 'balance_sheet',
         };
 
@@ -1658,20 +1520,6 @@ final class AssistantToolService
                 'pdf' => '/accounting/reports/assets/intangible/pdf',
                 'excel' => '/accounting/reports/assets/intangible/excel',
                 'query' => array_filter(['as_of' => $params['as_of_date'] ?? $now->toDateString()]),
-            ],
-            'members' => [
-                'name' => 'Ekspor Data Anggota',
-                'short_name' => 'Data Anggota',
-                'pdf' => null,
-                'excel' => '/members/export',
-                'query' => [],
-            ],
-            'groups' => [
-                'name' => 'Ekspor Data Kelompok',
-                'short_name' => 'Data Kelompok',
-                'pdf' => null,
-                'excel' => '/groups/export',
-                'query' => [],
             ],
         };
 

@@ -175,21 +175,6 @@ final class TenantRoleManagementController
     {
         return [
             [
-                'category' => 'master',
-                'label' => 'Data Master',
-                'icon' => 'folder_shared',
-                'permissions' => [
-                    ['key' => 'members.view', 'label' => 'Lihat Anggota', 'description' => 'Melihat daftar dan profil anggota'],
-                    ['key' => 'members.manage', 'label' => 'Kelola Anggota', 'description' => 'Tambah, ubah, dan hapus data anggota'],
-                    ['key' => 'groups.view', 'label' => 'Lihat Kelompok', 'description' => 'Melihat daftar kelompok pemanfaat'],
-                    ['key' => 'groups.manage', 'label' => 'Kelola Kelompok', 'description' => 'Tambah, ubah, dan hapus data kelompok'],
-                    ['key' => 'villages.view', 'label' => 'Lihat Desa', 'description' => 'Melihat daftar desa/wilayah'],
-                    ['key' => 'villages.manage', 'label' => 'Kelola Desa', 'description' => 'Ubah data desa/wilayah'],
-                    ['key' => 'institutions.view', 'label' => 'Lihat Lembaga', 'description' => 'Melihat daftar lembaga eksternal'],
-                    ['key' => 'institutions.manage', 'label' => 'Kelola Lembaga', 'description' => 'Tambah, ubah, dan hapus lembaga'],
-                ],
-            ],
-            [
                 'category' => 'accounting',
                 'label' => 'Akuntansi & Keuangan',
                 'icon' => 'receipt_long',
@@ -213,8 +198,6 @@ final class TenantRoleManagementController
                     ['key' => 'budgeting.view', 'label' => 'Lihat Anggaran (E-Budgeting)', 'description' => 'Melihat rencana anggaran operasional'],
                     ['key' => 'budgeting.manage', 'label' => 'Kelola Anggaran', 'description' => 'Menyusun dan mengesahkan anggaran'],
                     ['key' => 'messages.send', 'label' => 'Kirim Notifikasi WA', 'description' => 'Mengirim notifikasi tagihan WhatsApp'],
-                    ['key' => 'billing.view', 'label' => 'Lihat Tagihan Layanan', 'description' => 'Melihat invoice langganan sistem SaaS'],
-                    ['key' => 'billing.pay', 'label' => 'Bayar Tagihan Layanan', 'description' => 'Melakukan checkout pembayaran SaaS'],
                     ['key' => 'assistant.use', 'label' => 'Asisten AI Ariel', 'description' => 'Menggunakan asisten AI dan tool bantuannya'],
                     ['key' => 'village_user.access', 'label' => 'Akses Operator Desa', 'description' => 'Mode khusus terbatas untuk operator desa'],
                     ['key' => 'settings.manage', 'label' => 'Pengaturan Tenant', 'description' => 'Mengatur identitas lembaga, logo, dan sistem'],

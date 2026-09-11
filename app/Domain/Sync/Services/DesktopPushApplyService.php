@@ -16,18 +16,8 @@ use Throwable;
 final class DesktopPushApplyService
 {
     private const MASTER_TABLES = [
-        'people',
-        'members',
-        'member_addresses',
-        'member_businesses',
-        'member_guarantors',
-        'groups',
-        'group_members',
-        'group_officers',
         'business_types',
         'activity_types',
-        'group_levels',
-        'group_functions',
         'village_namings',
         'organization_profiles',
         'organization_units',

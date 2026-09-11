@@ -76,7 +76,7 @@ const journalColumns = [
             {{ unitName || "Dashboard" }}
           </h1>
           <p class="mt-1 text-on-surface-variant">
-            Data live per {{ formatDate(as_of) }} · {{ counts.members }} anggota
+            Data live per {{ formatDate(as_of) }}
           </p>
         </div>
         <div class="flex flex-wrap gap-2">

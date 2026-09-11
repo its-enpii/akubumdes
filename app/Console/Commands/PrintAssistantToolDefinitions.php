@@ -20,33 +20,6 @@ final class PrintAssistantToolDefinitions extends Command
 
         $tools = [
             [
-                'name' => 'search_members',
-                'description' => 'Cari anggota by nama/NIK/telepon. Opsional filter kelompok (group_query). Return items + match_count + needs_clarification (true jika bukan tepat 1).',
-                'requires_confirmation' => false,
-                'endpoint_url' => $base.'/api/assistant/tools/search_members',
-                'json_schema' => [
-                    'type' => 'object',
-                    'required' => ['query'],
-                    'properties' => [
-                        'query' => ['type' => 'string', 'description' => 'Nama/NIK/telepon min 2 karakter'],
-                        'group_query' => ['type' => 'string', 'description' => 'Filter nama/kode kelompok'],
-                    ],
-                ],
-            ],
-            [
-                'name' => 'search_groups',
-                'description' => 'Cari kelompok by nama atau kode. Return candidates; needs_clarification jika ≠1.',
-                'requires_confirmation' => false,
-                'endpoint_url' => $base.'/api/assistant/tools/search_groups',
-                'json_schema' => [
-                    'type' => 'object',
-                    'required' => ['query'],
-                    'properties' => [
-                        'query' => ['type' => 'string', 'description' => 'Nama/kode kelompok min 2 karakter'],
-                    ],
-                ],
-            ],
-            [
                 'name' => 'list_accounts',
                 'description' => 'Daftar akun postable. Filter code_prefix, query nama (Bank Jateng, Kas Tunai), atau cash_only.',
                 'requires_confirmation' => false,
@@ -203,7 +176,7 @@ final class PrintAssistantToolDefinitions extends Command
                     'properties' => [
                         'report_type' => [
                             'type' => 'string',
-                            'description' => 'balance_sheet, income_statement, cash_flow, trial_balance, equity_change, calk, general_ledger, journals, fixed_assets, members, groups',
+                            'description' => 'balance_sheet, income_statement, cash_flow, trial_balance, equity_change, calk, general_ledger, journals, fixed_assets',
                         ],
                         'format' => [
                             'type' => 'string',

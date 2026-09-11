@@ -666,7 +666,7 @@ function toggleRow(rowId) {
             <ul class="list-disc pl-4 space-y-0.5">
               <li>Saldo Awal Akun (`account_opening_balances`)</li>
               <li>Bagan Akun &amp; Master COA (`accounts`)</li>
-              <li>Data Anggota, Kelompok, Desa &amp; Unit Organisasi</li>
+              <li>Data Desa &amp; Unit Organisasi</li>
               <li>Data Pengguna, Akun Login &amp; Hak Akses</li>
               <li>Data Historis Migrasi Legacy (`legacy_transaksi`)</li>
             </ul>

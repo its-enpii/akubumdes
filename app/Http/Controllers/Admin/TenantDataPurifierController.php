@@ -148,7 +148,7 @@ final class TenantDataPurifierController extends Controller
         return back()->with(
             'success',
             sprintf(
-                'Reset transaksi pelatihan berhasil! %d jurnal telah dibersihkan. Saldo awal, anggota, kelompok, dan bagan akun tetap utuh.',
+                'Reset transaksi pelatihan berhasil! %d jurnal telah dibersihkan. Saldo awal, desa, unit organisasi, dan bagan akun tetap utuh.',
                 $result['deleted_entries'],
             ),
         );

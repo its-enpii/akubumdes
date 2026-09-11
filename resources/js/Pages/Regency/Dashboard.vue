@@ -34,8 +34,6 @@ const districtColumns = [
   { key: "turnover", label: "Perputaran Dana", align: "right" },
   { key: "total_assets", label: "Total Aset", align: "right" },
   { key: "cash", label: "Kas & Bank", align: "right" },
-  { key: "groups_count", label: "Kelompok", align: "right" },
-  { key: "members_count", label: "Anggota", align: "right" },
   { key: "actions", label: "Aksi", align: "center" },
 ];
 

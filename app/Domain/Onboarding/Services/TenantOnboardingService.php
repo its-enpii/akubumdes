@@ -92,12 +92,7 @@ final class TenantOnboardingService
      */
     public function downloadCsvTemplate(string $type): StreamedResponse
     {
-        // Canonicalize English variants to the Indonesian type names so that
-        // /onboarding/templates/{type} accepts both `members` and `anggota`,
-        // `groups` / `kelompok`, dst.
         $type = match ($type) {
-            'members', 'member' => 'anggota',
-            'groups', 'group', 'kelompoks' => 'kelompok',
             'opening-balances', 'opening-balance' => 'saldo-awal',
             'assets', 'asset', 'fixed-assets' => 'aset-tetap',
             default => $type,
@@ -110,20 +105,6 @@ final class TenantOnboardingService
                 ['1.1.01.01', 'Kas Kantor', '10000000', '0'],
                 ['1.1.02.01', 'Bank BRI', '25000000', '0'],
                 ['3.1.01.01', 'Modal Diterima', '0', '35000000'],
-            ]),
-
-            'anggota' => Csv::download('template_anggota.csv', [
-                'nik', 'nama', 'jenis_kelamin', 'alamat', 'desa', 'no_hp', 'status',
-            ], [
-                ['3515011203900001', 'Siti Aminah', 'P', 'Jl. Mawar No. 12', 'Desa Maju', '081234567890', 'active'],
-                ['3515011203900002', 'Budi Santoso', 'L', 'RT 02 RW 01', 'Desa Maju', '081987654321', 'active'],
-            ]),
-
-            'kelompok' => Csv::download('template_kelompok.csv', [
-                'nama', 'desa', 'alamat', 'no_hp',
-            ], [
-                ['Kelompok Melati 01', 'Desa Maju', 'RT 01 RW 01', '081234567800'],
-                ['Kelompok Seroja 02', 'Desa Makmur', 'RT 03 RW 02', '081234567801'],
             ]),
 
             'aset-tetap' => Csv::download('template_aset_tetap.csv', [

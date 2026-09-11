@@ -9,7 +9,6 @@ import AppCurrencyInput from "../../Components/AppCurrencyInput.vue";
 import AppDatePicker from "../../Components/AppDatePicker.vue";
 import AppInput from "../../Components/AppInput.vue";
 import AppIconButton from "../../Components/AppIconButton.vue";
-import AppFileUpload from "../../Components/AppFileUpload.vue";
 import AppTabs from "../../Components/AppTabs.vue";
 import SmartSelect from "../../Components/SmartSelect.vue";
 import { useMoney } from "../../composables/useMoney";
@@ -29,10 +28,9 @@ const activeTab = ref("balances");
 
 const wizardTabs = [
   { key: "balances", label: "1. Saldo Awal Keuangan (Neraca)" },
-  { key: "masterdata", label: "2. Impor Anggota & Kelompok" },
-  { key: "templates", label: "3. Template File Excel/CSV" },
-  { key: "manual-opening", label: "4. Saldo Awal Manual per Tahun" },
-  { key: "aggregate-journal", label: "5. Jurnal Agregat Mid-Year" },
+  { key: "templates", label: "2. Template File Excel/CSV" },
+  { key: "manual-opening", label: "3. Saldo Awal Manual per Tahun" },
+  { key: "aggregate-journal", label: "4. Jurnal Agregat Mid-Year" },
 ];
 
 // ============================================================
@@ -260,28 +258,6 @@ const submitAggregateJournal = () => {
   });
 };
 
-// ============================================================
-// Upload Forms (existing, Tab 2/3)
-// ============================================================
-
-const memberFileForm = useForm({ file: null });
-const groupFileForm = useForm({ file: null });
-
-const uploadMembers = () => {
-  if (!memberFileForm.file) return;
-  memberFileForm.post("/membership/members/import", {
-    preserveScroll: true,
-    onSuccess: () => memberFileForm.reset(),
-  });
-};
-
-const uploadGroups = () => {
-  if (!groupFileForm.file) return;
-  groupFileForm.post("/membership/groups/import", {
-    preserveScroll: true,
-    onSuccess: () => groupFileForm.reset(),
-  });
-};
 </script>
 
 <template>
@@ -306,8 +282,7 @@ const uploadGroups = () => {
               Migrasi Data & Saldo Awal Mandiri
             </h1>
             <p class="mt-1 max-w-2xl text-sm text-on-primary-container">
-              Impor neraca keuangan awal, daftar kelompok, keanggotaan, saldo
-              awal manual, dan jurnal agregat.
+              Impor neraca keuangan awal, saldo awal manual, dan jurnal agregat.
             </p>
           </div>
         </div>
@@ -414,86 +389,6 @@ const uploadGroups = () => {
         </AppCard>
       </div>
 
-      <!-- TAB 2: Impor Anggota & Kelompok -->
-      <div
-        v-if="activeTab === 'masterdata'"
-        class="grid grid-cols-1 gap-6 md:grid-cols-2"
-      >
-        <!-- Impor Anggota -->
-        <AppCard>
-          <template #header>
-            <h2 class="text-lg font-semibold text-primary">
-              Impor Massal Anggota
-            </h2>
-          </template>
-          <form @submit.prevent="uploadMembers" class="space-y-4">
-            <p class="text-xs text-on-surface-variant">
-              Upload file CSV berisi daftar anggota lengkap (NIK, Nama, Jenis
-              Kelamin, Alamat, Desa, Phone).
-            </p>
-            <AppFileUpload
-              :model-value="memberFileForm.file"
-              label="File CSV Anggota"
-              accept=".csv"
-              @update:model-value="(file) => (memberFileForm.file = file)"
-            />
-            <div class="flex justify-between items-center pt-2">
-              <a
-                :href="`${baseUrl}/onboarding/templates/anggota`"
-                class="text-xs text-secondary hover:underline font-semibold"
-              >
-                ?? Download Template CSV Anggota
-              </a>
-              <AppButton
-                type="submit"
-                variant="primary"
-                size="sm"
-                :disabled="!memberFileForm.file || memberFileForm.processing"
-              >
-                Upload & Impor Anggota
-              </AppButton>
-            </div>
-          </form>
-        </AppCard>
-
-        <!-- Impor Kelompok -->
-        <AppCard>
-          <template #header>
-            <h2 class="text-lg font-semibold text-primary">
-              Impor Massal Kelompok
-            </h2>
-          </template>
-          <form @submit.prevent="uploadGroups" class="space-y-4">
-            <p class="text-xs text-on-surface-variant">
-              Upload file CSV daftar kelompok usaha/masyarakat (Nama Kelompok,
-              Desa, Alamat, Telepon).
-            </p>
-            <AppFileUpload
-              :model-value="groupFileForm.file"
-              label="File CSV Kelompok"
-              accept=".csv"
-              @update:model-value="(file) => (groupFileForm.file = file)"
-            />
-            <div class="flex justify-between items-center pt-2">
-              <a
-                :href="`${baseUrl}/onboarding/templates/kelompok`"
-                class="text-xs text-secondary hover:underline font-semibold"
-              >
-                ?? Download Template CSV Kelompok
-              </a>
-              <AppButton
-                type="submit"
-                variant="primary"
-                size="sm"
-                :disabled="!groupFileForm.file || groupFileForm.processing"
-              >
-                Upload & Impor Kelompok
-              </AppButton>
-            </div>
-          </form>
-        </AppCard>
-      </div>
-
       <!-- TAB 4: Download Seluruh Template -->
       <div
         v-if="activeTab === 'templates'"
@@ -512,32 +407,8 @@ const uploadGroups = () => {
         </AppCard>
 
         <AppCard class="hover:border-primary transition-colors">
-          <h3 class="font-bold text-sm text-primary">2. Template Anggota</h3>
-          <p class="text-xs text-on-surface-variant mt-1">
-            Format data NIK, Nama, Alamat, Desa, Phone.
-          </p>
-          <a
-            :href="`${baseUrl}/onboarding/templates/anggota`"
-            class="mt-4 inline-block text-xs font-semibold text-secondary"
-            >?? Download CSV Template</a
-          >
-        </AppCard>
-
-        <AppCard class="hover:border-primary transition-colors">
-          <h3 class="font-bold text-sm text-primary">3. Template Kelompok</h3>
-          <p class="text-xs text-on-surface-variant mt-1">
-            Format nama kelompok, alamat, desa, pengurus.
-          </p>
-          <a
-            :href="`${baseUrl}/onboarding/templates/kelompok`"
-            class="mt-4 inline-block text-xs font-semibold text-secondary"
-            >?? Download CSV Template</a
-          >
-        </AppCard>
-
-        <AppCard class="hover:border-primary transition-colors">
           <h3 class="font-bold text-sm text-primary">
-            5. Template Aset Tetap Awal
+            3. Template Aset Tetap Awal
           </h3>
           <p class="text-xs text-on-surface-variant mt-1">
             Format barang inventaris, harga perolehan, depresiasi.

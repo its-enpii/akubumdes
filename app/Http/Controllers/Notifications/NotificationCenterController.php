@@ -43,7 +43,6 @@ final class NotificationCenterController
                     $latestInvoice = $unpaidInvoices->first();
                     $isOverdue = $latestInvoice->status === 'overdue' || ($latestInvoice->due_at && $latestInvoice->due_at->isPast());
                     $isBlocking = (bool) $latestInvoice->blocks_access;
-                    $targetUrl = "/billing/invoices/{$latestInvoice->row_id}";
 
                     $id = 'tenant_invoice_'.$latestInvoice->row_id;
                     $title = $isBlocking

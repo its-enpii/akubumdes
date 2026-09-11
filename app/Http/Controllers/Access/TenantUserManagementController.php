@@ -7,8 +7,6 @@ namespace App\Http\Controllers\Access;
 use App\Domain\Access\Models\Role;
 use App\Domain\Access\Models\UserRole;
 use App\Domain\Access\Services\PermissionChecker;
-use App\Domain\Membership\Models\Member;
-use App\Domain\Membership\Models\MemberUserLink;
 use App\Http\Requests\Access\StoreTenantUserRequest;
 use App\Http\Requests\Access\UpdateTenantUserRequest;
 use App\Models\Platform\TenantMembership;
@@ -56,12 +54,6 @@ final class TenantUserManagementController
             ->with('role:row_id,code,name')
             ->get();
 
-        $memberLinks = MemberUserLink::query()
-            ->whereIn('user_row_id', $userIds)
-            ->with('member.person:row_id,full_name')
-            ->get()
-            ->keyBy('user_row_id');
-
         $roleMap = [];
         foreach ($userRoles as $ur) {
             $roleMap[(int) $ur->platform_user_id] = [
@@ -80,8 +72,6 @@ final class TenantUserManagementController
             'village_row_id' => $user->village_row_id,
             'role_code' => $roleMap[(int) $user->row_id]['code'] ?? null,
             'role_name' => $roleMap[(int) $user->row_id]['name'] ?? null,
-            'member_row_id' => $memberLinks->get((int) $user->row_id)?->member_row_id,
-            'member_name' => $memberLinks->get((int) $user->row_id)?->member?->person?->full_name,
             'appointed_at' => $user->appointed_at?->toDateString(),
             'term_end_at' => $user->term_end_at?->toDateString(),
             'last_login_at' => $user->last_login_at?->toDateTimeString(),
@@ -144,7 +134,6 @@ final class TenantUserManagementController
         });
 
         $this->syncUserRole($user, $data['role'] ?? null);
-        $this->syncMemberLink($user, $data['role'] ?? null, $data['member_row_id'] ?? null);
 
         return to_route('access.users.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
@@ -158,11 +147,6 @@ final class TenantUserManagementController
             ->where('platform_user_id', (int) $user->row_id)
             ->with('role:row_id,code')
             ->first();
-        $memberLink = MemberUserLink::query()
-            ->where('user_row_id', (int) $user->row_id)
-            ->with('member.person:row_id,full_name')
-            ->first();
-
         $roles = $this->tenantRoleOptions();
         $villages = OrganizationUnit::query()->orderBy('name')->get(['row_id', 'name', 'code']);
 
@@ -172,8 +156,6 @@ final class TenantUserManagementController
                 'appointed_at' => $user->appointed_at?->toDateString(),
                 'term_end_at' => $user->term_end_at?->toDateString(),
                 'role' => $userRole?->role?->code ?? '',
-                'member_row_id' => $memberLink?->member_row_id,
-                'member_name' => $memberLink?->member?->person?->full_name,
             ],
             'roleOptions' => $roles,
             'villageOptions' => $villages->map(fn ($v) => ['value' => (int) $v->row_id, 'label' => "{$v->code} - {$v->name}"])->all(),
@@ -214,7 +196,6 @@ final class TenantUserManagementController
 
         if (array_key_exists('role', $data)) {
             $this->syncUserRole($user, $data['role'] ?: null);
-            $this->syncMemberLink($user, $data['role'] ?: null, $data['member_row_id'] ?? null);
         }
 
         return to_route('access.users.index')->with('success', 'Pengguna berhasil diperbarui.');
@@ -288,23 +269,6 @@ final class TenantUserManagementController
                 'role_row_id' => (int) $role->row_id,
             ]);
         }
-    }
-
-    private function syncMemberLink(User $user, ?string $roleCode, mixed $memberRowId): void
-    {
-        if ($roleCode !== 'anggota') {
-            MemberUserLink::query()->where('user_row_id', (int) $user->row_id)->delete();
-
-            return;
-        }
-
-        $memberRowId = (int) $memberRowId;
-        abort_unless(Member::query()->whereKey($memberRowId)->exists(), 422, 'Anggota tidak ditemukan.');
-
-        MemberUserLink::query()->updateOrCreate(
-            ['user_row_id' => (int) $user->row_id],
-            ['member_row_id' => $memberRowId],
-        );
     }
 
     /** @return list<array{value: string, label: string}> */

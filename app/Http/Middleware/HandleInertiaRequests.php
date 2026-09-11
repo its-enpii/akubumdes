@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Domain\Access\Services\PermissionChecker;
-use App\Domain\Membership\Models\OrganizationProfile;
+use App\Models\Tenant\OrganizationProfile;
 use App\Services\OfflineAccessService;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\Request;
@@ -123,10 +123,6 @@ final class HandleInertiaRequests extends Middleware
         if ($user->is_village_user === true) {
             return [
                 'village_user.access',
-                'members.view',
-                'members.manage',
-                'groups.view',
-                'groups.manage',
                 'reports.view',
             ];
         }

@@ -17,7 +17,7 @@ use App\Domain\Accounting\Services\Reports\IncomeStatementService;
 use App\Domain\Accounting\Services\Reports\JournalListingService;
 use App\Domain\Accounting\Services\Reports\TrialBalanceService;
 use App\Domain\Assets\Services\AssetReportService;
-use App\Domain\Membership\Models\OrganizationProfile;
+use App\Models\Tenant\OrganizationProfile;
 use App\Models\User;
 use App\Support\Excel\ReportExcel;
 use App\Support\ReportPdf;

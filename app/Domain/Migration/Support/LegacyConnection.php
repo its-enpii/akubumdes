@@ -89,16 +89,6 @@ final class LegacyConnection
         return $this->suffixedTable('saldo', $suffix);
     }
 
-    public function anggotaTable(string|int $suffix): string
-    {
-        return $this->suffixedTable('anggota', $suffix);
-    }
-
-    public function kelompokTable(string|int $suffix): string
-    {
-        return $this->suffixedTable('kelompok', $suffix);
-    }
-
     /**
      * @return list<object{COLUMN_NAME: string, DATA_TYPE: string, IS_NULLABLE: string, COLUMN_KEY: string}>
      */

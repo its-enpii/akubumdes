@@ -364,9 +364,7 @@ onUnmounted(() => {
                 </div>
 
                 <div class="mt-2.5 flex items-center justify-between text-xs text-on-surface-variant px-1">
-                    <span>{{ selectedKecamatan.groups_count }} Kelompok</span>
                     <span>•</span>
-                    <span>{{ selectedKecamatan.members_count }} Anggota</span>
                 </div>
 
                 <div class="mt-3 pt-3 border-t border-outline-variant/60">

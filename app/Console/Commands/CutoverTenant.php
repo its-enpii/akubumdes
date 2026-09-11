@@ -27,7 +27,6 @@ final class CutoverTenant extends Command
         {--skip-fiscal : Skip legacy:ensure-fiscal-periods}
         {--skip-coa : Skip tenancy:import-legacy-chart-of-accounts}
         {--skip-accounting : Skip legacy:migrate-accounting}
-        {--skip-membership : Skip legacy:migrate-membership}
         {--skip-sequences : Skip tenancy:initialize-sequences}
         {--continue-on-error : Do not abort chain on first non-zero exit}';
 
@@ -198,15 +197,6 @@ final class CutoverTenant extends Command
                     'suffix' => $suffix,
                 ], $accountingFlags),
                 'skip' => (bool) $this->option('skip-accounting'),
-            ],
-            [
-                'name' => 'membership',
-                'command' => 'legacy:migrate-membership',
-                'params' => array_merge([
-                    'tenant' => $tenant,
-                    'suffix' => $suffix,
-                ], $commonFlags),
-                'skip' => (bool) $this->option('skip-membership'),
             ],
             [
                 'name' => 'initialize-sequences',

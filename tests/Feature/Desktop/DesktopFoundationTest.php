@@ -32,7 +32,7 @@ final class DesktopFoundationTest extends TestCase
             // Verify core tables exist in SQLite schema
             $this->assertTrue(Schema::connection('sqlite')->hasTable('tenant_registry'));
             $this->assertTrue(Schema::connection('sqlite')->hasTable('accounts'));
-            $this->assertTrue(Schema::connection('sqlite')->hasTable('members'));
+            $this->assertTrue(Schema::connection('sqlite')->hasTable('organization_profiles'));
             $this->assertTrue(Schema::connection('sqlite')->hasTable('journal_entries'));
         } finally {
             if (File::exists($tempSqlite)) {

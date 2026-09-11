@@ -23,14 +23,21 @@ final readonly class EnsureSubscriptionActive
             return $next($request);
         }
 
-        // Jangan blokir rute billing, profile, auth, atau webhook
-        if ($request->routeIs('billing.*') || $request->routeIs('profile.*') || $request->is('logout') || $request->is('api/*') || $request->routeIs('admin.*')) {
+        // Jangan blokir rute profile, auth, atau webhook
+        if ($request->routeIs('profile.*') || $request->is('logout') || $request->is('api/*') || $request->routeIs('admin.*')) {
             return $next($request);
         }
 
         $gate = app(SubscriptionGateService::class)->check((int) $tenant->row_id);
 
         if ($gate['blocked'] && $gate['invoice_id'] !== null) {
+            if ($request->routeIs('dashboard')) {
+                $response = $next($request);
+                $response->headers->set('X-Payment-Gate', 'invoice');
+
+                return $response;
+            }
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => $gate['message'],
@@ -39,11 +46,18 @@ final readonly class EnsureSubscriptionActive
                 ], 402);
             }
 
-            return redirect()->route('billing.invoices.show', $gate['invoice_id'])
+            return redirect()->route('dashboard')
                 ->with('error', "Akses fitur operasional ditangguhkan karena tagihan #{$gate['invoice_number']} mewajibkan pelunasan sebelum dapat melanjutkan aktivitas. Silakan lakukan pembayaran tagihan.");
         }
 
         if ($gate['blocked']) {
+            if ($request->routeIs('dashboard')) {
+                $response = $next($request);
+                $response->headers->set('X-Payment-Gate', 'suspended');
+
+                return $response;
+            }
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => $gate['message'],
@@ -52,7 +66,7 @@ final readonly class EnsureSubscriptionActive
                 ], 402);
             }
 
-            return redirect()->route('billing.invoices.index')
+            return redirect()->route('dashboard')
                 ->with('error', 'Akses fitur operasional dibatasi karena langganan Anda ditangguhkan/menunggak. Silakan selesaikan pembayaran tagihan untuk mengaktifkan kembali.');
         }
 

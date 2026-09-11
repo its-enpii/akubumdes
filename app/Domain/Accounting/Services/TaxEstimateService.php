@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Accounting\Services;
 
 use App\Domain\Accounting\Models\Account;
-use App\Domain\Membership\Models\OrganizationProfile;
+use App\Models\Tenant\OrganizationProfile;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Support\Collection;

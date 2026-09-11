@@ -21,9 +21,7 @@ final class PermissionConfigTest extends TestCase
         self::assertContains('assets.view', $perms);
         self::assertContains('period_close.manage', $perms);
         self::assertContains('reports.view', $perms);
-        self::assertContains('billing.view', $perms);
-        self::assertContains('institutions.manage', $perms);
-        self::assertContains('villages.view', $perms);
+        self::assertContains('reports.manage', $perms);
         self::assertContains('website.view', $perms);
         self::assertContains('website.manage', $perms);
     }

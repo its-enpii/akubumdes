@@ -7,8 +7,6 @@ namespace App\Domain\Search\Services;
 use App\Domain\Access\Services\PermissionChecker;
 use App\Domain\Accounting\Models\JournalEntry;
 use App\Domain\Assets\Models\Asset;
-use App\Domain\Membership\Models\Group;
-use App\Domain\Membership\Models\Member;
 use App\Models\User;
 use App\Tenancy\TenantContext;
 
@@ -39,20 +37,6 @@ final class GlobalSearchService
 
         $groups = [];
 
-        if ($this->permissions->allows($user, 'members.view')) {
-            $items = $this->members($q);
-            if ($items !== []) {
-                $groups[] = ['key' => 'members', 'label' => 'Anggota', 'items' => $items];
-            }
-        }
-
-        if ($this->permissions->allows($user, 'groups.view')) {
-            $items = $this->groups($q);
-            if ($items !== []) {
-                $groups[] = ['key' => 'groups', 'label' => 'Kelompok', 'items' => $items];
-            }
-        }
-
         if ($this->permissions->allows($user, 'journals.view')) {
             $items = $this->journals($q);
             if ($items !== []) {
@@ -65,69 +49,6 @@ final class GlobalSearchService
         }
 
         return ['q' => $q, 'groups' => $groups];
-    }
-
-    /**
-     * @return list<array{title:string,subtitle:?string,href:string,icon:string}>
-     */
-    private function members(string $q): array
-    {
-        $term = '%'.$q.'%';
-
-        return Member::query()
-            ->with(['person:row_id,full_name,national_identity_number,phone'])
-            ->where(function ($w) use ($term, $q): void {
-                $w->where('member_number', 'like', $term)
-                    ->orWhereHas('person', function ($p) use ($term, $q): void {
-                        $p->where('full_name', 'like', $term)
-                            ->orWhere('national_identity_number', 'like', $term)
-                            ->orWhere('phone', 'like', $term);
-                        if (ctype_digit($q)) {
-                            $p->orWhere('national_identity_number', $q);
-                        }
-                    });
-            })
-            ->orderBy('row_id', 'desc')
-            ->limit(self::LIMIT_PER)
-            ->get()
-            ->map(fn (Member $m): array => [
-                'title' => (string) ($m->person?->full_name ?: $m->member_number ?: 'Anggota #'.$m->id),
-                'subtitle' => trim(implode(' · ', array_filter([
-                    $m->member_number,
-                    $m->person?->national_identity_number,
-                ]))) ?: null,
-                'href' => '/master-data/members/'.$m->row_id,
-                'icon' => 'person',
-            ])
-            ->all();
-    }
-
-    /**
-     * @return list<array{title:string,subtitle:?string,href:string,icon:string}>
-     */
-    private function groups(string $q): array
-    {
-        $term = '%'.$q.'%';
-
-        return Group::query()
-            ->with(['village:row_id,name'])
-            ->where(function ($w) use ($term): void {
-                $w->where('name', 'like', $term)->orWhere('code', 'like', $term);
-            })
-            ->orderBy('name')
-            ->limit(self::LIMIT_PER)
-            ->get()
-            ->map(fn (Group $g): array => [
-                'title' => (string) $g->name,
-                'subtitle' => trim(implode(' · ', array_filter([
-                    $g->code,
-                    $g->village?->name,
-                    $g->status,
-                ]))) ?: null,
-                'href' => '/master-data/groups/'.$g->row_id,
-                'icon' => 'groups',
-            ])
-            ->all();
     }
 
     /**

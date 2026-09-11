@@ -13,7 +13,7 @@ use App\Models\User;
 use App\Tenancy\Services\DefaultChartOfAccountsProvisioner;
 use App\Tenancy\Services\FiscalPeriodProvisioner;
 use App\Tenancy\Services\ShardConnectionManager;
-use App\Tenancy\Services\TenantGroupMasterDataProvisioner;
+use App\Tenancy\Services\TenantMasterDataProvisioner;
 use App\Tenancy\Services\TenantRegistrySynchronizer;
 use App\Tenancy\Services\TenantVillageProvisioner;
 use App\Tenancy\Services\TenantWorkbench;
@@ -30,7 +30,7 @@ final readonly class TenantRegistrationService
         private ShardConnectionManager $connections,
         private TenantRegistrySynchronizer $registry,
         private TenantVillageProvisioner $villages,
-        private TenantGroupMasterDataProvisioner $groupMasterData,
+        private TenantMasterDataProvisioner $groupMasterData,
         private DefaultChartOfAccountsProvisioner $coa,
         private FiscalPeriodProvisioner $fiscalPeriods,
         private PermissionChecker $permissions,

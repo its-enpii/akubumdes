@@ -91,18 +91,6 @@ final readonly class RegencyConsolidatedReportService
                 $totalKecCount,
             );
 
-            $kecGroups = DB::connection('tenant')
-                ->table('groups')
-                ->where('tenant_id', $tId)
-                ->where('status', 'active')
-                ->count();
-
-            $kecMembers = DB::connection('tenant')
-                ->table('members')
-                ->where('tenant_id', $tId)
-                ->where('status', 'active')
-                ->count();
-
             $recap[] = [
                 'tenant_id' => $tId,
                 'code' => $kecamatan->code,
@@ -110,8 +98,8 @@ final readonly class RegencyConsolidatedReportService
                 'district_code' => $kecamatan->district_code,
                 'cash' => $kecCash,
                 'total_assets' => $kecAssets,
-                'groups_count' => $kecGroups,
-                'members_count' => $kecMembers,
+                'groups_count' => 0,
+                'members_count' => 0,
                 'lat' => $geo['lat'],
                 'lng' => $geo['lng'],
                 'zoom' => $geo['zoom'] ?? 13,

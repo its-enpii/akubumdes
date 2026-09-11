@@ -231,50 +231,6 @@ const sections = [
         items: [{ label: 'Dashboard', icon: 'dashboard', href: '/dashboard', exact: true }],
     },
     {
-        label: 'Anggota',
-        items: [{ label: 'Portal Saya', icon: 'account_circle', href: '/portal' }],
-    },
-    {
-        label: 'akubumdes',
-        items: [
-            {
-                key: 'master-data',
-                label: 'Master Data',
-                icon: 'database',
-                children: [
-                    { label: 'Data Desa', icon: 'location_city', href: '/master-data/villages' },
-                    {
-                        key: 'members',
-                        label: 'Anggota',
-                        icon: 'person',
-                        children: [
-                            { label: 'Tambah Anggota', href: '/master-data/members/create', exact: true },
-                            { label: 'Daftar Anggota', href: '/master-data/members', exclude: '/master-data/members/create' },
-                        ],
-                    },
-                    {
-                        key: 'groups',
-                        label: 'Kelompok',
-                        icon: 'groups',
-                        children: [
-                            { label: 'Tambah Kelompok', href: '/master-data/groups/create', exact: true },
-                            { label: 'Daftar Kelompok', href: '/master-data/groups', exclude: '/master-data/groups/create' },
-                        ],
-                    },
-                    {
-                        key: 'institutions',
-                        label: 'Lembaga Lain',
-                        icon: 'business',
-                        children: [
-                            { label: 'Tambah Lembaga', href: '/master-data/institutions/create', exact: true },
-                            { label: 'Daftar Lembaga', href: '/master-data/institutions', exclude: '/master-data/institutions/create' },
-                        ],
-                    },
-                ],
-            },
-        ],
-    },
-    {
         label: 'Keuangan',
         items: [
             {
@@ -314,12 +270,6 @@ const sections = [
                     { label: 'Buku Besar', href: '/accounting/reports/general-ledger' },
                 ],
             },
-        ],
-    },
-    {
-        label: 'Tagihan',
-        items: [
-            { label: 'Daftar Tagihan', icon: 'receipt_long', href: '/billing/invoices' },
         ],
     },
     {
@@ -529,7 +479,7 @@ function logout() {
                 @click="openSearch"
             >
                 <AppIcon name="search" class="text-on-surface-variant" />
-                                <span class="min-w-0 flex-1 truncate">Cari anggota atau kelompok...</span>
+                                <span class="min-w-0 flex-1 truncate">Cari jurnal atau inventaris...</span>
                 <kbd class="hidden rounded border border-outline-variant bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-on-surface-variant sm:inline">Ctrl K</kbd>
             </button>
             <p v-if="props.unitName" class="ml-6 hidden items-center gap-2 text-sm font-semibold text-primary xl:flex"><AppIcon name="location_on" class="text-secondary" />{{ props.unitName }}</p>
@@ -634,7 +584,7 @@ function logout() {
                                 ref="searchInput"
                                 v-model="searchQ"
                                 type="search"
-                                placeholder="Cari anggota atau kelompok..."
+                                placeholder="Cari jurnal atau inventaris..."
                                 aria-label="Kata kunci pencarian"
                                 class="h-14 min-w-0 flex-1 border-0 bg-transparent text-base text-primary placeholder:text-on-surface-variant focus:outline-none focus:ring-0"
                                 autocomplete="off"

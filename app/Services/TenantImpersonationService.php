@@ -45,7 +45,7 @@ final class TenantImpersonationService
         }
 
         if ((int) $targetUser->tenant_id !== (int) $tenant->row_id) {
-            throw new DomainException("Pengguna [{$targetUser->name}] bukan merupakan anggota tenant [{$tenant->name}].");
+            throw new DomainException("Pengguna [{$targetUser->name}] tidak tergabung dalam tenant [{$tenant->name}].");
         }
 
         if ($targetUser->status !== 'active') {

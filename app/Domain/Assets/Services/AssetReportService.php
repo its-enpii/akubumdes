@@ -6,7 +6,7 @@ namespace App\Domain\Assets\Services;
 
 use App\Domain\Assets\Models\Asset;
 use App\Domain\Assets\Models\AssetCategory;
-use App\Domain\Membership\Models\OrganizationProfile;
+use App\Models\Tenant\OrganizationProfile;
 use App\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
 

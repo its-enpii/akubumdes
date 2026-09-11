@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Mobile;
 
 use App\Domain\Access\Services\PermissionChecker;
-use App\Domain\Membership\Models\OrganizationProfile;
+use App\Models\Tenant\OrganizationProfile;
 use App\Models\User;
 use App\Support\ApiResponse;
 use App\Tenancy\TenantContext;

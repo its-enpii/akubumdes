@@ -107,7 +107,7 @@ final class SubscriptionAutomationAndEnforcementTest extends TestCase
         $this->assertSame('suspended', $subscription->status);
     }
 
-    public function test_overdue_suspended_tenant_is_blocked_from_operational_routes(): void
+    public function test_overdue_suspended_tenant_receives_payment_gate_payload(): void
     {
         [$user, $tenant] = $this->createTenantWithUser('sub_test_3');
 
@@ -129,15 +129,10 @@ final class SubscriptionAutomationAndEnforcementTest extends TestCase
             'auto_renew' => true,
         ]);
 
-        // Coba akses dashboard operasional -> diredirect ke billing
+        // Dashboard tetap dirender dengan sinyal pembayaran pada header API.
         $this->actingAs($user)
             ->get('/dashboard')
-            ->assertRedirect(route('billing.invoices.index'));
-
-        // Akses menu billing -> tetap diizinkan
-        $this->actingAs($user)
-            ->get('/billing/invoices')
-            ->assertOk();
+            ->assertHeader('X-Payment-Gate', 'suspended');
     }
 
     public function test_paid_invoice_renews_subscription_and_restores_active_status(): void

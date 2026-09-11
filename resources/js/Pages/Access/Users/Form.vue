@@ -1,13 +1,12 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { computed } from 'vue';
 import AppButton from '../../../Components/AppButton.vue';
 import AppCard from '../../../Components/AppCard.vue';
 import AppCheckbox from '../../../Components/AppCheckbox.vue';
 import AppDatePicker from '../../../Components/AppDatePicker.vue';
 import AppIcon from '../../../Components/AppIcon.vue';
 import AppInput from '../../../Components/AppInput.vue';
-import SmartSelect from '../../../Components/SmartSelect.vue';
 import AuthenticatedLayout from '../../../Layouts/AuthenticatedLayout.vue';
 
 const props = defineProps({
@@ -29,7 +28,6 @@ const form = useForm({
     appointed_at: props.user?.appointed_at || '',
     term_end_at: props.user?.term_end_at || '',
     role: props.user?.role || '',
-    member_row_id: props.user?.member_row_id || '',
     is_village_user: Boolean(props.user?.is_village_user),
     village_row_id: props.user?.village_row_id || '',
 });
@@ -41,38 +39,6 @@ const statusOptions = [
 ];
 
 const showVillageSelect = computed(() => form.is_village_user || form.role === 'village_operator');
-const showMemberSelect = computed(() => form.role === 'anggota');
-const memberOptions = ref(props.user?.member_row_id ? [{
-    value: props.user.member_row_id,
-    label: props.user.member_name ? `${props.user.member_name} · ${props.user.member_row_id}` : String(props.user.member_row_id),
-}] : []);
-const memberLoading = ref(false);
-let memberSearchController;
-
-async function searchMembers(search = '') {
-    memberSearchController?.abort();
-    const controller = new AbortController();
-    memberSearchController = controller;
-    memberLoading.value = true;
-    try {
-        const response = await fetch(`/master-data/groups/member-options?search=${encodeURIComponent(search.trim())}`, {
-            headers: { Accept: 'application/json' },
-            signal: controller.signal,
-        });
-        if (!response.ok) throw new Error('Data anggota gagal dimuat.');
-        const payload = await response.json();
-        const selected = memberOptions.value.find((option) => String(option.value) === String(form.member_row_id));
-        memberOptions.value = selected ? [selected, ...payload.data.filter((option) => String(option.value) !== String(selected.value))] : payload.data;
-    } catch (error) {
-        if (error.name !== 'AbortError') memberOptions.value = [];
-    } finally {
-        if (!controller.signal.aborted) memberLoading.value = false;
-    }
-}
-
-onMounted(() => {
-    if (showMemberSelect.value) searchMembers();
-});
 
 function submit() {
     if (editing) {
@@ -111,20 +77,6 @@ function submit() {
                             <AppInput v-model="form.phone" label="Nomor HP (WhatsApp)" icon="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx" required :error="form.errors.phone" />
                         </div>
 
-                        <div v-if="showMemberSelect" class="border-t border-outline-variant pt-4">
-                            <SmartSelect
-                                v-model="form.member_row_id"
-                                label="Anggota Terhubung"
-                                :options="memberOptions"
-                                searchable
-                                required
-                                clearable
-                                placeholder="Cari nama atau nomor anggota..."
-                                :loading="memberLoading"
-                                :error="form.errors.member_row_id"
-                                @search="searchMembers"
-                            />
-                        </div>
                     </div>
                 </AppCard>
 
@@ -169,7 +121,7 @@ function submit() {
 
                         <div class="border-t border-outline-variant pt-4 space-y-3">
                             <AppCheckbox v-model="form.is_village_user" label="Tandai sebagai Operator Desa Khusus" />
-                            <p class="text-xs text-on-surface-variant">Operator desa hanya memiliki hak akses terbatas untuk menginput proposal dan data anggota di desa tertentu.</p>
+                            <p class="text-xs text-on-surface-variant">Operator desa hanya memiliki hak akses terbatas untuk pengelolaan di desa tertentu.</p>
                             <div v-if="showVillageSelect" class="pt-2">
                                 <SmartSelect
                                     v-model="form.village_row_id"

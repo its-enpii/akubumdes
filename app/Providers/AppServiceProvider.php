@@ -11,9 +11,7 @@ use App\Assistant\Handlers\GetAssetHandler;
 use App\Assistant\Handlers\ListAccountsHandler;
 use App\Assistant\Handlers\ReverseJournalHandler;
 use App\Assistant\Handlers\SearchAssetsHandler;
-use App\Assistant\Handlers\SearchGroupsHandler;
 use App\Assistant\Handlers\SearchJournalsHandler;
-use App\Assistant\Handlers\SearchMembersHandler;
 use App\Domain\Migration\Support\LegacyConnection;
 use App\Models\Platform\PersonalAccessToken;
 use App\Tenancy\TenantContext;
@@ -48,8 +46,6 @@ final class AppServiceProvider extends ServiceProvider
         // handler gets AssistantToolService + dependencies injected.
         $this->app->afterResolving(ToolRegistry::class, function (ToolRegistry $registry): void {
             $registry->registerMany([
-                $this->app->make(SearchMembersHandler::class),
-                $this->app->make(SearchGroupsHandler::class),
                 $this->app->make(ListAccountsHandler::class),
                 $this->app->make(SearchJournalsHandler::class),
                 $this->app->make(SearchAssetsHandler::class),
