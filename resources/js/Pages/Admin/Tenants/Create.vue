@@ -16,6 +16,7 @@ const form = useForm({
     map_latitude: null,
     map_longitude: null,
     map_zoom: 13,
+    coa_variant: 'standard',
     user_name: '',
     username: '',
     email: '',
@@ -27,6 +28,12 @@ const provinces = ref([]);
 const regencies = ref([]);
 const districts = ref([]);
 const loading = ref(false);
+
+const coaVariantOptions = [
+    { value: 'standard', label: 'BUMDes Standar' },
+    { value: 'trading', label: 'Unit Usaha Perdagangan' },
+    { value: 'cooperative', label: 'Koperasi' },
+];
 
 const regencyCenter = reactive({
     lat: -7.5,
@@ -127,6 +134,7 @@ function submit() {
                     <div class="border-t border-outline-variant pt-5">
                         <h2 class="font-semibold text-primary">Pengguna Pertama</h2>
                         <div class="mt-4 grid gap-4 xl:grid-cols-3">
+                            <SmartSelect v-model="form.coa_variant" label="Varian COA" :options="coaVariantOptions" :error="form.errors.coa_variant" hint="Menentukan chart of accounts dan struktur laba rugi." />
                             <AppInput v-model="form.user_name" label="Nama Pengguna" icon="person" required :error="form.errors.user_name" />
                             <AppInput v-model="form.username" label="Username" icon="account_circle" required :error="form.errors.username" />
                             <AppInput v-model="form.email" label="Email" icon="mail" type="email" required :error="form.errors.email" />

@@ -12,7 +12,7 @@ Seluruh laporan legacy SIDBM kini telah di-implementasikan secara penuh pada ars
 | No | Laporan | File Legacy | File Modern (PDF) | Endpoint Web & PDF | Status |
 |---|---|---|---|---|:---:|
 | 1 | **Neraca (Balance Sheet)** | `neraca/neraca1.blade.php`, `neraca2.blade.php` | `reports/pdf/balance_sheet.blade.php` | `/accounting/reports/balance-sheet` | ✅ Selesai |
-| 2 | **Laba Rugi (Income Statement)** | `view/laba_rugi.blade.php` | `reports/pdf/income_statement.blade.php` | `/accounting/reports/income-statement` | ✅ Selesai |
+| 2 | **Laba Rugi (Income Statement)** | `view/laba_rugi.blade.php` | `reports/pdf/income_statement.blade.php` | `/accounting/reports/income-statement` | ✅ Selesai; varian `standard`, `trading`, dan `cooperative` mengikuti `tenants.coa_variant` |
 | 3 | **Arus Kas (Cash Flow)** | `view/arus_kas.blade.php` | `reports/pdf/cash_flow.blade.php` | `/accounting/reports/cash-flow` | ✅ Selesai |
 | 4 | **Perubahan Ekuitas (Equity Change)** | `view/perubahan_modal.blade.php` | `reports/pdf/equity_change.blade.php` | `/accounting/reports/equity-change` | ✅ Selesai |
 | 5 | **CALK (Catatan Atas Lap. Keuangan)** | `view/calk.blade.php`, `calk_c.blade.php` | `reports/pdf/calk.blade.php` | `/accounting/reports/calk` | ✅ Selesai |

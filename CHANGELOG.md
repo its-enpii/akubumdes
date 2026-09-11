@@ -5,6 +5,10 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+- Varian COA multi-model usaha (`standard`, `trading`, `cooperative`) pada platform tenants, tiga template provisioning paritas Simak, serta strategi laporan laba rugi per varian termasuk Laba Kotor/HPP dan Perhitungan Hasil Usaha.
+- Field dan validasi varian COA pada pendaftaran/edit tenant dengan re-provision idempotent setelah varian berubah.
+
 ### Removed
 - **Strip 3 Modul — Anggota (Membership), Master Data, Tagihan (Billing Tenant):**
   - **A. Anggota (Membership):** menghapus `app/Domain/Membership/` (Models: Member, Person, Group, GroupMember, GroupOfficer, MemberAddress, MemberBusiness, MemberGuarantor, MemberUserLink; Services: MemberService, GroupService, MasterDataCsvService). `OrganizationProfile` DIPERTAHANKAN (dipakai 11 report services, Settings, middleware) dan dipindahkan ke `app/Models/Tenant/OrganizationProfile.php`.

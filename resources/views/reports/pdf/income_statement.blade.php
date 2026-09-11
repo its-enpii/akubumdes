@@ -1,10 +1,14 @@
-@extends('reports.pdf.layout', ['title' => 'Laporan Laba Rugi', 'identity' => $identity, 'period' => $period])
+@php
+    $reportTitle = $title ?? 'Laporan Laba Rugi';
+    $reportLabel = strtoupper($reportTitle);
+@endphp
+@extends('reports.pdf.layout', ['title' => $reportTitle, 'identity' => $identity, 'period' => $period])
 
 @section('content')
 <table border="0" width="100%" cellspacing="0" cellpadding="0" style="font-size: 11px;">
     <tr>
         <td colspan="4" align="center">
-            <div style="font-size: 18px;"><b>LAPORAN LABA RUGI</b></div>
+            <div style="font-size: 18px;"><b>{{ $reportLabel }}</b></div>
             <div style="font-size: 16px;"><b>{{ strtoupper($period['period_label'] ?? '') }}</b></div>
         </td>
     </tr>

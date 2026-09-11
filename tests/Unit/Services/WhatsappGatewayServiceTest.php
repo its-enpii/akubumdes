@@ -103,6 +103,7 @@ final class WhatsappGatewayServiceTest extends TestCase
         config([
             'services.wa_gateway.base_url' => 'https://agent.sidbm.net/webhook-test',
             'services.wa_gateway.api_key' => 'enpii:its.enpii-118',
+            'services.wa_gateway.instance_prefix' => 'app-sidbm',
         ]);
 
         $http = new HttpFactory;

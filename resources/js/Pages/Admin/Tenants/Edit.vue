@@ -27,6 +27,7 @@ const form = useForm({
     map_latitude: props.tenant.map_latitude ?? null,
     map_longitude: props.tenant.map_longitude ?? null,
     map_zoom: props.tenant.map_zoom ?? 13,
+    coa_variant: props.tenant.coa_variant || 'standard',
     custom_domains: Array.isArray(props.tenant.custom_domains) ? [...props.tenant.custom_domains] : [],
 });
 
@@ -50,6 +51,12 @@ const regencyCenter = reactive({
     lng: 109.5,
     zoom: 11,
 });
+
+const coaVariantOptions = [
+    { value: 'standard', label: 'BUMDes Standar' },
+    { value: 'trading', label: 'Unit Usaha Perdagangan' },
+    { value: 'cooperative', label: 'Koperasi' },
+];
 
 async function loadRegencyCenter(regencyCode) {
     if (!regencyCode) return;
@@ -146,8 +153,9 @@ function submit() {
             <AppCard>
                 <form class="space-y-5" @submit.prevent="submit">
                     <AppInput v-model="form.name" label="Nama Tenant" required :error="form.errors.name" />
-                    <SmartSelect v-model="form.status" label="Status" :options="statusOptions" required :error="form.errors.status" />
-                    <AppInput v-model="form.timezone" label="Zona waktu" :error="form.errors.timezone" />
+                            <SmartSelect v-model="form.status" label="Status" :options="statusOptions" required :error="form.errors.status" />
+                            <SmartSelect v-model="form.coa_variant" label="Varian COA" :options="coaVariantOptions" required :error="form.errors.coa_variant" hint="Perubahan memicu re-provision idempotent." />
+                            <AppInput v-model="form.timezone" label="Zona waktu" :error="form.errors.timezone" />
 
                     <!-- Custom Domains Section -->
                     <div class="border-t border-outline-variant pt-5">

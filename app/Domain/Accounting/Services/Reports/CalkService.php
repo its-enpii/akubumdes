@@ -56,7 +56,9 @@ final class CalkService
             'highlights' => [
                 [
                     'key' => 'net_income',
-                    'label' => 'Laba (rugi) bersih YTD',
+                    'label' => $this->incomeStatement->coaVariant() === 'cooperative'
+                        ? 'Perhitungan Hasil Usaha bersih YTD'
+                        : 'Laba (rugi) bersih YTD',
                     'amount' => round((float) ($is['summary']['after_tax']['ytd'] ?? $this->balances->netIncome($asOf)), 2),
                 ],
                 [

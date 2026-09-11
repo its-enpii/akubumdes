@@ -156,12 +156,21 @@ public_id
 code
 name
 status
+coa_variant
 timezone
 metadata
 provisioned_at
 suspended_at
 created_at
 updated_at
+```
+
+`coa_variant` menentukan template chart of accounts dan strategi laporan laba rugi:
+
+```text
+standard    = BUMDes standar (Surplus / Defisit)
+trading     = unit usaha perdagangan (Laba Kotor / HPP)
+cooperative = koperasi (Perhitungan Hasil Usaha)
 ```
 
 Status contoh:

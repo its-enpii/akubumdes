@@ -50,6 +50,7 @@ final readonly class TenantRegistrationService
                 'map_latitude' => $data['map_latitude'] ?? null,
                 'map_longitude' => $data['map_longitude'] ?? null,
                 'map_zoom' => $data['map_zoom'] ?? null,
+                'coa_variant' => $data['coa_variant'] ?? 'standard',
                 'status' => 'provisioning',
                 'timezone' => 'Asia/Jakarta',
             ]);
@@ -123,6 +124,7 @@ final readonly class TenantRegistrationService
             $this->registry->sync($tenant);
             $this->groupMasterData->ensureDefaults();
             $this->villages->provision($tenant);
+            $tenant->refresh();
             $coa = $this->coa->ensureDefaults();
             $fiscal = $this->fiscalPeriods->ensureDefaults(1);
             $this->permissions->ensureSystemRoles();

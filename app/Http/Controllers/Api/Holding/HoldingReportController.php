@@ -87,11 +87,13 @@ final class HoldingReportController
             fn (): array => $this->incomeStatementService->build($year, $month),
         );
 
+        $data['title'] = $this->incomeStatementService->title();
+
         return response()->json([
             'status' => 'success',
             'meta' => [
                 'report' => 'income_statement',
-                'report_title' => 'Laporan Laba Rugi',
+                'report_title' => $data['title'],
                 'scope' => 'single_tenant',
                 'tenant' => $this->tenantSummary($targetTenant),
                 'period' => $data['period'] ?? null,

@@ -14,7 +14,10 @@ const props = defineProps({
   header_lalu: { type: String, required: true },
   header_sekarang: { type: String, required: true },
   groups: { type: Array, required: true },
+  sections: { type: Array, required: true },
   summary: { type: Object, required: true },
+  title: { type: String, required: true },
+  coa_variant: { type: String, required: true },
   monthLabels: { type: Object, required: true },
   filters: { type: Object, required: true },
 });
@@ -28,16 +31,17 @@ const incomeColumns = [
   { key: "ytd", label: `s.d. ${props.header_sekarang}`, align: "right" },
 ];
 
-const incomeSections = computed(() =>
-  props.groups.map((group) => ({
-    title: `${group.code}. ${group.name}`,
-    rows: group.children,
-    subtotalLabel: `Jumlah ${group.name}`,
-    prior: group.prior,
-    current: group.current,
-    ytd: group.ytd,
+const visibleSections = computed(() =>
+  props.sections.map((section) => ({
+    title: section.label,
+    rows: section.rows,
+    subtotalLabel: `Jumlah ${section.label}`,
+    prior: section.prior,
+    current: section.current,
+    ytd: section.total,
   })),
 );
+
 </script>
 
 <template>
@@ -50,7 +54,7 @@ const incomeSections = computed(() =>
         >
           Pelaporan
         </p>
-        <h1 class="mt-1 text-2xl font-bold text-primary">Laporan Laba Rugi</h1>
+        <h1 class="mt-1 text-2xl font-bold text-primary">{{ title }}</h1>
         <p class="text-sm text-on-surface-variant">{{ period.period_label }}</p>
       </div>
 
@@ -66,12 +70,7 @@ const incomeSections = computed(() =>
 
       <AppCard class="overflow-hidden p-0">
         <div class="overflow-x-auto">
-          <ReportTable
-            :columns="incomeColumns"
-            :rows="[]"
-            :sections="incomeSections"
-            size="compact"
-          >
+          <ReportTable :columns="incomeColumns" :rows="[]" :sections="visibleSections" size="compact">
             <template #cell-code="{ row }">
               <span class="font-medium">{{ row.code }}</span>
               <span class="text-on-surface-variant"> · {{ row.name }}</span>

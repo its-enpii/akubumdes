@@ -24,6 +24,7 @@ use App\Support\ReportPdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use InvalidArgumentException;
@@ -56,7 +57,7 @@ final class ReportController
                 ['key' => 'journals', 'title' => 'Jurnal Transaksi', 'href' => '/accounting/reports/journals', 'icon' => 'receipt_long'],
                 ['key' => 'trial-balance', 'title' => 'Neraca Saldo', 'href' => '/accounting/reports/trial-balance', 'icon' => 'table_chart'],
                 ['key' => 'balance-sheet', 'title' => 'Neraca', 'href' => '/accounting/reports/balance-sheet', 'icon' => 'account_balance'],
-                ['key' => 'income-statement', 'title' => 'Laba Rugi', 'href' => '/accounting/reports/income-statement', 'icon' => 'trending_up'],
+                ['key' => 'income-statement', 'title' => $this->incomeStatement->title(), 'href' => '/accounting/reports/income-statement', 'icon' => 'trending_up'],
                 ['key' => 'cash-flow', 'title' => 'Arus Kas', 'href' => '/accounting/reports/cash-flow', 'icon' => 'water_drop'],
                 ['key' => 'equity-change', 'title' => 'Perubahan Ekuitas', 'href' => '/accounting/reports/equity-change', 'icon' => 'account_balance_wallet'],
                 ['key' => 'calk', 'title' => 'CALK', 'href' => '/accounting/reports/calk', 'icon' => 'description'],
@@ -151,6 +152,8 @@ final class ReportController
 
         return Inertia::render('Accounting/Reports/IncomeStatement', [
             ...$this->incomeStatement->build($year, $month),
+            'title' => $this->incomeStatement->title(),
+            'coa_variant' => $this->incomeStatement->coaVariant(),
             'monthLabels' => $this->monthLabels(),
             'filters' => ['year' => $year, 'month' => $month ?? 'all'],
         ]);
@@ -161,11 +164,12 @@ final class ReportController
         $this->authorize($request);
         [$year, $month] = $this->period($request, defaultMonth: (int) date('n'));
         $data = $this->incomeStatement->build($year, $month);
+        $data['title'] = $this->incomeStatement->title();
 
         return $this->pdf->stream(
             'reports.pdf.income_statement',
             $data,
-            'laba-rugi-'.$year.($month ? '-'.$month : '').'.pdf',
+            Str::slug($data['title']).'-'.$year.($month ? '-'.$month : '').'.pdf',
         );
     }
 
