@@ -42,7 +42,6 @@ final readonly class GeneralLedgerService
         $account = Account::query()
             ->whereKey($accountRowId)
             ->where('is_postable', true)
-            ->whereDate('created_at', '<=', $periodUntil->toDateString())
             ->where(function ($q) use ($periodFrom, $mutatedAccountIds): void {
                 $q->where('is_active', true)
                     ->orWhereNull('deactivated_at')
@@ -151,14 +150,12 @@ final readonly class GeneralLedgerService
         $accountOptions = Account::query()
             ->where('is_postable', true)
             ->where('code', '!=', AccountBalanceQuery::CURRENT_EARNINGS_CODE)
-            ->where(function ($q) use ($periodFrom, $periodUntil, $mutatedAccountIds): void {
-                $q->whereDate('created_at', '<=', $periodUntil->toDateString())
-                    ->where(function ($active) use ($periodFrom): void {
-                        $active->where('is_active', true)
-                            ->orWhereNull('deactivated_at')
-                            ->orWhere('deactivated_at', '>=', $periodFrom->toDateString());
-                    })
-                    ->orWhereIn('row_id', $mutatedAccountIds);
+            ->where(function ($q) use ($periodFrom, $mutatedAccountIds): void {
+                $q->where(function ($active) use ($periodFrom): void {
+                    $active->where('is_active', true)
+                        ->orWhereNull('deactivated_at')
+                        ->orWhere('deactivated_at', '>=', $periodFrom->toDateString());
+                })->orWhereIn('row_id', $mutatedAccountIds);
             })
             ->orderBy('code')
             ->get(['row_id', 'code', 'name'])

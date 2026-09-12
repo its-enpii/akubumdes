@@ -55,12 +55,14 @@ final class CashFlowService
             ->where('code', 'like', self::CASH_PREFIX.'%')
             ->where(function ($q) use ($from, $until, $cashMutationAccountIds): void {
                 $q->where(function ($relevant) use ($from, $until): void {
-                    $relevant->whereDate('created_at', '<=', $until->toDateString())
-                        ->where(function ($active) use ($from): void {
-                            $active->where('is_active', true)
-                                ->orWhereNull('deactivated_at')
-                                ->orWhere('deactivated_at', '>=', $from->toDateString());
-                        });
+                    $relevant->where(function ($alive) use ($until): void {
+                        $alive->whereNull('deactivated_at')
+                            ->orWhere('deactivated_at', '>', $until->toDateString());
+                    })->where(function ($active) use ($from): void {
+                        $active->where('is_active', true)
+                            ->orWhereNull('deactivated_at')
+                            ->orWhere('deactivated_at', '>=', $from->toDateString());
+                    });
                 })->orWhereIn('row_id', $cashMutationAccountIds);
             })
             ->orderBy('code')

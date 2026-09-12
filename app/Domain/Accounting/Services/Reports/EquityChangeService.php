@@ -45,12 +45,14 @@ final class EquityChangeService
             ->where('is_postable', true)
             ->where(function ($q) use ($from, $asOf, $equityMutationAccountIds): void {
                 $q->where(function ($relevant) use ($from, $asOf): void {
-                    $relevant->whereDate('created_at', '<=', $asOf->toDateString())
-                        ->where(function ($active) use ($from): void {
-                            $active->where('is_active', true)
-                                ->orWhereNull('deactivated_at')
-                                ->orWhere('deactivated_at', '>=', $from->toDateString());
-                        });
+                    $relevant->where(function ($alive) use ($asOf): void {
+                        $alive->whereNull('deactivated_at')
+                            ->orWhere('deactivated_at', '>', $asOf->toDateString());
+                    })->where(function ($active) use ($from): void {
+                        $active->where('is_active', true)
+                            ->orWhereNull('deactivated_at')
+                            ->orWhere('deactivated_at', '>=', $from->toDateString());
+                    });
                 })->orWhereIn('row_id', $equityMutationAccountIds);
             })
             ->orderBy('code')

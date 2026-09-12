@@ -196,6 +196,10 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
 - Middleware `BlockOfflineMutations` memberikan pengecualian mutasi hanya untuk pengguna tenant yang ditetapkan sebagai pengguna offline, sedangkan autentikasi mobile tetap di-whitelist.
 
 ### Fixed
+- **Perbaikan Kebenaran Data Seluruh Laporan Akuntansi (Historis):**
+  - Menghapus pembatasan filter `created_at` pada query akun di `BalanceSheetService`, `TrialBalanceService`, `EquityChangeService`, `GeneralLedgerService`, dan `CashFlowService`.
+  - Memastikan seluruh akun hasil migrasi (yang diinsert dengan timestamp `now()`) dapat diaudit dan diagregasikan dengan tepat pada periode historis lampau.
+  - Memverifikasi keseimbangan persamaan dasar akuntansi (Aset = Kewajiban + Ekuitas) pada data migrasi riil.
 - **Perbaikan Migrasi Simak & Penyesuaian Skema:**
   - Menambahkan migrasi pelebaran kolom `district_code` menjadi `varchar(20)` pada tabel platform `tenants` dan tabel shard `tenant_registry` untuk mengakomodasi kode desa/kelurahan SIMAK.
   - Memperbaiki `LegacyCoaImporter` agar melakukan pengurutan akun berdasar `kode_akun` bukan `id` pada tabel posting `accounts_*` dan `rekening_*`.

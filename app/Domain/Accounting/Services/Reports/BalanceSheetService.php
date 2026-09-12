@@ -41,7 +41,8 @@ final readonly class BalanceSheetService
         $accounts = Account::query()
             ->whereIn('account_type', ['asset', 'liability', 'equity'])
             ->where(function ($q) use ($asOf, $mutatedAccountIds): void {
-                $q->whereDate('created_at', '<=', $asOf->toDateString())
+                $q->whereNull('deactivated_at')
+                    ->orWhere('deactivated_at', '>', $asOf->toDateString())
                     ->orWhereIn('row_id', $mutatedAccountIds);
             })
             ->orderBy('code')
