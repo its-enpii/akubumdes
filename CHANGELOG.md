@@ -196,6 +196,11 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
 - Middleware `BlockOfflineMutations` memberikan pengecualian mutasi hanya untuk pengguna tenant yang ditetapkan sebagai pengguna offline, sedangkan autentikasi mobile tetap di-whitelist.
 
 ### Fixed
+- **Perbaikan Migrasi Simak & Penyesuaian Skema:**
+  - Menambahkan migrasi pelebaran kolom `district_code` menjadi `varchar(20)` pada tabel platform `tenants` dan tabel shard `tenant_registry` untuk mengakomodasi kode desa/kelurahan SIMAK.
+  - Memperbaiki `LegacyCoaImporter` agar melakukan pengurutan akun berdasar `kode_akun` bukan `id` pada tabel posting `accounts_*` dan `rekening_*`.
+  - Memperbaiki `AccountingMigrationReconciler` dan `LegacyAccountingDiscovery` agar pengecekan `deleted_at` kondisional terhadap keberadaan kolom pada tabel transaksi legacy.
+  - Memperbarui `LegacyAccountingNormalizer` untuk mengabaikan saldo pembuka dan bulanan dengan `tahun < 2000` (dummy/placeholder sistem lama).
 - Kontrak parameter URL `download_report` AI Assistant agar sesuai dengan controller laporan: jurnal menggunakan `year`/`month`, buku besar menggunakan `account`, dan portofolio pinjaman menggunakan `as_of`.
 - Keamanan halaman multi-instance WhatsApp: operasi `update` kini melakukan otorisasi izin `settings.manage` sebelum perubahan data.
 - Kesalahan parameter entity pemanfaat pinjaman pada test mobile agar analisis Flutter kembali berjalan tanpa error pada kode test.

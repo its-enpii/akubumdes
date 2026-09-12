@@ -180,7 +180,7 @@ final class LegacyCoaImporter
 
         // 1. Level 1
         if ($this->legacy->tableExists($level1Table)) {
-            $l1Rows = $this->legacy->select("SELECT * FROM `{$level1Table}` ORDER BY id ASC");
+            $l1Rows = $this->legacy->select("SELECT * FROM `{$level1Table}` ORDER BY kode_akun ASC");
             foreach ($l1Rows as $row) {
                 $code = trim((string) ($row->kode_akun ?? $row->id ?? ''));
                 if ($code === '') {
@@ -201,7 +201,7 @@ final class LegacyCoaImporter
 
         // 2. Level 2
         if ($this->legacy->tableExists($level2Table)) {
-            $l2Rows = $this->legacy->select("SELECT * FROM `{$level2Table}` ORDER BY id ASC");
+            $l2Rows = $this->legacy->select("SELECT * FROM `{$level2Table}` ORDER BY kode_akun ASC");
             foreach ($l2Rows as $row) {
                 $code = trim((string) ($row->kode_akun ?? ''));
                 if ($code === '') {
@@ -223,7 +223,7 @@ final class LegacyCoaImporter
 
         // 3. Level 3 (from akun_{lokasi} or fallback)
         if ($this->legacy->tableExists($level3Table)) {
-            $l3Rows = $this->legacy->select("SELECT * FROM `{$level3Table}` ORDER BY id ASC");
+            $l3Rows = $this->legacy->select("SELECT * FROM `{$level3Table}` ORDER BY kode_akun ASC");
             foreach ($l3Rows as $row) {
                 $code = trim((string) ($row->kode_akun ?? ''));
                 if ($code === '') {
@@ -245,7 +245,7 @@ final class LegacyCoaImporter
 
         // 4. Posting Level 4 (from rekening_{lokasi} or accounts_{lokasi})
         if ($this->legacy->tableExists($postingTable)) {
-            $postRows = $this->legacy->select("SELECT * FROM `{$postingTable}` ORDER BY id ASC");
+            $postRows = $this->legacy->select("SELECT * FROM `{$postingTable}` ORDER BY kode_akun ASC");
             foreach ($postRows as $row) {
                 $code = trim((string) ($row->kode_akun ?? ''));
                 if ($code === '') {

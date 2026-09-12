@@ -138,7 +138,16 @@ final class LegacyAccountingNormalizer
         $code = trim((string) ($row->kode_akun ?? ''));
         $year = (int) ($row->tahun ?? 0);
         $month = (int) ($row->bulan ?? 0);
-        if ($code === '' || $year < 2000 || $month < 1 || $month > 12) {
+        if ($code === '') {
+            return ['ok' => null, 'error' => "Invalid monthly code/year/month [{$code}/{$year}/{$month}]", 'skip' => false];
+        }
+
+        // Legacy dummy/template saldo rows carry tahun = 1 → ignore gracefully.
+        if ($year < 2000) {
+            return ['ok' => null, 'error' => null, 'skip' => true];
+        }
+
+        if ($month < 1 || $month > 12) {
             return ['ok' => null, 'error' => "Invalid monthly code/year/month [{$code}/{$year}/{$month}]", 'skip' => false];
         }
 
@@ -191,8 +200,13 @@ final class LegacyAccountingNormalizer
     {
         $code = trim((string) ($row->kode_akun ?? ''));
         $year = (int) ($row->tahun ?? 0);
-        if ($code === '' || $year < 2000) {
+        if ($code === '') {
             return ['ok' => null, 'error' => "Invalid opening code/year [{$code}/{$year}]", 'skip' => false];
+        }
+
+        // Legacy dummy/template saldo rows carry tahun = 1 → ignore gracefully.
+        if ($year < 2000) {
+            return ['ok' => null, 'error' => null, 'skip' => true];
         }
 
         $sourceId = "{$year}:{$code}";

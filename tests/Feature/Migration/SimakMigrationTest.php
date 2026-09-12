@@ -187,6 +187,47 @@ final class SimakMigrationTest extends TestCase
         self::assertNotNull($monthlyKas);
     }
 
+    public function test_saldo_rows_with_legacy_placeholder_year_are_skipped(): void
+    {
+        for ($m = 1; $m <= 12; $m++) {
+            FiscalPeriod::query()->create([
+                'fiscal_year' => 2026,
+                'fiscal_month' => $m,
+                'starts_at' => sprintf('2026-%02d-01', $m),
+                'ends_at' => sprintf('2026-%02d-%02d', $m, $m === 2 ? 28 : ($m === 4 || $m === 6 || $m === 9 || $m === 11 ? 30 : 31)),
+                'status' => 'open',
+            ]);
+        }
+
+        // Dummy/template saldo rows from simak carry tahun = 1; they must not fail the run.
+        DB::connection('tenant')->table('saldo_1')->insert([
+            ['id' => 101, 'kode_akun' => '110101100', 'tahun' => 1, 'bulan' => '0', 'debit' => '0', 'kredit' => '0'],
+            ['id' => 102, 'kode_akun' => '1.1.01.01', 'tahun' => 1, 'bulan' => '1', 'debit' => '0', 'kredit' => '0'],
+            ['id' => 103, 'kode_akun' => '1.1.01.01', 'tahun' => 1999, 'bulan' => '3', 'debit' => '250000', 'kredit' => '0'],
+        ]);
+
+        app(LegacyCoaImporter::class)->import(suffix: '1', dryRun: false, reset: true);
+
+        $result = app(AccountingMigrationPipeline::class)->run(
+            suffix: '1',
+            dryRun: false,
+            chunk: 100,
+            fromDate: '2026-01-01',
+            toDate: '2026-12-31',
+            failFast: true,
+            skipOpenings: false,
+            skipJournals: false,
+            skipRecalc: false,
+            skipReconcile: true,
+        );
+
+        self::assertSame('completed', $result['status'], json_encode($result));
+        self::assertSame([], $result['errors']);
+        // Placeholder rows are ignored; only the seeded 2026 saldo rows migrate.
+        self::assertSame(2, $result['inserted_openings']);
+        self::assertSame(2, $result['inserted_monthly']);
+    }
+
     public function test_migration_controller_auto_provision_tenant_from_usaha(): void
     {
         $superadmin = User::query()->where('username', 'superadmin')->first();

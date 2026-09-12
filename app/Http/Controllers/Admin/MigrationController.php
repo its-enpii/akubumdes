@@ -32,6 +32,9 @@ final class MigrationController extends Controller
      */
     private const DISCOVERY_CACHE_TTL = 300;
 
+    /** Panjang maksimum kolom tenants.code. */
+    private const TENANT_CODE_MAX_LENGTH = 50;
+
     public function index(Request $request): Response
     {
         $tenants = Tenant::query()
@@ -316,14 +319,11 @@ final class MigrationController extends Controller
 
     private function autoProvisionTenant(string $districtCode, string $name, int $jenisAkun = 5): Tenant
     {
-        $code = $districtCode !== '' ? strtolower(str_replace('.', '-', $districtCode)) : Str::slug($name);
-        if ($code === '') {
-            $code = 'tenant';
-        }
+        $baseCode = $this->tenantCodeFrom($districtCode, $name);
 
-        $baseCode = $code;
+        $code = $baseCode;
         for ($suffix = 2; Tenant::query()->where('code', $code)->exists(); $suffix++) {
-            $code = $baseCode.'-'.$suffix;
+            $code = $this->tenantCodeWithSuffix($baseCode, $suffix);
         }
 
         $variant = match ($jenisAkun) {
@@ -353,6 +353,29 @@ final class MigrationController extends Controller
         }
 
         return $tenant;
+    }
+
+    /**
+     * Kode tenant turunan kd_desa legacy. Kode desa/kelurahan simak memakai
+     * titik (33.08.19.2001) sehingga titik diganti strip; hasilnya dibatasi
+     * sepanjang kolom tenants.code, sementara district_code menyimpan utuh.
+     */
+    private function tenantCodeFrom(string $districtCode, string $name): string
+    {
+        $code = $districtCode !== ''
+            ? strtolower(str_replace('.', '-', $districtCode))
+            : Str::slug($name);
+
+        return $code !== ''
+            ? Str::limit($code, self::TENANT_CODE_MAX_LENGTH, '')
+            : 'tenant';
+    }
+
+    private function tenantCodeWithSuffix(string $baseCode, int $suffix): string
+    {
+        $tail = '-'.$suffix;
+
+        return Str::limit($baseCode, self::TENANT_CODE_MAX_LENGTH - strlen($tail), '').$tail;
     }
 
     public function stream(CutoverRun $run, TenantCutoverRunnerService $runner): StreamedResponse

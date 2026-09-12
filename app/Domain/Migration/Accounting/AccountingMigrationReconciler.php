@@ -214,7 +214,7 @@ final class AccountingMigrationReconciler
         $this->legacy->assertSafeTableName($table);
         // Match normalizer: skip empty/zero jumlah (placeholders), count migratable rows only.
         $sql = "SELECT COUNT(*) AS c FROM `{$table}`
-                WHERE deleted_at IS NULL
+                WHERE {$this->softDeleteFilter($table)}
                   AND jumlah IS NOT NULL
                   AND TRIM(CAST(jumlah AS CHAR)) NOT IN ('', '0', '0.0', '0.00', '0,00')";
         $bindings = [];
@@ -234,7 +234,7 @@ final class AccountingMigrationReconciler
     {
         $this->legacy->assertSafeTableName($table);
         $sql = "SELECT jumlah FROM `{$table}`
-                WHERE deleted_at IS NULL
+                WHERE {$this->softDeleteFilter($table)}
                   AND jumlah IS NOT NULL
                   AND TRIM(CAST(jumlah AS CHAR)) NOT IN ('', '0', '0.0', '0.00', '0,00')";
         $bindings = [];
@@ -260,6 +260,20 @@ final class AccountingMigrationReconciler
         }
 
         return $sum;
+    }
+
+    /**
+     * Legacy SIMAK tables do not always carry a `deleted_at` column, so the
+     * soft-delete filter is only applied when the column actually exists.
+     */
+    private function softDeleteFilter(string $table): string
+    {
+        $columns = array_map(
+            static fn (object $column): string => (string) ($column->COLUMN_NAME ?? ''),
+            $this->legacy->columns($table),
+        );
+
+        return in_array('deleted_at', $columns, true) ? 'deleted_at IS NULL' : '1 = 1';
     }
 
     private function parseOpeningSide(mixed $raw): string

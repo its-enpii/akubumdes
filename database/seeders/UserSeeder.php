@@ -28,6 +28,7 @@ final class UserSeeder extends Seeder
                 'status' => 'active',
                 'tenant_id' => null,
                 'is_superadmin' => true,
+                'phone' => '081234567890',
             ],
         );
 
@@ -80,6 +81,7 @@ final class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'status' => 'active',
                 'is_superadmin' => false,
+                'phone' => '081234567891',
             ],
         );
 
