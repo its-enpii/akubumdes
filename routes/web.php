@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\TenantUserController as AdminTenantUserController
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Assets\AssetController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\HoldingSsoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Budgeting\BudgetController;
 use App\Http\Controllers\ChangelogController;
@@ -68,6 +69,10 @@ Route::get('/storage/{path}', StorageServeController::class)
 Route::get('/', [PublicSiteController::class, 'home'])
     ->middleware('public.site')
     ->name('home');
+
+Route::get('/auth/holding', [HoldingSsoController::class, 'store'])
+    ->middleware(['web', 'throttle:10,1'])
+    ->name('auth.holding');
 
 // Public tenant site content (blog & static pages). Rendered only on tenant
 // domains; platform hosts fall back to the vendor home inside the controller.
