@@ -6,6 +6,15 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
 ## [Unreleased]
 
 ### Added
+- **Adaptasi Pipeline Migrasi Legacy ke Skema SIMAK:**
+  - Koneksi legacy database mendukung alias `SIMAK_DB_*` di `config/database.php` dan `.env.example` dengan default database `simak`.
+  - `MigrationController::resolveLegacyTenants()` membaca daftar `usaha` (`id`, `nama_usaha`, `jenis_akun`, `kd_desa`) dan memetakan jenis akun (5=Standard, 7=Trading, 8=Cooperative) ke varian Next (`standard`, `trading`, `cooperative`).
+  - Pembuatan tenant otomatis (`autoProvisionTenant`) mengonfigurasi `coa_variant` sesuai `jenis_akun` legacy dan menderivasi kode tenant dari `kd_desa`.
+  - Service `LegacyCoaImporter` untuk impor COA multi-varian dari `akun_level_1` / `1s` / `1_koperasi`, `akun_level_2` / `2s` / `2_koperasi`, `akun_{lokasi}`, dan `rekening_{lokasi}` / `accounts_{lokasi}` dengan pemetaan `jenis_mutasi` ke `normal_balance` serta `tgl_nonaktif` ke status aktif.
+  - `LegacyAccountingExtractor`, `LegacyAccountingNormalizer`, dan `LegacyMonthlyBalanceLoader` mengekstrak `saldo_{lokasi}` (bulan 0 -> opening balances, bulan 1-12 -> account monthly balances) dan `transaksi_{lokasi}` secara aman.
+  - Audit urutan rantai cutover (`legacy:cutover-tenant`): fiscal periods -> COA varian -> accounting -> sequences.
+  - Pembaruan dokumentasi `docs/CUTOVER_RUNBOOK.md`, `docs/DATABASE_STRUCTURE.md`, dan `docs/PERBANDINGAN_DATABASE_LEGACY_VS_NEXT.md`.
+  - Feature test `SimakMigrationTest` memverifikasi resolusi varian, impor COA varian standard/trading, dan pemetaan saldo opening/monthly.
 - Varian COA multi-model usaha (`standard`, `trading`, `cooperative`) pada platform tenants, tiga template provisioning paritas Simak, serta strategi laporan laba rugi per varian termasuk Laba Kotor/HPP dan Perhitungan Hasil Usaha.
 - Field dan validasi varian COA pada pendaftaran/edit tenant dengan re-provision idempotent setelah varian berubah.
 

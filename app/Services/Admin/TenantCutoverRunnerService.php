@@ -231,7 +231,10 @@ final class TenantCutoverRunnerService
                 'name' => 'chart-of-accounts',
                 'label' => 'Import Bagan Akun COA Legacy',
                 'command' => 'tenancy:import-legacy-chart-of-accounts',
-                'params' => ['tenant' => $tenantCode],
+                'params' => [
+                    'tenant' => $tenantCode,
+                    '--suffix' => $suffix,
+                ],
                 'skip' => ! empty($options['skip_coa']) || $dryRun,
             ],
             [

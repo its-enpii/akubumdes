@@ -1,14 +1,14 @@
-# Runbook cutover 1 tenant (Phase 5 rehearsal)
+# Runbook cutover 1 tenant (SIMAK → Next)
 
-Rehearsal per tenant: **legacy suffix** → Next tenant code.  
-Pilot referensi: `suffix=1` → `tenant=local` (Phase 3–4 hijau).
+Rehearsal per tenant: **legacy suffix (`usaha.id`)** → Next tenant code & varian COA.  
+Pilot referensi: `suffix=1` → `tenant=local`.
 
-## Prinsip (PROJECT_OVERVIEW §12.2)
+## Prinsip
 
-1. Tenant maintenance / read-only di legacy (produksi).  
-2. Backup terverifikasi.  
+1. Tenant maintenance / read-only di legacy SIMAK (produksi).  
+2. Backup terverifikasi (`mysqldump simak`).  
 3. Migrate + recon.  
-4. Smoke UI + laporan.  
+4. Smoke UI + laporan keuangan.  
 5. Switch placement (jika belum).  
 6. Legacy read-only.  
 
@@ -18,46 +18,40 @@ Rehearsal dev **tanpa** maintenance/backup live — tetap jalankan chain Artisan
 
 | Item | Cek |
 |---|---|
-| `LEGACY_DB_*` di `.env` (password tidak di git) | `legacy:discover-accounting --suffix=N` |
-| Platform tenant + placement + shard | `tenants.code`, `tenant_placements` |
+| `SIMAK_DB_*` / `LEGACY_DB_*` di `.env` | `legacy:discover-accounting --suffix=N` |
+| Platform tenant + placement + shard | `tenants.code`, `tenants.coa_variant`, `tenant_placements` |
 | Shard schema migrasi | `tenancy:migrate-shards` |
-| COA postable di tenant | `tenancy:import-legacy-chart-of-accounts {tenant}` |
-| Docker (Laragon) | host DB = `mysql` → **wajib** `docker exec new_sidbm-app-1 …` |
-
-Prefix perintah di bawah:  
-`docker exec new_sidbm-app-1 php artisan`
+| COA varian di tenant | `tenancy:import-legacy-chart-of-accounts {tenant} --suffix={suffix}` |
+| Koneksi DB Legacy | default database = `simak` |
 
 ## Urutan load (wajib)
 
 ```text
 fiscal periods
-  → COA (jika belum)
-  → accounting (transaksi + saldo0)
-  → villages (legacy:sync-villages — termasuk desa custom)
-  → membership (anggota + kelompok; pipeline juga auto-sync villages)
-  → lending (pinjaman_kelompok + pinjaman_anggota + rencana + real)
-  → apply payment → installment progress
-  → reconcile lending (§65 + exceptions)
-  → sequences (pipeline biasanya sudah bump)
+  → COA varian (standard / trading / cooperative dari akun_level_* + akun_{lokasi} + rekening_{lokasi}/accounts_{lokasi})
+  → accounting (transaksi_{lokasi} + saldo_{lokasi} bulan 0 untuk opening & bulan 1-12 untuk monthly balances)
+  → sequences (sinkronisasi nomor urut sekuensial tenant)
 ```
 
-Desa: `kelompok.desa` / `anggota.desa` = `desa.kd_desa` (bisa custom, bukan hanya BPS API).
-Command: `legacy:sync-villages {tenant} {suffix}` — seed `organization_units` + backfill FK.
+Mapping varian `usaha.jenis_akun`:
+- `5` → `standard` (BUMDes Standar — `rekening_{lokasi}`)
+- `7` → `trading` (Unit Usaha Perdagangan — `accounts_{lokasi}`)
+- `8` → `cooperative` (Koperasi — `rekening_{lokasi}`)
 
-**Idempotent:** re-run skip baris yang sudah di `legacy_record_mappings`.
+**Idempotent:** re-run skip baris yang sudah terdaftar di `legacy_record_mappings`.
 
 ## Command orchestrator
 
 ```bash
 # Dry-run full chain (validasi saja di tiap step migrate)
-docker exec new_sidbm-app-1 php artisan legacy:cutover-tenant local 1 --dry-run
+php artisan legacy:cutover-tenant local 1 --dry-run
 
 # Full load rehearsal
-docker exec new_sidbm-app-1 php artisan legacy:cutover-tenant local 1 \
+php artisan legacy:cutover-tenant local 1 \
   --from-year=2018 --to-year=2026 --chunk=500 --no-fail-fast
 
-# Skip step yang sudah hijau
-docker exec new_sidbm-app-1 php artisan legacy:cutover-tenant local 1 \
+# Skip step yang sudah selesai
+php artisan legacy:cutover-tenant local 1 \
   --skip-fiscal --skip-coa --skip-accounting
 ```
 
@@ -68,33 +62,18 @@ Ganti `TENANT` / `SUFFIX`.
 ```bash
 # 0. Discover (read-only)
 php artisan legacy:discover-accounting --suffix=SUFFIX
-php artisan legacy:discover-membership --suffix=SUFFIX
 
-# 1. Fiscal
+# 1. Fiscal Periods
 php artisan legacy:ensure-fiscal-periods TENANT --from=2018 --to=2026
 
-# 2. COA (sekali per tenant)
-php artisan tenancy:import-legacy-chart-of-accounts TENANT
+# 2. COA Varian Legacy (sekali per tenant)
+php artisan tenancy:import-legacy-chart-of-accounts TENANT --suffix=SUFFIX
 
-# 3. Accounting
+# 3. Accounting (Transaksi + Saldo Opening & Monthly)
 php artisan legacy:migrate-accounting TENANT SUFFIX --dry-run --chunk=500
 php artisan legacy:migrate-accounting TENANT SUFFIX --chunk=500 --no-fail-fast
 
-# 4. Membership
-php artisan legacy:migrate-membership TENANT SUFFIX --dry-run --chunk=500
-php artisan legacy:migrate-membership TENANT SUFFIX --chunk=500 --no-fail-fast
-
-# 5. Lending
-php artisan legacy:migrate-lending TENANT SUFFIX --dry-run --chunk=500
-php artisan legacy:migrate-lending TENANT SUFFIX --chunk=500 --no-fail-fast
-
-# 6. Progress angsuran (jika lending sudah pernah load tanpa apply)
-php artisan legacy:apply-loan-payment-progress TENANT
-
-# 7. Recon pinjaman
-php artisan legacy:reconcile-lending TENANT SUFFIX
-
-# 8. Sequences (opsional; pipeline biasanya sudah)
+# 4. Sequences
 php artisan tenancy:initialize-sequences TENANT
 ```
 
@@ -102,59 +81,26 @@ php artisan tenancy:initialize-sequences TENANT
 
 ### Counts
 
-- [ ] `anggota_N` active ≈ `members`  
-- [ ] `kelompok_N` ≈ `groups`  
-- [ ] `pinjaman_kelompok_N` = `loans` where `legacy_source=group_loan`  
-- [ ] `transaksi_N` migratable ≈ `journal_entries` source legacy (± exception disetujui)  
+- [ ] `usaha.id` = `suffix` terpetakan ke `tenants.code` dengan `coa_variant` sesuai.  
+- [ ] `transaksi_{suffix}` migratable ≈ `journal_entries` source legacy.  
+- [ ] `saldo_{suffix}` bulan 0 = `account_opening_balances`.  
+- [ ] `saldo_{suffix}` bulan 1..12 = `account_monthly_balances`.  
 
 ### Accounting
 
-- [ ] Openings bulan0 match (±0.01)  
-- [ ] Neraca / Laba Rugi / Neraca Saldo seimbang vs legacy spot  
-- [ ] Buku Besar 3 footer totals  
-
-### Lending
-
-- [ ] `legacy:reconcile-lending` → `group_loans` **matched**  
-- [ ] `loan_balance` matched **atau** partial + exception `pending_approval` ditinjau  
-- [ ] Spot 1 pinjaman aktif: sisa pokok = last `saldo_pokok` legacy  
-- [ ] UI detail pinjaman menampilkan **legacy `id`**, bukan hanya `row_id`  
-
-### Ops / data kotor (bukan silent fix)
-
-- [ ] Exception missing `nia` (beneficiary)  
-- [ ] Exception orphan `rencana`  
-- [ ] Pengurus kosong → isi via form “Simpan Pengurus” (sekali, irrevocable)  
-- [ ] Gap jurnal (jika ada) dicatat  
+- [ ] Openings bulan 0 match (±0.01).  
+- [ ] Saldo bulanan dan Neraca / Laba Rugi seimbang vs legacy SIMAK.  
+- [ ] Buku Besar 3 footer totals (Debit, Kredit, Saldo Akhir) valid.  
 
 ### Smoke UI
 
-- [ ] `/master-data/members`, `/master-data/groups`  
-- [ ] `/lending/loans?tab=aktif`  
-- [ ] `/accounting/reports/*`  
-- [ ] Dashboard KPI load  
-
-## Known gaps pilot `local` / suffix `1` (signed disposition)
-
-| Item | Status | Disposition |
-|---|---|---|
-| Journals | **matched** 19075 | gap 2 rows loaded on re-cutover |
-| Payments | **matched** 7542 | zero-placeholder skip; negative reversals loaded |
-| loan_balance §65 | **matched** 921/921 | outstanding = `disbursed − Σ realisasi` (ignore dirty last saldo) |
-| Beneficiaries 182 nia orphan | **approve_skip** | `nia` not in `anggota_1` (id range below min anggota) — no invent people |
-| Installments 24 orphan | **approve_skip** | `loan_id` not in `pinjaman_kelompok_1` — deleted parent |
-| Committee 0/921 | ops | free-text legacy; UI “Simpan Pengurus” one-shot |
-| `group_members` tipis | known | only resolvable officers at membership load |
-
-## Out of scope runbook ini
-
-- Multi-suffix production batch (Phase 6)  
-- UI admin migrasi  
-- Hapus / putus legacy DB  
-- Holding server terpisah  
+- [ ] `/accounting/chart-of-accounts` (struktur pohon akun 4-level sesuai varian).  
+- [ ] `/accounting/journal` (jurnal terposting dari legacy).  
+- [ ] `/accounting/reports/balance-sheet` (Neraca seimbang).  
+- [ ] `/accounting/reports/income-statement` (Laba Rugi sesuai varian BUMDes/Trading/Koperasi).  
+- [ ] `/admin/migration` (monitoring eksekusi cutover run).  
 
 ## Referensi
 
-- `PROJECT_OVERVIEW.md` §11 Phase 5–6, §12 cutover, §14 DoD  
-- `DATABASE_STRUCTURE.md` §59–65  
-- `VALIDATION.md`  
+- `docs/DATABASE_STRUCTURE.md`
+- `docs/PERBANDINGAN_DATABASE_LEGACY_VS_NEXT.md`

@@ -78,8 +78,14 @@ final class MigrateLegacyAccounting extends Command
             $this->line('Would insert journals: '.$result['would_insert_journals']);
             $this->line('Would skip (mapped): '.$result['would_skip_journals']);
             $this->line('Would insert openings: '.$result['would_insert_openings']);
+            if (isset($result['would_insert_monthly'])) {
+                $this->line('Would insert monthly: '.$result['would_insert_monthly']);
+            }
             $this->line('Inserted journals: '.$result['inserted_journals']);
             $this->line('Inserted openings: '.$result['inserted_openings']);
+            if (isset($result['inserted_monthly'])) {
+                $this->line('Inserted monthly: '.$result['inserted_monthly']);
+            }
             $this->line('Status: '.$result['status']);
             if ($result['batch_row_id'] !== null) {
                 $this->line('Batch row_id: '.$result['batch_row_id']);

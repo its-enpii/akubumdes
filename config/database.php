@@ -60,17 +60,18 @@ return [
             ]) : [],
         ],
 
-        // Legacy SIDBM source (SELECT only — never write from app code).
+        // Legacy SIMAK source (SELECT only — never write from app code).
+        // SIMAK_DB_* is supported as alias to LEGACY_DB_*.
         'legacy' => [
             'driver' => 'mysql',
-            'host' => env('LEGACY_DB_HOST', '127.0.0.1'),
-            'port' => env('LEGACY_DB_PORT', '3306'),
-            'database' => env('LEGACY_DB_DATABASE', 'sidbm'),
-            'username' => env('LEGACY_DB_USERNAME', 'root'),
-            'password' => env('LEGACY_DB_PASSWORD', ''),
-            'unix_socket' => env('LEGACY_DB_SOCKET', ''),
-            'charset' => env('LEGACY_DB_CHARSET', 'utf8mb4'),
-            'collation' => env('LEGACY_DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'host' => env('SIMAK_DB_HOST', env('LEGACY_DB_HOST', '127.0.0.1')),
+            'port' => env('SIMAK_DB_PORT', env('LEGACY_DB_PORT', '3306')),
+            'database' => env('SIMAK_DB_DATABASE', env('LEGACY_DB_DATABASE', 'simak')),
+            'username' => env('SIMAK_DB_USERNAME', env('LEGACY_DB_USERNAME', 'root')),
+            'password' => env('SIMAK_DB_PASSWORD', env('LEGACY_DB_PASSWORD', '')),
+            'unix_socket' => env('SIMAK_DB_SOCKET', env('LEGACY_DB_SOCKET', '')),
+            'charset' => env('SIMAK_DB_CHARSET', env('LEGACY_DB_CHARSET', 'utf8mb4')),
+            'collation' => env('SIMAK_DB_COLLATION', env('LEGACY_DB_COLLATION', 'utf8mb4_unicode_ci')),
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,

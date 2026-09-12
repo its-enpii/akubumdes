@@ -6,6 +6,7 @@ namespace App\Domain\Migration\Accounting;
 
 use App\Domain\Accounting\Models\Account;
 use App\Domain\Migration\Accounting\DTO\NormalizedJournal;
+use App\Domain\Migration\Accounting\DTO\NormalizedMonthly;
 use App\Domain\Migration\Accounting\DTO\NormalizedOpening;
 use App\Domain\Migration\Support\LegacyAmountParser;
 use App\Tenancy\TenantContext;
@@ -123,6 +124,60 @@ final class LegacyAccountingNormalizer
                 amount: $amount,
                 amountRaw: is_scalar($rawAmount) ? (string) $rawAmount : '',
                 snapshot: $snapshot,
+            ),
+            'error' => null,
+            'skip' => false,
+        ];
+    }
+
+    /**
+     * @return array{ok: NormalizedMonthly|null, error: string|null, skip: bool}
+     */
+    public function normalizeMonthly(object $row, string $sourceTable, callable $isMapped): array
+    {
+        $code = trim((string) ($row->kode_akun ?? ''));
+        $year = (int) ($row->tahun ?? 0);
+        $month = (int) ($row->bulan ?? 0);
+        if ($code === '' || $year < 2000 || $month < 1 || $month > 12) {
+            return ['ok' => null, 'error' => "Invalid monthly code/year/month [{$code}/{$year}/{$month}]", 'skip' => false];
+        }
+
+        $sourceId = "{$year}:{$month}:{$code}";
+        if ($isMapped($sourceTable, $sourceId, (string) $month)) {
+            return ['ok' => null, 'error' => null, 'skip' => true];
+        }
+
+        $account = $this->resolveAny($code);
+        if ($account === null) {
+            if ($this->looksLikeChartCode($code)) {
+                return ['ok' => null, 'error' => "Monthly missing account [{$code}] year={$year} month={$month}", 'skip' => false];
+            }
+
+            return ['ok' => null, 'error' => null, 'skip' => true];
+        }
+
+        try {
+            $debitRaw = $row->debit ?? '0';
+            $creditRaw = $row->kredit ?? $row->credit ?? '0';
+            $debit = $this->parseNonNegative($debitRaw);
+            $credit = $this->parseNonNegative($creditRaw);
+        } catch (InvalidArgumentException $e) {
+            return ['ok' => null, 'error' => "Monthly {$sourceId}: {$e->getMessage()}", 'skip' => false];
+        }
+
+        if (bccomp($debit, '0.00', 2) === 0 && bccomp($credit, '0.00', 2) === 0) {
+            return ['ok' => null, 'error' => null, 'skip' => true];
+        }
+
+        return [
+            'ok' => new NormalizedMonthly(
+                accountCode: $code,
+                accountRowId: $account['row_id'],
+                fiscalYear: $year,
+                fiscalMonth: $month,
+                debit: $debit,
+                credit: $credit,
+                sourceId: $sourceId,
             ),
             'error' => null,
             'skip' => false,

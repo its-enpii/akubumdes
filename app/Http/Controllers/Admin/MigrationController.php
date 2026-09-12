@@ -9,7 +9,9 @@ use App\Domain\Migration\Support\LegacyConnection;
 use App\Http\Controllers\Controller;
 use App\Jobs\RunTenantCutoverJob;
 use App\Models\Platform\CutoverRun;
+use App\Models\Platform\DatabaseShard;
 use App\Models\Platform\Tenant;
+use App\Models\Platform\TenantPlacement;
 use App\Services\Admin\TenantCutoverRunnerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -33,13 +35,10 @@ final class MigrationController extends Controller
     public function index(Request $request): Response
     {
         $tenants = Tenant::query()
-            ->select(['row_id', 'code', 'name', 'status'])
+            ->select(['row_id', 'code', 'name', 'status', 'coa_variant'])
             ->orderBy('name')
             ->get();
 
-        // Discovery is intentionally NOT called here — it can take 60+ seconds
-        // against a remote legacy MySQL. The Vue page loads instantly and
-        // triggers /admin/migration/discover via AJAX (cached for 5 min).
         $discoveredSuffixes = [];
 
         $runs = CutoverRun::query()
@@ -69,7 +68,7 @@ final class MigrationController extends Controller
             'legacy_config' => [
                 'host' => (string) config('database.connections.legacy.host', '127.0.0.1'),
                 'port' => (int) config('database.connections.legacy.port', 3306),
-                'database' => (string) config('database.connections.legacy.database', 'sidbm'),
+                'database' => (string) config('database.connections.legacy.database', 'simak'),
             ],
             'discovered_suffixes' => $discoveredSuffixes,
         ]);
@@ -104,7 +103,7 @@ final class MigrationController extends Controller
 
             try {
                 $legacy = $legacyConnection->selectOne(
-                    'SELECT id, nama_kec, kd_kec, web_kec FROM kecamatan WHERE id = ? LIMIT 1',
+                    'SELECT id, nama_usaha, jenis_akun, kd_desa FROM usaha WHERE id = ? LIMIT 1',
                     [(int) $validated['legacy_id']],
                 );
             } catch (\Throwable $e) {
@@ -115,15 +114,25 @@ final class MigrationController extends Controller
 
             if ($legacy === null) {
                 throw ValidationException::withMessages([
-                    'legacy_id' => 'Kecamatan legacy tidak ditemukan.',
+                    'legacy_id' => 'Usaha legacy tidak ditemukan.',
                 ]);
             }
 
-            $legacyCode = (string) ($legacy->kd_kec ?? '');
-            $tenant = Tenant::query()->where('district_code', $legacyCode)->first();
+            $legacyCode = trim((string) ($legacy->kd_desa ?? ''));
+            $jenisAkun = (int) ($legacy->jenis_akun ?? 5);
+            $variant = match ($jenisAkun) {
+                7 => 'trading',
+                8 => 'cooperative',
+                default => 'standard',
+            };
+
+            $tenant = null;
+            if ($legacyCode !== '') {
+                $tenant = Tenant::query()->where('district_code', $legacyCode)->first();
+            }
 
             if ($tenant === null && (bool) ($validated['auto_provision'] ?? false)) {
-                $tenant = $this->autoProvisionTenant($legacyCode, (string) $legacy->nama_kec, (string) ($legacy->web_kec ?? ''));
+                $tenant = $this->autoProvisionTenant($legacyCode, (string) $legacy->nama_usaha, $jenisAkun);
                 $autoProvisioned = true;
             }
 
@@ -133,15 +142,17 @@ final class MigrationController extends Controller
 
             if ($tenant === null) {
                 throw ValidationException::withMessages([
-                    'tenant_id' => 'Tenant Next belum tersedia untuk kd_kec '.$legacyCode.'. Pilih tenant manual atau aktifkan pembuatan tenant otomatis.',
+                    'tenant_id' => 'Tenant Next belum tersedia untuk kd_desa '.$legacyCode.'. Pilih tenant manual atau aktifkan pembuatan tenant otomatis.',
                 ]);
             }
 
             $suffix = (string) $legacy->id;
             $runOptions = [
                 'legacy_id' => (int) $legacy->id,
-                'legacy_name' => (string) $legacy->nama_kec,
+                'legacy_name' => (string) $legacy->nama_usaha,
                 'legacy_code' => $legacyCode,
+                'jenis_akun' => $jenisAkun,
+                'coa_variant' => $variant,
                 'auto_provisioned' => $autoProvisioned,
             ];
         } else {
@@ -177,7 +188,6 @@ final class MigrationController extends Controller
         ]);
 
         if (! empty($validated['run_immediately'])) {
-            // Run synchronously for instant feedback in dev/testing
             app(TenantCutoverRunnerService::class)->execute($run);
         } else {
             RunTenantCutoverJob::dispatch($run);
@@ -191,11 +201,11 @@ final class MigrationController extends Controller
     }
 
     /**
-     * Lightweight legacy kecamatan list with Next tenant enrichment.
+     * Lightweight legacy usaha list with Next tenant enrichment.
      */
     public function legacyTenants(Request $request): JsonResponse
     {
-        $cacheKey = 'admin.migration.legacy_tenants.v1';
+        $cacheKey = 'admin.migration.legacy_tenants.v2';
 
         if ($request->boolean('refresh')) {
             Cache::forget($cacheKey);
@@ -224,44 +234,89 @@ final class MigrationController extends Controller
     }
 
     /**
-     * @return list<array{legacy_id: int, legacy_name: string, legacy_code: string, legacy_domain: string|null, next_tenant: array{row_id: int, code: string, name: string}|null}>
+     * @return list<array{
+     *   legacy_id: int,
+     *   legacy_name: string,
+     *   legacy_code: string,
+     *   jenis_akun: int,
+     *   jenis_akun_label: string,
+     *   coa_variant: string,
+     *   next_tenant: array{row_id: int, code: string, name: string, coa_variant: string}|null
+     * }>
      */
-    private function resolveLegacyTenants(): array
+    public function resolveLegacyTenants(): array
     {
         $rows = app(LegacyConnection::class)->select(
-            'SELECT id, nama_kec, kd_kec, web_kec FROM kecamatan ORDER BY nama_kec ASC',
+            'SELECT id, nama_usaha, jenis_akun, kd_desa FROM usaha ORDER BY nama_usaha ASC',
         );
 
         $codes = [];
         foreach ($rows as $row) {
-            if ((string) ($row->kd_kec ?? '') !== '') {
-                $codes[] = (string) $row->kd_kec;
+            $code = trim((string) ($row->kd_desa ?? ''));
+            if ($code !== '') {
+                $codes[] = $code;
             }
         }
 
         $nextTenants = Tenant::query()
-            ->whereIn('district_code', array_values(array_unique($codes)))
-            ->get(['row_id', 'code', 'name', 'district_code'])
-            ->keyBy('district_code');
+            ->where(function ($q) use ($codes): void {
+                if ($codes !== []) {
+                    $q->whereIn('district_code', array_values(array_unique($codes)))
+                        ->orWhereIn('code', array_values(array_unique($codes)));
+                }
+            })
+            ->get(['row_id', 'code', 'name', 'district_code', 'coa_variant']);
 
-        return array_map(static fn (object $row): array => [
-            'legacy_id' => (int) $row->id,
-            'legacy_name' => (string) $row->nama_kec,
-            'legacy_code' => (string) $row->kd_kec,
-            'legacy_domain' => $row->web_kec !== null ? (string) $row->web_kec : null,
-            'next_tenant' => $nextTenants->get((string) $row->kd_kec) !== null
-                ? [
-                    'row_id' => (int) $nextTenants->get((string) $row->kd_kec)->row_id,
-                    'code' => (string) $nextTenants->get((string) $row->kd_kec)->code,
-                    'name' => (string) $nextTenants->get((string) $row->kd_kec)->name,
-                ]
-                : null,
-        ], $rows);
+        $nextByDistrict = [];
+        $nextByCode = [];
+        foreach ($nextTenants as $t) {
+            if ($t->district_code) {
+                $nextByDistrict[$t->district_code] = $t;
+            }
+            $nextByCode[$t->code] = $t;
+        }
+
+        return array_map(static function (object $row) use ($nextByDistrict, $nextByCode): array {
+            $code = trim((string) ($row->kd_desa ?? ''));
+            $jenisAkun = (int) ($row->jenis_akun ?? 5);
+            $variant = match ($jenisAkun) {
+                7 => 'trading',
+                8 => 'cooperative',
+                default => 'standard',
+            };
+            $variantLabel = match ($jenisAkun) {
+                7 => 'Trading',
+                8 => 'Cooperative',
+                default => 'Standard',
+            };
+
+            $matchedTenant = null;
+            if ($code !== '') {
+                $matchedTenant = $nextByDistrict[$code] ?? $nextByCode[$code] ?? null;
+            }
+
+            return [
+                'legacy_id' => (int) $row->id,
+                'legacy_name' => (string) ($row->nama_usaha ?? 'Usaha #'.$row->id),
+                'legacy_code' => $code,
+                'jenis_akun' => $jenisAkun,
+                'jenis_akun_label' => $variantLabel,
+                'coa_variant' => $variant,
+                'next_tenant' => $matchedTenant !== null
+                    ? [
+                        'row_id' => (int) $matchedTenant->row_id,
+                        'code' => (string) $matchedTenant->code,
+                        'name' => (string) $matchedTenant->name,
+                        'coa_variant' => (string) ($matchedTenant->coa_variant ?? 'standard'),
+                    ]
+                    : null,
+            ];
+        }, $rows);
     }
 
-    private function autoProvisionTenant(string $districtCode, string $name, string $domain): Tenant
+    private function autoProvisionTenant(string $districtCode, string $name, int $jenisAkun = 5): Tenant
     {
-        $code = $districtCode !== '' ? $districtCode : Str::slug($name);
+        $code = $districtCode !== '' ? strtolower(str_replace('.', '-', $districtCode)) : Str::slug($name);
         if ($code === '') {
             $code = 'tenant';
         }
@@ -271,15 +326,33 @@ final class MigrationController extends Controller
             $code = $baseCode.'-'.$suffix;
         }
 
-        return Tenant::query()->create([
+        $variant = match ($jenisAkun) {
+            7 => 'trading',
+            8 => 'cooperative',
+            default => 'standard',
+        };
+
+        $tenant = Tenant::query()->create([
             'public_id' => (string) Str::ulid(),
             'code' => $code,
             'name' => $name !== '' ? $name : 'Tenant '.$districtCode,
             'district_code' => $districtCode !== '' ? $districtCode : null,
+            'coa_variant' => $variant,
             'status' => 'provisioning',
             'timezone' => 'Asia/Jakarta',
-            'metadata' => $domain !== '' ? ['domains' => [$domain]] : null,
         ]);
+
+        $shard = DatabaseShard::query()->where('status', 'active')->orderBy('row_id')->first();
+        if ($shard !== null) {
+            TenantPlacement::query()->create([
+                'tenant_id' => $tenant->row_id,
+                'shard_id' => $shard->row_id,
+                'status' => 'active',
+                'placed_at' => now(),
+            ]);
+        }
+
+        return $tenant;
     }
 
     public function stream(CutoverRun $run, TenantCutoverRunnerService $runner): StreamedResponse
@@ -336,7 +409,7 @@ final class MigrationController extends Controller
     {
         $force = $request->boolean('refresh');
 
-        $cacheKey = 'admin.migration.discovery.v1';
+        $cacheKey = 'admin.migration.discovery.v2';
 
         if ($force) {
             Cache::forget($cacheKey);

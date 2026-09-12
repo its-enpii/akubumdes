@@ -1,4 +1,4 @@
-# Perbandingan Database SIDBM Legacy vs. SIDBM Next (Modern)
+# Perbandingan Database SIMAK Legacy vs. Next (Modern)
 
 Dokumen ini berisi panduan komparasi arsitektur database, pemetaan tabel (*table mapping*), transformasi kolom (*column transformation*), dan relasi data antara **SIDBM Legacy** (sistem monolitik tabel dinamis) dan **SIDBM Next** (arsitektur multi-tenant modern dengan database platform dan sharding).
 
@@ -265,7 +265,12 @@ Pada SIDBM Legacy, pinjaman kelompok dan pinjaman anggota sering mengalami selis
 
 ## 4. Perbandingan Chart of Accounts (COA) & Hirarki Akun
 
-Pada SIDBM Legacy, struktur akun dipecah ke dalam 4 level tabel terpisah (`akun_level_1`, `akun_level_2`, `akun_level_3`, dan `rekening_{id}`). 
+Pada SIMAK Legacy, struktur akun terbagi berdasarkan varian lembaga (`usaha.jenis_akun`):
+- **BUMDes Standar (`jenis_akun = 5`)**: `akun_level_1`, `akun_level_2`, `akun_{lokasi}`, `rekening_{lokasi}`
+- **Unit Perdagangan (`jenis_akun = 7`)**: `akun_level_1s`, `akun_level_2s`, `akun_{lokasi}`, `accounts_{lokasi}`
+- **Koperasi (`jenis_akun = 8`)**: `akun_level_1_koperasi`, `akun_level_2_koperasi`, `akun_{lokasi}`, `rekening_{lokasi}`
+
+Pada Next, seluruh hierarki akun disatukan ke dalam satu tabel rekursif `accounts` yang fleksibel dengan relasi `parent_row_id` dan atribut `coa_variant` pada level tenant.
 
 Pada SIDBM Next, seluruh hirarki akun disatukan ke dalam satu tabel rekursif `accounts` yang fleksibel dengan relasi `parent_row_id`:
 
@@ -298,24 +303,21 @@ CREATE TABLE `accounts` (
 Untuk mengeksekusi transformasi data dari tabel legacy ke skema Next, telah disediakan serangkaian perintah artisan otomatis yang aman dan dapat diuji coba (*dry-run*):
 
 ```bash
-# 1. Discover & Analisis Struktur Data Legacy
-php artisan legacy:discover-membership {tenant_id} {lokasi_id}
-php artisan legacy:discover-accounting {tenant_id} {lokasi_id}
+# 1. Discover & Analisis Struktur Data Legacy SIMAK
+php artisan legacy:discover-accounting --suffix={lokasi_id}
 
-# 2. Migrasi Data Master & Keanggotaan (anggota & kelompok -> people, members, groups)
-php artisan legacy:migrate-membership {tenant_id} {lokasi_id} --dry-run
-php artisan legacy:migrate-membership {tenant_id} {lokasi_id}
+# 2. Inisialisasi Periode Fiskal
+php artisan legacy:ensure-fiscal-periods {tenant} --from=2018 --to=2026
 
-# 3. Migrasi Akuntansi & Jurnal Transaksi (rekening & transaksi -> accounts, journals)
-php artisan legacy:migrate-accounting {tenant_id} {lokasi_id} --dry-run
-php artisan legacy:migrate-accounting {tenant_id} {lokasi_id}
+# 3. Migrasi Bagan Akun (COA) Varian Legacy
+php artisan tenancy:import-legacy-chart-of-accounts {tenant} --suffix={lokasi_id}
 
-# 4. Migrasi Pinjaman & Realisasi Angsuran (pinjaman & angsuran -> loans, payments)
-php artisan legacy:migrate-lending {tenant_id} {lokasi_id} --dry-run
-php artisan legacy:migrate-lending {tenant_id} {lokasi_id}
+# 4. Migrasi Akuntansi & Saldo (Opening bulan 0 + Monthly bulan 1-12 + Jurnal Transaksi)
+php artisan legacy:migrate-accounting {tenant} {lokasi_id} --dry-run --chunk=500
+php artisan legacy:migrate-accounting {tenant} {lokasi_id} --chunk=500 --no-fail-fast
 
-# 5. Rekonsiliasi & Validasi Integritas Data Pasca-Migrasi
-php artisan legacy:reconcile-lending {tenant_id}
+# 5. Inisialisasi Sequence Nomor Urut
+php artisan tenancy:initialize-sequences {tenant}
 ```
 
 ---

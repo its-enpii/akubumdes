@@ -7,6 +7,7 @@ namespace App\Domain\Migration\Accounting;
 use App\Domain\Accounting\Models\FiscalPeriod;
 use App\Domain\Accounting\Services\MonthlyBalanceRecalculator;
 use App\Domain\Migration\Accounting\DTO\NormalizedJournal;
+use App\Domain\Migration\Accounting\DTO\NormalizedMonthly;
 use App\Domain\Migration\Accounting\DTO\NormalizedOpening;
 use App\Domain\Migration\Support\LegacyConnection;
 use App\Tenancy\Services\TenantSequenceService;
@@ -25,6 +26,7 @@ final class AccountingMigrationPipeline
         private LegacyAccountingNormalizer $normalizer,
         private LegacyJournalLoader $journalLoader,
         private LegacyOpeningBalanceLoader $openingLoader,
+        private LegacyMonthlyBalanceLoader $monthlyLoader,
         private AccountingMigrationReconciler $reconciler,
         private MonthlyBalanceRecalculator $recalculator,
         private TenantSequenceService $sequences,
@@ -38,8 +40,10 @@ final class AccountingMigrationPipeline
      *   would_insert_journals: int,
      *   would_skip_journals: int,
      *   would_insert_openings: int,
+     *   would_insert_monthly: int,
      *   inserted_journals: int,
      *   inserted_openings: int,
+     *   inserted_monthly: int,
      *   errors: list<string>,
      *   recon: list<array<string, mixed>>,
      *   years: list<int>,
@@ -80,7 +84,9 @@ final class AccountingMigrationPipeline
         $wouldJournals = 0;
         $wouldSkip = 0;
         $wouldOpenings = 0;
+        $wouldMonthly = 0;
         $normalizedOpenings = [];
+        $normalizedMonthly = [];
         $years = [];
 
         $isMapped = function (string $sourceTable, string $sourceId, string $secondary = ''): bool {
@@ -113,6 +119,26 @@ final class AccountingMigrationPipeline
                 $ok = $r['ok'];
                 $normalizedOpenings[] = $ok;
                 $wouldOpenings++;
+                $years[$ok->fiscalYear] = true;
+            }
+
+            foreach ($this->extractor->monthlyBalances($suffix) as $row) {
+                $r = $this->normalizer->normalizeMonthly($row, $saldoTable, $isMapped);
+                if ($r['skip']) {
+                    continue;
+                }
+                if ($r['error'] !== null) {
+                    $errors[] = $r['error'];
+                    if ($failFast && ! $dryRun) {
+                        break;
+                    }
+
+                    continue;
+                }
+                /** @var NormalizedMonthly $ok */
+                $ok = $r['ok'];
+                $normalizedMonthly[] = $ok;
+                $wouldMonthly++;
                 $years[$ok->fiscalYear] = true;
             }
         }
@@ -150,8 +176,10 @@ final class AccountingMigrationPipeline
             'would_insert_journals' => $wouldJournals,
             'would_skip_journals' => $wouldSkip,
             'would_insert_openings' => $wouldOpenings,
+            'would_insert_monthly' => $wouldMonthly,
             'inserted_journals' => 0,
             'inserted_openings' => 0,
+            'inserted_monthly' => 0,
             'errors' => array_slice($errors, 0, 50),
             'error_count' => count($errors),
             'recon' => [],
@@ -177,6 +205,10 @@ final class AccountingMigrationPipeline
         try {
             if (! $skipOpenings && $normalizedOpenings !== []) {
                 $summary['inserted_openings'] = $this->openingLoader->load($batchRowId, $saldoTable, $normalizedOpenings);
+            }
+
+            if (! $skipOpenings && $normalizedMonthly !== []) {
+                $summary['inserted_monthly'] = $this->monthlyLoader->load($batchRowId, $saldoTable, $normalizedMonthly);
             }
 
             // Second pass load: re-stream legacy rows (memory-safe). Mapped skips handle dry pre-pass noise.
@@ -273,7 +305,7 @@ final class AccountingMigrationPipeline
         return (int) DB::connection($conn)->table('legacy_migration_batches')->insertGetId([
             'tenant_id' => $tenantId,
             'public_id' => (string) Str::ulid(),
-            'source_database' => (string) config('database.connections.legacy.database'),
+            'source_database' => (string) config('database.connections.legacy.database', 'simak'),
             'source_suffix' => $suffix,
             'status' => 'running',
             'started_at' => $now,
@@ -293,6 +325,7 @@ final class AccountingMigrationPipeline
     {
         $conn = (string) config('tenancy.tenant_connection', 'tenant');
         $now = now()->format('Y-m-d H:i:s');
+
         DB::connection($conn)->table('legacy_migration_batches')
             ->where('row_id', $batchRowId)
             ->update([
@@ -314,8 +347,5 @@ final class AccountingMigrationPipeline
                 ->max('id');
             $this->sequences->initializeAtLeast($table, $max + 1);
         }
-
-        // Also invoke command path for full table set when available in context
-        // (optional — above covers accounting).
     }
 }

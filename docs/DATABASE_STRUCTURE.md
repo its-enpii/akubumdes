@@ -683,7 +683,16 @@ Ketua, sekretaris, dan bendahara tidak lagi disimpan sebagai kolom nama bebas. R
 
 ## 24. `accounts`
 
-Menggantikan `akun_level_1`, `akun_level_2`, `akun_level_3`, dan `rekening_{tenant}`.
+Menggantikan hierarki akun SIMAK:
+- Master level-1: `akun_level_1` (Standar), `akun_level_1s` (Trading), `akun_level_1_koperasi` (Koperasi)
+- Master level-2: `akun_level_2`, `akun_level_2s`, `akun_level_2_koperasi`
+- Level-3 per lokasi: `akun_{lokasi}`
+- Chart posting per lokasi: `rekening_{lokasi}` (jenis 5/8) atau `accounts_{lokasi}` (jenis 7)
+
+Atribut akun ditransformasikan secara presisi:
+- `jenis_mutasi` ('debet'/'kredit') -> `normal_balance` ('D'/'C')
+- `tgl_nonaktif` -> `is_active` (false jika tgl <= hari ini) dan `deactivated_at`
+- `is_postable` = true untuk akun posting level terdalam (`rekening_{lokasi}` / `accounts_{lokasi}`), false untuk akun induk/header.
 
 ```text
 row_id
@@ -1588,10 +1597,14 @@ API publik menggunakan `public_id`, bukan `row_id` atau gabungan tenant dan loca
 | `rencana_angsuran_{tenant}` | `loan_installments` |
 | `real_angsuran_{tenant}` | `loan_payments`, `loan_payment_allocations` |
 | `penghapusan` | `loan_write_offs` |
-| `rekening_{tenant}` | `accounts`, `account_opening_balances` |
-| `akun_level_1..3` | `accounts` hierarchy |
-| `transaksi_{tenant}` | `journal_entries`, `journal_lines` |
-| `saldo_{tenant}` | `account_monthly_balances` hasil rekalkulasi |
+| `usaha` (jenis_akun 5/7/8) | `tenants` (`coa_variant`: standard, trading, cooperative) |
+| `akun_level_1` / `1s` / `1_koperasi` | `accounts` (Level 1) |
+| `akun_level_2` / `2s` / `2_koperasi` | `accounts` (Level 2) |
+| `akun_{lokasi}` | `accounts` (Level 3) |
+| `rekening_{lokasi}` / `accounts_{lokasi}` | `accounts` (Level 4 Postable, `normal_balance`, `is_active`) |
+| `transaksi_{lokasi}` | `journal_entries`, `journal_lines` |
+| `saldo_{lokasi}` (bulan = 0) | `account_opening_balances` |
+| `saldo_{lokasi}` (bulan 1-12) | `account_monthly_balances` |
 | `ebudgeting_{tenant}` | `budgets`, `budget_lines` |
 | `inventaris_{tenant}` | `assets`, `asset_categories` |
 | `users` | platform `users`, `tenant_memberships`, shard `user_roles` |

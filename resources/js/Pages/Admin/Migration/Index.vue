@@ -18,7 +18,7 @@ const props = defineProps({
   runs: { type: Object, required: true },
   legacy_config: {
     type: Object,
-    default: () => ({ host: "127.0.0.1", port: 3306, database: "sidbm" }),
+    default: () => ({ host: "127.0.0.1", port: 3306, database: "simak" }),
   },
   discovered_suffixes: { type: Array, default: () => [] },
 });
@@ -113,13 +113,14 @@ const selectedLegacyTenant = computed(
 const legacyTenantOptions = computed(() =>
   legacyTenants.value.map((item) => {
     const tenant = item.next_tenant;
+    const variantLabel = item.jenis_akun_label || (item.jenis_akun === 7 ? "Trading" : item.jenis_akun === 8 ? "Cooperative" : "Standard");
     return {
       value: item.legacy_id,
-      label: `${item.legacy_name} (${item.legacy_code})`,
+      label: `${item.legacy_name} [${variantLabel}] (${item.legacy_code || item.legacy_id})`,
       subtitle: tenant
-        ? `Target: ${tenant.name} (${tenant.code})`
-        : "Belum ada tenant Next — tenant baru dapat dibuat otomatis.",
-      badge: tenant ? tenant.name : "Belum ada tenant Next",
+        ? `Target: ${tenant.name} (${tenant.code}) • Varian: ${variantLabel}`
+        : `Belum ada tenant Next — otomatis buat tenant [${variantLabel}].`,
+      badge: tenant ? `${tenant.name} (${variantLabel})` : `Varian: ${variantLabel}`,
     };
   }),
 );
@@ -438,7 +439,7 @@ const runColumns = [
             Migrasi & Cutover Tenant
           </h1>
           <p class="text-sm text-on-surface-variant">
-            Eksekusi migrasi data dari database MySQL legacy SIDBM (transaksi_*,
+            Eksekusi migrasi data dari database MySQL legacy SIMAK (transaksi_*,
             saldo_*, dll) ke tenant Next platform.
           </p>
         </div>
@@ -464,7 +465,7 @@ const runColumns = [
                     :options="legacyTenantOptions"
                     :error="form.errors.legacy_id"
                     :loading="isLoadingLegacyTenants"
-                    hint="Nama kecamatan dicocokkan dengan district_code tenant Next."
+                    hint="Unit usaha legacy dicocokkan dengan district_code / kode tenant Next."
                     searchable
                     required
                   />
@@ -481,31 +482,36 @@ const runColumns = [
                     class="flex flex-wrap items-center justify-between gap-2"
                   >
                     <div>
-                      <p class="text-sm font-semibold text-primary">Target</p>
+                      <p class="text-sm font-semibold text-primary">{{ selectedLegacyTenant.legacy_name }}</p>
                       <p
                         v-if="selectedLegacyTenant.next_tenant"
                         class="text-xs text-on-surface-variant"
                       >
-                        {{ selectedLegacyTenant.next_tenant.name }} ({{
+                        Target Next: {{ selectedLegacyTenant.next_tenant.name }} ({{
                           selectedLegacyTenant.next_tenant.code
-                        }})
+                        }}) • Varian: {{ selectedLegacyTenant.jenis_akun_label }}
                       </p>
                       <p v-else class="text-xs text-on-surface-variant">
-                        Tenant Next belum ditemukan untuk kd_kec
-                        {{ selectedLegacyTenant.legacy_code }}.
+                        Tenant Next belum ditemukan untuk kd_desa
+                        {{ selectedLegacyTenant.legacy_code || '-' }} (Varian: {{ selectedLegacyTenant.jenis_akun_label }}).
                       </p>
                     </div>
-                    <AppBadge
-                      :tone="
-                        selectedLegacyTenant.next_tenant ? 'success' : 'warning'
-                      "
-                    >
-                      {{
-                        selectedLegacyTenant.next_tenant
-                          ? "Tenant Next ketemu"
-                          : "Belum ada tenant Next"
-                      }}
-                    </AppBadge>
+                    <div class="flex items-center gap-2">
+                      <AppBadge tone="primary">
+                        {{ selectedLegacyTenant.jenis_akun_label }} (Jenis {{ selectedLegacyTenant.jenis_akun }})
+                      </AppBadge>
+                      <AppBadge
+                        :tone="
+                          selectedLegacyTenant.next_tenant ? 'success' : 'warning'
+                        "
+                      >
+                        {{
+                          selectedLegacyTenant.next_tenant
+                            ? "Tenant Next Siap"
+                            : "Auto-Provision"
+                        }}
+                      </AppBadge>
+                    </div>
                   </div>
 
                   <div
@@ -759,7 +765,7 @@ const runColumns = [
                 <p>
                   Database:
                   <code class="font-mono font-bold text-primary">{{
-                    props.legacy_config?.database || "sidbm"
+                    props.legacy_config?.database || "simak"
                   }}</code>
                 </p>
               </div>
@@ -770,7 +776,7 @@ const runColumns = [
                   Sistem membaca database MySQL legacy
                   <code
                     class="rounded bg-surface-container px-1 py-0.5 font-mono text-[11px]"
-                    >{{ props.legacy_config?.database || "sidbm" }}</code
+                    >{{ props.legacy_config?.database || "simak" }}</code
                   >
                   yang telah dikonfigurasi di file
                   <code

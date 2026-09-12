@@ -186,7 +186,10 @@ final class CutoverTenant extends Command
             [
                 'name' => 'chart-of-accounts',
                 'command' => 'tenancy:import-legacy-chart-of-accounts',
-                'params' => ['tenant' => $tenant],
+                'params' => [
+                    'tenant' => $tenant,
+                    '--suffix' => $suffix,
+                ],
                 'skip' => (bool) $this->option('skip-coa') || $dryRun,
             ],
             [
