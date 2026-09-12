@@ -27,22 +27,9 @@ final class IncomeStatementData
         return Account::query()
             ->whereIn('account_type', ['revenue', 'expense'])
             ->where('is_postable', true)
-            ->whereDate('created_at', '<=', $periodUntil->toDateString())
-            ->where(function ($q) use ($periodFrom, $periodUntil): void {
+            ->where(function ($q) use ($periodFrom): void {
                 $q->whereNull('deactivated_at')
-                    ->orWhere('deactivated_at', '>=', $periodFrom->toDateString())
-                    ->orWhereIn('row_id', Account::query()
-                        ->from('accounts as future_accounts')
-                        ->join('journal_lines as lines', 'lines.account_row_id', '=', 'future_accounts.row_id')
-                        ->join('journal_entries as entries', function ($join): void {
-                            $join->on('entries.tenant_id', '=', 'lines.tenant_id')
-                                ->on('entries.row_id', '=', 'lines.journal_entry_row_id');
-                        })
-                        ->where('entries.status', 'posted')
-                        ->where('entries.transaction_date', '>=', $periodFrom->toDateString())
-                        ->where('entries.transaction_date', '<', $periodUntil->toDateString())
-                        ->whereDate('future_accounts.created_at', '<=', $periodUntil->toDateString())
-                        ->select('future_accounts.row_id'));
+                    ->orWhere('deactivated_at', '>=', $periodFrom->toDateString());
             })
             ->orderBy('code')
             ->get(['row_id', 'code', 'name', 'account_type', 'normal_balance', 'level', 'parent_row_id']);
