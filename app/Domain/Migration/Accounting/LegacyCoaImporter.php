@@ -409,6 +409,10 @@ final class LegacyCoaImporter
 
     private function mapAccountType(string $code): string
     {
+        if ($code === '0') {
+            return 'equity';
+        }
+
         $prefix = explode('.', $code)[0].'.';
 
         return match ($prefix) {

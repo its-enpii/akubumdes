@@ -196,6 +196,10 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
 - Middleware `BlockOfflineMutations` memberikan pengecualian mutasi hanya untuk pengguna tenant yang ditetapkan sebagai pengguna offline, sedangkan autentikasi mobile tetap di-whitelist.
 
 ### Fixed
+- **Dukungan Akun Penyeimbang Legacy '0' & Paritas Koperasi (PHU):**
+  - Menambahkan penanganan otomatis akun penyeimbang legacy `'0'` (tipe equity, saldo normal Kredit) pada `LegacyAccountingNormalizer` dan `LegacyCoaImporter` untuk menangani mutasi penyeimbang single-entry/balancing legacy.
+  - Memperbarui ekspresi reguler pendeteksi kode akun COA agar mendukung rentang level 1–7.
+  - Berhasil memverifikasi migrasi dan laporan keuangan untuk unit usaha Koperasi (`cooperative` / PHU) dan BUMDes Standard (`standard` / Surplus Defisit) dengan hasil neraca seimbang.
 - **Perbaikan Kebenaran Data Seluruh Laporan Akuntansi (Historis):**
   - Menghapus pembatasan filter `created_at` pada query akun di `BalanceSheetService`, `TrialBalanceService`, `EquityChangeService`, `GeneralLedgerService`, dan `CashFlowService`.
   - Memastikan seluruh akun hasil migrasi (yang diinsert dengan timestamp `now()`) dapat diaudit dan diagregasikan dengan tepat pada periode historis lampau.

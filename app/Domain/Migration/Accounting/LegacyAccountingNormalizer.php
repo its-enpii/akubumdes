@@ -303,6 +303,29 @@ final class LegacyAccountingNormalizer
             return null;
         }
 
+        if ($code === '0') {
+            try {
+                $account = Account::query()->create([
+                    'code' => '0',
+                    'name' => 'Akun Penyeimbang Legacy',
+                    'account_type' => 'equity',
+                    'normal_balance' => 'C',
+                    'level' => 4,
+                    'is_postable' => true,
+                    'is_active' => true,
+                ]);
+                $info = [
+                    'row_id' => (int) $account->row_id,
+                    'is_postable' => true,
+                ];
+                $this->accountsByCode['0'] = $info;
+
+                return $info;
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+
         $tenantId = $this->context->id();
         $conn = (string) config('tenancy.tenant_connection', 'tenant');
 
@@ -401,7 +424,8 @@ final class LegacyAccountingNormalizer
 
     private function looksLikeChartCode(string $code): bool
     {
-        // Standard SIDBM: 1.1.01.01 (lev1 1-5). Desa/kec keys like 33.08.19 are not COA.
-        return (bool) preg_match('/^[1-5](\.\d+){1,3}$/', $code);
+        // Standard SIDBM: 1.1.01.01 (lev1 1-7). Desa/kec keys like 33.08.19 are not COA.
+        // Code '0' is the legacy balancing account.
+        return $code === '0' || (bool) preg_match('/^[1-7](\.\d+){1,4}$/', $code);
     }
 }
