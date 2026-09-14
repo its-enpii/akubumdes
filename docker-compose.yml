@@ -10,6 +10,9 @@ services:
       - .:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - default
+      - web-network
     environment:
       APP_ENV: local
       PLATFORM_DB_HOST: mysql
@@ -45,6 +48,9 @@ services:
     command: php artisan queue:work redis --tries=3 --timeout=90
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - default
+      - web-network
     environment:
       APP_ENV: local
       PLATFORM_DB_HOST: mysql
