@@ -77,6 +77,52 @@ php artisan legacy:migrate-accounting TENANT SUFFIX --chunk=500 --no-fail-fast
 php artisan tenancy:initialize-sequences TENANT
 ```
 
+## Finalize (langkah penutup chain)
+
+Jalankan **setelah** seluruh step di atas selesai dan batch rekonsiliasi terakhir
+berstatus `matched` untuk semua scope. Command ini menutup cutover satu tenant.
+
+```bash
+php artisan tenancy:finalize-cutover 33-03-11-2014 --force
+
+# Password admin eksplisit (tanpa opsi ini password dibuat acak dan dicetak sekali)
+php artisan tenancy:finalize-cutover 33-03-11-2014
+php artisan tenancy:finalize-cutover 123 --password=GantiNantiSaja
+```
+
+Argumen `tenant` menerima kode tenant **atau** `row_id` numerik. Tanpa `--force`
+command menampilkan ringkasan lalu meminta konfirmasi.
+
+Yang dilakukan:
+
+1. **Parity gate** — baca `max(batch_row_id)` pada `migration_reconciliation_results`
+   milik tenant; kalau ada scope di batch terbaru yang bukan `matched`, command gagal
+   dan tidak menulis apa pun. Batch lama yang mismatch diabaikan (dipakai sebagai
+   jejak historis). Belum pernah jalan sama sekali → gagal dengan pesan
+   `No reconciliation results found ... run the cutover chain`.
+2. **Sanitasi nama** — `strip_tags` + rapikan spasi (pemisah `<br>` dari legacy).
+3. **Admin user** — `username` = slug nama dipotong 30 karakter, email
+   `{username}@tenant.akubumdes.local`, `phone` sentinel `pending-wa-…`,
+   password `Hash::make`. Role `admin` di-assign di shard, membership `active`.
+4. **Aktivasi** — `tenants.status = active`, `provisioned_at` diisi, lalu
+   `tenant_registry` di-sync.
+
+Output yang diharapkan:
+
+```text
+Name sanitized: [New Kospin Jaya <br> ... <br>] → [New Kospin Jaya ...]
+Admin user created: [new-kospin-jaya-provinsi-jawa] <new-kospin-jaya-provinsi-jawa@tenant.akubumdes.local>
+Generated password: AbC123xyz456PqRs
+Tenant [33-03-11-2014] status: active (provisioned_at: 2026-09-14 10:12:33)
+```
+
+**Idempotent:** run kedua tidak membuat user/membership/role ganda — user aktif
+yang sudah ada dipertahankan (`Existing active user kept: [username] (admin role
+ensured)`), `provisioned_at` tidak ditimpa, dan registry tetap sinkron. Aman
+diulang setelah kegagalan di tengah chain.
+
+Test: `tests/Feature/Migration/TenantFinalizeCutoverCommandTest.php`.
+
 ## Acceptance checklist (per tenant)
 
 ### Counts
@@ -98,7 +144,14 @@ php artisan tenancy:initialize-sequences TENANT
 - [ ] `/accounting/journal` (jurnal terposting dari legacy).  
 - [ ] `/accounting/reports/balance-sheet` (Neraca seimbang).  
 - [ ] `/accounting/reports/income-statement` (Laba Rugi sesuai varian BUMDes/Trading/Koperasi).  
-- [ ] `/admin/migration` (monitoring eksekusi cutover run).  
+- [ ] `/admin/migration` (monitoring eksekusi cutover run).
+
+### Finalize
+
+- [ ] `tenancy:finalize-cutover TENANT --force` sukses (parity batch terbaru `matched`).
+- [ ] Nama tenant bersih dari tag legacy, `status = active`, `provisioned_at` terisi.
+- [ ] Admin user + membership + role `admin` ada tepat satu (re-run tidak menduplikasi).
+- [ ] `tenant_registry` mencerminkan nama dan status final.
 
 ## Referensi
 

@@ -1,11 +1,19 @@
 # Changelog
 
-Semua perubahan penting pada proyek **SIDBM Next** didokumentasikan dalam berkas ini.
+Semua perubahan penting pada proyek **akubumdes** didokumentasikan dalam berkas ini.
 Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
 ## [Unreleased]
 
 ### Added
+- **Finalisasi Cutover Tenant (`tenancy:finalize-cutover`):**
+  - Command `FinalizeTenantCutover` menutup rantai cutover satu tenant SIMAK: gerbang parity, sanitasi nama legacy, provisioning admin pertama, aktivasi tenant, dan sinkronisasi registry.
+  - Gerbang parity membaca batch rekonsiliasi terbaru per tenant (`max(batch_row_id)` pada `migration_reconciliation_results`); batch dengan scope bukan `matched` menolak finalisasi, dan tenant yang belum punya hasil rekonsiliasi diarahkan untuk menjalankan `legacy:cutover-tenant` lebih dulu.
+  - Sanitasi nama menghapus tag HTML (pemisah `<br>` legacy) dan merapikan whitespace; nama hasil sanitasi ikut tersimpan ke `tenant_registry`.
+  - Admin user dibuat mengikuti pola provisioning: `username` dari slug nama (cap 30 karakter, unik), email `{username}@tenant.akubumdes.local`, sentinel `phone` non-OTP `pending-wa-*`, `public_id` ULID, dan password `Hash::make` (acak atau lewat `--password`), plus `TenantMembership` aktif dan role `admin` di shard.
+  - Idempotent: run kedua mempertahankan user aktif yang sudah ada (role admin dipastikan ulang) tanpa menduplikasi user, membership, maupun assignment role, dan tidak menimpa `provisioned_at`.
+  - Dokumentasi langkah finalisasi ditambahkan ke `docs/CUTOVER_RUNBOOK.md` (kapan dipanggil, contoh command, output yang diharapkan, catatan idempoten) beserta butir checklist per tenant.
+  - Feature test integrasi `TenantFinalizeCutoverCommandTest` memverifikasi happy path (nama, status, user, membership, role, registry), penolakan parity, penolakan tenant tak dikenal / tanpa rekonsiliasi, idempotensi, dan pemakaian batch terbaru.
 - **Adaptasi Pipeline Migrasi Legacy ke Skema SIMAK:**
   - Koneksi legacy database mendukung alias `SIMAK_DB_*` di `config/database.php` dan `.env.example` dengan default database `simak`.
   - `MigrationController::resolveLegacyTenants()` membaca daftar `usaha` (`id`, `nama_usaha`, `jenis_akun`, `kd_desa`) dan memetakan jenis akun (5=Standard, 7=Trading, 8=Cooperative) ke varian Next (`standard`, `trading`, `cooperative`).
