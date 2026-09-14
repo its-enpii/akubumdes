@@ -90,7 +90,7 @@ final class HoldingSsoController extends Controller
         }
 
         $cacheKey = 'sso:'.hash('sha256', $token);
-        $payload = Cache::pull($cacheKey);
+        $payload = Cache::store('sso')->pull($cacheKey);
 
         if (! is_array($payload)) {
             throw new RuntimeException('Token SSO tidak valid.');

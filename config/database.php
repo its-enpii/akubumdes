@@ -128,5 +128,19 @@ return [
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_CACHE_DB', '1'),
         ],
+        // Shared SSO token bus run by the holding portal. Every coordinate comes from
+        // the environment (docs/SSO-CONTRACT.md): one build serves a same-server deploy
+        // (127.0.0.1:6380) or a remote holding host with no code change. The empty
+        // connection prefix keeps keys readable across applications on the bus.
+        'sso' => [
+            'url' => env('SSO_REDIS_URL'),
+            'host' => env('SSO_REDIS_HOST', '127.0.0.1'),
+            'username' => env('SSO_REDIS_USERNAME'),
+            'password' => env('SSO_REDIS_PASSWORD', ''),
+            'port' => env('SSO_REDIS_PORT', '6380'),
+            'database' => env('SSO_REDIS_DB', '0'),
+            'prefix' => env('SSO_REDIS_PREFIX', ''),
+            'client' => env('SSO_REDIS_CLIENT', 'predis'),
+        ],
     ],
 ];

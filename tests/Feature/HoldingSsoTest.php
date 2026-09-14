@@ -24,6 +24,7 @@ final class HoldingSsoTest extends TestCase
         $this->rebuildTenantTestDatabases();
         $this->withoutMiddleware(PreventRequestForgery::class);
         config(['services.holding_sso.secret' => $this->secret]);
+        $this->useInMemorySsoStore();
         Cache::flush();
     }
 
@@ -46,7 +47,25 @@ final class HoldingSsoTest extends TestCase
         $this->assertSame((int) $this->testTenant->row_id, (int) $user->tenant_id);
         $this->assertFalse((bool) $user->is_superadmin);
         $this->assertAuthenticatedAs($user);
-        $this->assertNull(Cache::get('sso:'.hash('sha256', $token)));
+        $this->assertNull(Cache::store('sso')->get('sso:'.hash('sha256', $token)));
+        $this->assertNull(Cache::get('sso:'.hash('sha256', $token)), 'The token must never reach the default store.');
+    }
+
+    public function test_token_stored_in_the_default_store_is_not_consumed(): void
+    {
+        $payload = $this->payload();
+        $payload['signature'] = hash_hmac('sha256', json_encode($payload, JSON_THROW_ON_ERROR), $this->secret);
+        $token = bin2hex(random_bytes(32));
+        $cacheKey = 'sso:'.hash('sha256', $token);
+        Cache::put($cacheKey, $payload, 60);
+
+        $this->get('/auth/holding?token='.$token)
+            ->assertRedirect('/login')
+            ->assertSessionHas('error');
+
+        $this->assertGuest();
+        $this->assertDatabaseCount('users', 0, 'platform');
+        $this->assertNotNull(Cache::get($cacheKey), 'Reading the default store instead of the shared sso store is the bug this guards.');
     }
 
     public function test_token_cannot_be_used_twice(): void
@@ -166,7 +185,7 @@ final class HoldingSsoTest extends TestCase
         }
 
         $token = bin2hex(random_bytes(32));
-        Cache::put('sso:'.hash('sha256', $token), $payload, 60);
+        Cache::store('sso')->put('sso:'.hash('sha256', $token), $payload, 60);
 
         return $token;
     }
