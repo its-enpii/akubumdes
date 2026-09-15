@@ -3,6 +3,8 @@ import { computed, ref } from 'vue';
 
 const props = defineProps({
     data: { type: Array, required: true },
+    leftLabel: { type: String, default: 'Cair' },
+    rightLabel: { type: String, default: 'Terima' },
 });
 
 const money = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 });
@@ -138,7 +140,7 @@ function tooltipStyle(h) {
             :viewBox="`0 0 ${W} ${H}`"
             class="h-full min-h-[14rem] w-full select-none"
             role="img"
-            aria-label="Tren aktivitas keuangan 6 bulan"
+            :aria-label="`Tren aktivitas keuangan 6 bulan ${leftLabel} vs ${rightLabel}`"
         >
             <g>
                 <line
@@ -220,13 +222,13 @@ function tooltipStyle(h) {
             <div class="space-y-1 text-xs">
                 <p class="flex items-center justify-between gap-4">
                     <span class="inline-flex items-center gap-1.5 text-on-surface-variant">
-                        <span class="size-2 rounded-sm bg-primary" aria-hidden="true" />Cair
+                        <span class="size-2 rounded-sm bg-primary" aria-hidden="true" />{{ leftLabel }}
                     </span>
                     <span class="font-semibold tabular-nums text-on-surface">{{ formatMoney(hover.disbursed) }}</span>
                 </p>
                 <p class="flex items-center justify-between gap-4">
                     <span class="inline-flex items-center gap-1.5 text-on-surface-variant">
-                        <span class="size-2 rounded-sm bg-secondary" aria-hidden="true" />Terima
+                        <span class="size-2 rounded-sm bg-secondary" aria-hidden="true" />{{ rightLabel }}
                     </span>
                     <span class="font-semibold tabular-nums text-on-surface">{{ formatMoney(hover.collected) }}</span>
                 </p>
@@ -234,12 +236,12 @@ function tooltipStyle(h) {
         </div>
 
         <table class="sr-only">
-            <caption>Tren 6 bulan pencairan vs penerimaan</caption>
+            <caption>Tren 6 bulan {{ leftLabel }} vs {{ rightLabel }}</caption>
             <thead>
                 <tr>
                     <th>Bulan</th>
-                    <th>Cair</th>
-                    <th>Terima</th>
+                    <th>{{ leftLabel }}</th>
+                    <th>{{ rightLabel }}</th>
                 </tr>
             </thead>
             <tbody>

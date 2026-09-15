@@ -18,7 +18,7 @@ final class JournalEntry extends TenantModel
     protected function casts(): array
     {
         return [
-            'transaction_date' => 'date',
+            'transaction_date' => 'date:Y-m-d',
             'posted_at' => 'datetime',
         ];
     }

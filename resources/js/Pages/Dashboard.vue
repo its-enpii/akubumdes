@@ -1,10 +1,12 @@
 <script setup>
+import { computed } from "vue";
 import { Head, Link } from "@inertiajs/vue3";
 import AppBadge from "../Components/AppBadge.vue";
 import AppButton from "../Components/AppButton.vue";
 import AppCard from "../Components/AppCard.vue";
 import AppEmptyState from "../Components/AppEmptyState.vue";
 import AppIcon from "../Components/AppIcon.vue";
+import TrendBarChart from "../Components/TrendBarChart.vue";
 import ReportTable from "../Components/Reports/ReportTable.vue";
 import { useMoney } from "../composables/useMoney";
 import AuthenticatedLayout from "../Layouts/AuthenticatedLayout.vue";
@@ -13,8 +15,10 @@ const props = defineProps({
   unitName: { type: String, default: null },
   as_of: { type: String, required: true },
   cards: { type: Array, required: true },
+  trend: { type: Array, required: true },
+  top_revenues: { type: Array, required: true },
+  period: { type: Object, default: null },
   recent_journals: { type: Array, required: true },
-  counts: { type: Object, required: true },
 });
 
 const { money } = useMoney();
@@ -32,21 +36,53 @@ function formatMoney(value) {
 
 function formatDate(value) {
   if (!value) return "—";
-  const d = new Date(`${value}T00:00:00`);
-  if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleDateString("id-ID", {
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 }
 
+const monthNames = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
+const periodLabel = computed(() => {
+  if (!props.period?.fiscal_month || !props.period?.fiscal_year) return null;
+  const month = monthNames[Number(props.period.fiscal_month) - 1];
+  return `${month} ${props.period.fiscal_year}`;
+});
+
+const trendData = computed(() =>
+  props.trend.map((month) => ({
+    key: month.key,
+    label: month.label,
+    disbursed: month.revenue,
+    collected: month.expense,
+  })),
+);
+
 const quickActions = [
   {
-    label: "Jurnal Umum",
+    label: "Buat Jurnal",
     href: "/accounting/journal-entries/create",
     icon: "receipt_long",
   },
+  { label: "Jurnal Umum", href: "/accounting/journal-entries", icon: "list_alt" },
+  { label: "Laporan", href: "/accounting/reports", icon: "description" },
   { label: "E-Budgeting", href: "/budgeting", icon: "account_balance_wallet" },
 ];
 
@@ -61,6 +97,11 @@ const journalColumns = [
   { key: "source", label: "Sumber" },
   { key: "amount", label: "Jumlah", align: "right" },
 ];
+
+const topRevenueColumns = [
+  { key: "account_name", label: "Akun" },
+  { key: "amount", label: "Jumlah", align: "right" },
+];
 </script>
 
 <template>
@@ -72,12 +113,17 @@ const journalColumns = [
       >
         <div>
           <p class="eyebrow">Ringkasan operasional</p>
-          <h1 class="mt-1 text-2xl font-semibold tracking-[-0.02em] text-on-surface sm:text-3xl">
+          <h1
+            class="mt-1 text-2xl font-semibold tracking-[-0.02em] text-on-surface sm:text-3xl"
+          >
             {{ unitName || "Dashboard" }}
           </h1>
           <p class="mt-1 text-on-surface-variant">
             Data live per {{ formatDate(as_of) }}
           </p>
+          <AppBadge v-if="periodLabel" tone="neutral" class="mt-2">
+            Periode aktif: {{ periodLabel }}
+          </AppBadge>
         </div>
         <div class="flex flex-wrap gap-2">
           <Link
@@ -85,15 +131,15 @@ const journalColumns = [
             :key="action.href"
             :href="action.href"
           >
-            <AppButton variant="secondary" size="compact" :icon="action.icon">{{
-              action.label
-            }}</AppButton>
+            <AppButton variant="secondary" size="compact" :icon="action.icon">
+              {{ action.label }}
+            </AppButton>
           </Link>
         </div>
       </section>
 
       <section
-        class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
         aria-label="KPI utama"
       >
         <AppCard v-for="card in cards" :key="card.key" class="stat-card">
@@ -108,9 +154,9 @@ const journalColumns = [
             >
               <AppIcon :name="card.icon" />
             </div>
-            <AppBadge v-if="card.tone === 'error'" tone="error"
-              >Perhatian</AppBadge
-            >
+            <AppBadge v-if="card.tone === 'error'" tone="error">
+              Perhatian
+            </AppBadge>
           </div>
           <p
             class="text-[11px] font-semibold uppercase tracking-[0.14em] text-on-surface-variant"
@@ -130,26 +176,43 @@ const journalColumns = [
       </section>
 
       <div class="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-2">
-        <section
-          class="flex max-h-[28rem] min-h-0 flex-col rounded-lg border border-outline-variant bg-surface-container-lowest xl:col-span-2"
-        >
-          <header
-            class="flex shrink-0 items-center justify-between border-b border-outline-variant px-6 py-4"
-          >
+        <AppCard :padded="false">
+          <template #header>
             <div>
-          <h2 class="accent-bar pl-4 text-lg font-bold text-primary">Jurnal Terbaru</h2>
+              <h2 class="accent-bar pl-4 text-lg font-bold text-primary">
+                Tren 6 Bulan
+              </h2>
+              <p class="text-sm text-on-surface-variant">
+                Pendapatan dan beban dari jurnal posted
+              </p>
+            </div>
+          </template>
+          <div class="px-4 pb-4 pt-2">
+            <TrendBarChart
+              :data="trendData"
+              left-label="Pendapatan"
+              right-label="Beban"
+            />
+          </div>
+        </AppCard>
+
+        <AppCard :padded="false">
+          <template #header>
+            <div>
+              <h2 class="accent-bar pl-4 text-lg font-bold text-primary">
+                Jurnal Terbaru
+              </h2>
               <p class="text-sm text-on-surface-variant">
                 Posted, {{ recent_journals.length }} entri terakhir
               </p>
             </div>
-            <Link href="/accounting/journal-entries/create">
-              <AppButton variant="ghost" size="compact">Buat jurnal</AppButton>
+            <Link href="/accounting/journal-entries">
+              <AppButton variant="ghost" size="compact">Lihat semua</AppButton>
             </Link>
-          </header>
-
+          </template>
           <div
             v-if="recent_journals.length"
-            class="min-h-0 flex-1 overflow-auto"
+            class="max-h-[28rem] min-h-0 overflow-auto"
           >
             <ReportTable
               :columns="journalColumns"
@@ -158,9 +221,9 @@ const journalColumns = [
               sticky-header
             >
               <template #cell-transaction_date="{ row }">
-                <span class="whitespace-nowrap text-on-surface-variant">{{
-                  formatDate(row.transaction_date)
-                }}</span>
+                <span class="whitespace-nowrap text-on-surface-variant">
+                  {{ formatDate(row.transaction_date) }}
+                </span>
               </template>
               <template #cell-description="{ row }">
                 <p class="font-semibold text-primary">
@@ -171,26 +234,65 @@ const journalColumns = [
                 </p>
               </template>
               <template #cell-source="{ row }">
-                <AppBadge tone="neutral">{{
-                  sourceLabel[row.source_type] || row.source_type || "—"
-                }}</AppBadge>
+                <AppBadge tone="neutral">
+                  {{ sourceLabel[row.source_type] || row.source_type || "—" }}
+                </AppBadge>
               </template>
               <template #cell-amount="{ row }">
-                <span class="whitespace-nowrap font-semibold text-primary">{{
-                  formatMoney(row.amount)
-                }}</span>
+                <span class="whitespace-nowrap font-semibold text-primary">
+                  {{ formatMoney(row.amount) }}
+                </span>
               </template>
             </ReportTable>
           </div>
-          <div v-else class="flex flex-1 items-center p-6">
+          <div v-else class="flex min-h-[16rem] items-center p-6">
             <AppEmptyState
               icon="receipt_long"
               title="Belum ada jurnal posted"
               description="Transaksi yang di-post akan tampil di sini."
             />
           </div>
-        </section>
+        </AppCard>
       </div>
+
+      <AppCard :padded="false">
+        <template #header>
+          <div>
+            <h2 class="accent-bar pl-4 text-lg font-bold text-primary">
+              Top Pendapatan YTD
+            </h2>
+            <p class="text-sm text-on-surface-variant">
+              Lima akun pendapatan posted terbesar tahun ini
+            </p>
+          </div>
+          <Link href="/accounting/chart-of-accounts">
+            <AppButton variant="ghost" size="compact">Lihat COA</AppButton>
+          </Link>
+        </template>
+        <ReportTable
+          v-if="top_revenues.length"
+          :columns="topRevenueColumns"
+          :rows="top_revenues"
+          row-key="account_code"
+        >
+          <template #cell-account_name="{ row }">
+            <p class="font-semibold text-primary">{{ row.account_name }}</p>
+            <p class="text-xs text-on-surface-variant">{{ row.account_code }}</p>
+          </template>
+          <template #cell-amount="{ row }">
+            <span class="whitespace-nowrap font-semibold text-primary">
+              {{ formatMoney(row.amount) }}
+            </span>
+          </template>
+        </ReportTable>
+        <div v-else class="flex min-h-[12rem] items-center p-6">
+          <AppEmptyState
+            icon="query_stats"
+            title="Belum ada pendapatan posted"
+            description="Pendapatan tahun berjalan akan tampil di sini."
+          />
+        </div>
+      </AppCard>
 
       <section
         class="relative overflow-hidden rounded-lg border-t-[3px] border-secondary bg-primary p-6 text-on-primary"
