@@ -1,5 +1,5 @@
 #!/bin/sh
-# Entrypoint for the new_sidbm PHP-FPM container.
+# Entrypoint for the akubumdes PHP-FPM container.
 #
 # Responsibilities (in order):
 #   1. Ensure storage / bootstrap directories exist (idempotent).

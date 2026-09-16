@@ -20,7 +20,7 @@ jobs:
       - run: npx electron-builder --win nsis --publish never
       - uses: actions/upload-artifact@v4
         with:
-          name: sidbm-desktop-installer
+          name: akubumdes-desktop-installer
           path: |
             dist-electron/*.exe
             dist-electron/*.blockmap

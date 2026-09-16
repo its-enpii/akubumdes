@@ -15,7 +15,7 @@ final class DesktopFoundationTest extends TestCase
     public function test_desktop_status_command_executes_successfully(): void
     {
         $this->artisan('desktop:status')
-            ->expectsOutputToContain('=== SIDBM Next Desktop Client Status ===')
+            ->expectsOutputToContain('=== Akubumdes Desktop Client Status ===')
             ->assertSuccessful();
     }
 

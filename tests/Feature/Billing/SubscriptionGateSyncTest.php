@@ -132,7 +132,7 @@ final class SubscriptionGateSyncTest extends TestCase
     public function test_desktop_client_stops_before_push_or_pull_when_gate_is_blocked(): void
     {
         Http::fake([
-            'https://app.sidbm.id/api/v1/desktop/sync/tenants/tenant-a/status' => Http::response([
+            'https://app.akubumdes.id/api/v1/desktop/sync/tenants/tenant-a/status' => Http::response([
                 'status' => 'success',
                 'subscription' => [
                     'blocked' => true,
@@ -141,13 +141,13 @@ final class SubscriptionGateSyncTest extends TestCase
                     'message' => 'Sync ditahan sampai tagihan dibayar.',
                 ],
             ]),
-            'https://app.sidbm.id/api/v1/desktop/sync/tenants/tenant-a/snapshot' => Http::response([
+            'https://app.akubumdes.id/api/v1/desktop/sync/tenants/tenant-a/snapshot' => Http::response([
                 'status' => 'success',
-                'format' => 'sidbm-desktop-snapshot-v1',
+                'format' => 'akubumdes-desktop-snapshot-v1',
                 'data' => [],
             ]),
         ]);
-        Config::set('desktop.server.url', 'https://app.sidbm.id');
+        Config::set('desktop.server.url', 'https://app.akubumdes.id');
         Config::set('desktop.server.tenant_code', 'tenant-a');
 
         $result = app(DesktopSyncClientService::class)->syncFromCloud('tenant-a');

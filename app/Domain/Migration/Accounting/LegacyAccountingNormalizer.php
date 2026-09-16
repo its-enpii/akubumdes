@@ -424,7 +424,7 @@ final class LegacyAccountingNormalizer
 
     private function looksLikeChartCode(string $code): bool
     {
-        // Standard SIDBM: 1.1.01.01 (lev1 1-7). Desa/kec keys like 33.08.19 are not COA.
+        // Standar kode akun lama (legacy): 1.1.01.01 (lev1 1-7). Desa/kec keys like 33.08.19 are not COA.
         // Code '0' is the legacy balancing account.
         return $code === '0' || (bool) preg_match('/^[1-7](\.\d+){1,4}$/', $code);
     }

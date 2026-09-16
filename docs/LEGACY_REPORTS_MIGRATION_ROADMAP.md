@@ -1,8 +1,8 @@
-# Roadmap & Spesifikasi Migrasi Laporan Legacy ke Sistem Modern (SIDBM Next)
+# Roadmap & Spesifikasi Migrasi Laporan Legacy ke Sistem Modern (Akubumdes)
 
 **Status:** ✅ **100% IMPLEMENTED (Seluruh Laporan Legacy Selesai Di-migrasi ke Arsitektur Modern)**
 
-Seluruh laporan legacy SIDBM kini telah di-implementasikan secara penuh pada arsitektur modern (Multi-tenant, Clean Domain Service, Inertia Vue 3, Tailwind CSS, dan PDF Rendering Engine berstandar SAK Entitas Privat / PP No. 11/2021). Tampilan dan format data mengacu pada standar visual resmi dengan akurasi dan kecepatan komputasi modern.
+Seluruh laporan aplikasi lama (legacy) kini telah di-implementasikan secara penuh pada arsitektur modern (Multi-tenant, Clean Domain Service, Inertia Vue 3, Tailwind CSS, dan PDF Rendering Engine berstandar SAK Entitas Privat / PP No. 11/2021). Tampilan dan format data mengacu pada standar visual resmi dengan akurasi dan kecepatan komputasi modern.
 
 ---
 

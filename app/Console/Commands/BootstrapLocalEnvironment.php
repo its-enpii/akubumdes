@@ -21,7 +21,7 @@ use RuntimeException;
 
 final class BootstrapLocalEnvironment extends Command
 {
-    protected $signature = 'sidbm:bootstrap-local
+    protected $signature = 'akubumdes:bootstrap-local
         {--password= : Dev user password; skip user provisioning when empty}
         {--username=dev : Dev username}
         {--email=dev@example.test : Dev email}
@@ -38,7 +38,7 @@ final class BootstrapLocalEnvironment extends Command
         TenantMasterDataProvisioner $groupMasterData,
     ): int {
         if (! app()->environment(['local', 'testing'])) {
-            throw new RuntimeException('sidbm:bootstrap-local is restricted to local/testing.');
+            throw new RuntimeException('akubumdes:bootstrap-local is restricted to local/testing.');
         }
 
         $tenantCode = (string) $this->option('tenant');
@@ -88,7 +88,7 @@ final class BootstrapLocalEnvironment extends Command
 
         $password = (string) ($this->option('password') ?? '');
         if ($password !== '') {
-            $exit = Artisan::call('sidbm:provision-dev-user', [
+            $exit = Artisan::call('akubumdes:provision-dev-user', [
                 '--username' => (string) $this->option('username'),
                 '--email' => (string) $this->option('email'),
                 '--password' => $password,
@@ -99,7 +99,7 @@ final class BootstrapLocalEnvironment extends Command
                 return $exit;
             }
         } else {
-            $this->warn('No --password given; skipped sidbm:provision-dev-user.');
+            $this->warn('No --password given; skipped akubumdes:provision-dev-user.');
         }
 
         $this->newLine();
@@ -116,7 +116,7 @@ final class BootstrapLocalEnvironment extends Command
     private function ensureLocalShard(): DatabaseShard
     {
         $host = (string) config('database.connections.tenant.host', 'mysql');
-        $database = (string) config('database.connections.tenant.database', 'sidbm_shard_local');
+        $database = (string) config('database.connections.tenant.database', 'akubumdes_shard_local');
         $port = (int) config('database.connections.tenant.port', 3306);
 
         $shard = DatabaseShard::query()->updateOrCreate(
@@ -157,7 +157,7 @@ final class BootstrapLocalEnvironment extends Command
                 'timezone' => 'Asia/Jakarta',
                 'district_code' => $districtCode ?? Tenant::query()->where('code', $code)->value('district_code'),
                 'metadata' => [
-                    'domains' => ['localhost', '127.0.0.1', 'new_sidbm-nginx-1'],
+                    'domains' => ['localhost', '127.0.0.1', 'akubumdes-nginx-1'],
                 ],
                 'provisioned_at' => now(),
             ],

@@ -88,7 +88,7 @@ final class AggregateJournalTest extends TestCase
         $response = $this->actingAs($this->superadmin)
             ->post("/admin/tenants/{$this->testTenant->row_id}/onboarding/aggregate-journal", [
                 'transaction_date' => '2026-06-01',
-                'description' => 'Backfill Jan-Mei migrasi ke SIDBM',
+                'description' => 'Backfill Jan-Mei migrasi ke Akubumdes',
                 'lines' => [
                     ['account_row_id' => $this->cash->row_id, 'debit' => 11_000_000, 'credit' => 0, 'description' => 'Kas naik'],
                     ['account_row_id' => $this->ar->row_id, 'debit' => 0, 'credit' => 5_000_000, 'description' => 'Aset tak lancar turun'],
@@ -106,7 +106,7 @@ final class AggregateJournalTest extends TestCase
 
         self::assertNotNull($entry);
         self::assertSame('posted', $entry->status, 'Journal harus auto-post.');
-        self::assertSame('Backfill Jan-Mei migrasi ke SIDBM', $entry->description);
+        self::assertSame('Backfill Jan-Mei migrasi ke Akubumdes', $entry->description);
         self::assertEquals(11_000_000.0, (float) $entry->lines()->sum('debit'));
         self::assertEquals(11_000_000.0, (float) $entry->lines()->sum('credit'));
         self::assertCount(3, $entry->lines);

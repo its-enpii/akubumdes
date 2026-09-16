@@ -1,6 +1,6 @@
-# SIDBM Next
+# Akubumdes — Sistem Informasi Akuntansi & Keuangan BUMDes
 
-Aplikasi pembaruan **SIDBM (Sistem Informasi Dana Bergulir Masyarakat / BUMDesma LKD)** berbasis **PHP 8.4 + Laravel 13**, **Vue 3.5 + Inertia 2.0**, **Tailwind CSS 4**, **MySQL 8.4 / SQLite multi-tenant shard**, **Redis 8 (Cache, Session, Queue Worker)**, **PostgreSQL 16 (pgvector RAG AI)**, dan **Docker Architecture**.
+Aplikasi **Akubumdes (Sistem Informasi Akuntansi & Keuangan BUMDes / BUMDesma LKD)** berbasis **PHP 8.4 + Laravel 13**, **Vue 3.5 + Inertia 2.0**, **Tailwind CSS 4**, **MySQL 8.4 / SQLite multi-tenant shard**, **Redis 8 (Cache, Session, Queue Worker)**, **PostgreSQL 16 (pgvector RAG AI)**, dan **Docker Architecture**.
 
 ---
 
@@ -74,10 +74,10 @@ cp .env.example .env
 docker compose up --build -d
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate --database=platform --path=database/migrations/platform --force
-docker compose exec app php artisan sidbm:bootstrap-local --password='change-me'
+docker compose exec app php artisan akubumdes:bootstrap-local --password='change-me'
 ```
 
-Perintah `sidbm:bootstrap-local` bersifat *idempotent*: mendaftarkan shard/tenant local, migrasi shard, sinkronisasi registry, import COA, buka periode fiskal, seed master data/produk pinjaman, dan provision user dev.
+Perintah `akubumdes:bootstrap-local` bersifat *idempotent*: mendaftarkan shard/tenant local, migrasi shard, sinkronisasi registry, import COA, buka periode fiskal, seed master data/produk pinjaman, dan provision user dev.
 
 - **Aplikasi**: <http://localhost:64080> (atau port `APP_PORT` di `.env`)
 - **Login Dev**: `dev` / `password`
@@ -88,7 +88,7 @@ Perintah `sidbm:bootstrap-local` bersifat *idempotent*: mendaftarkan shard/tenan
 ## Indeks Dokumentasi Terkait (`/docs`)
 
 - **Panduan Pengguna Lengkap (User Manual)**: [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
-- **Perbandingan Legacy vs Next**: [docs/PERBANDINGAN_SIDBM_LEGACY_VS_NEXT.md](docs/PERBANDINGAN_SIDBM_LEGACY_VS_NEXT.md)
+- **Perbandingan Aplikasi Lama vs Akubumdes**: [docs/PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md](docs/PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md)
 - **Roadmap Migrasi Laporan Legacy**: [docs/LEGACY_REPORTS_MIGRATION_ROADMAP.md](docs/LEGACY_REPORTS_MIGRATION_ROADMAP.md)
 - **Status Fitur & Roadmap**: [docs/FEATURE_ROADMAP.md](docs/FEATURE_ROADMAP.md)
 - **Arsitektur & Topologi Database**: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) & [docs/DATABASE_STRUCTURE.md](docs/DATABASE_STRUCTURE.md)

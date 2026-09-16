@@ -1,4 +1,4 @@
-# Edit Jurnal (Reverse + Recreate Atomik) — SIDBM Next 2026-08-18
+# Edit Jurnal (Reverse + Recreate Atomik) — Akubumdes 2026-08-18
 
 > **Pertanyaan user:** "Apakah sudah ada fitur edit transaksi?"
 > → "Bisa tambahkan fitur edit? Bukan edit dalam artian meng-edit yang sudah
@@ -7,7 +7,7 @@
 
 ## Latar Belakang
 
-Sistem akuntansi SIDBM Next memberlakukan **immutability** terhadap jurnal
+Sistem akuntansi Akubumdes memberlakukan **immutability** terhadap jurnal
 yang sudah `posted` (`app/Domain/Accounting/Models/JournalEntry.php`: save
 & delete melempar `DomainException`). Prinsip ini penting untuk menjaga
 audit trail — tapi membuat koreksi jurnal yang salah jadi workflow 2 langkah

@@ -1,12 +1,12 @@
 # Tahap 4 — Migrasi Live kecamatan_id 76 via Admin GUI
 
-Tanggal: 2026-08-15 (UTC+7) — sesi audit komprehensif SIDBM Next.
+Tanggal: 2026-08-15 (UTC+7) — sesi audit komprehensif Akubumdes.
 
 ## Tujuan
 
 Mengeksekusi migrasi cutover data **live** (non-dry-run) dari basis legacy
-`103.177.95.91:3306/sidbm` (suffix=`76`) ke basis tenant lokal
-`sidbm_shard_local` MySQL container (port 3307), melalui halaman admin
+`103.177.95.91:3306/legacy` (suffix=`76`) ke basis tenant lokal
+`akubumdes_shard_local` MySQL container (port 3307), melalui halaman admin
 `/admin/migration` di stack `localhost:56586` — **tanpa** menyentuh
 `php artisan` dari terminal host.
 
@@ -28,13 +28,13 @@ Mengeksekusi migrasi cutover data **live** (non-dry-run) dari basis legacy
 
 | Field              | Nilai                                                  |
 | ------------------ | ------------------------------------------------------ |
-| tenant_id          | `1` (tenant `local`, shard `sidbm_shard_local`)        |
+| tenant_id          | `1` (tenant `local`, shard `akubumdes_shard_local`)        |
 | suffix             | `76`                                                   |
 | chunk              | `500`                                                  |
 | from_year          | `2018`                                                 |
 | to_year            | `2026`                                                 |
 | is_dry_run         | `false`                                                |
-| run_immediately    | `false` (submit via queue worker `new_sidbm-queue-1`)  |
+| run_immediately    | `false` (submit via queue worker `akubumdes-queue-1`)  |
 | skip_reconcile     | `true` (lewati `legacy:reconcile-lending` karena mismatch data legacy) |
 
 Form submit lewat Playwright dengan superadmin session (`POST /admin/migrations`).
@@ -57,11 +57,11 @@ Toggle `Lompati Rekonsiliasi` ditemukan via
 
 Symptom: Accounting step gagal dengan
 `SQLSTATE[HY000] [2002] Connection refused (Connection: legacy, Host: 127.0.0.1, …)`.
-Root cause: `new_sidbm-queue-1` di-restart sebelum perubahan `.env`
+Root cause: `akubumdes-queue-1` di-restart sebelum perubahan `.env`
 (`LEGACY_DB_HOST=103.177.95.91`). PHP-FPM pool `www` punya `clear_env = yes` (default),
 jadi Dotenv hanya di-load sekali saat container start. Perubahan `.env` berikutnya
 **tidak** ter-baca sampai container restart.
-Fix: `docker restart new_sidbm-queue-1` → queue worker pick up `.env` baru.
+Fix: `docker restart akubumdes-queue-1` → queue worker pick up `.env` baru.
 
 ### F009 — Playwright test salah klik switch (skip_sequences vs run_immediately)
 
@@ -177,7 +177,7 @@ setiap 1 detik di SSE handler.
 **Walau M.3 FAIL di level test Playwright, data riil sudah dimigrasikan
 ke tenant DB oleh queue worker (run #5 status=completed).** Verifikasi di
 atas menunjukkan seluruh data legacy suffix=76 telah berpindah ke
-`sidbm_shard_local` sesuai expectation.
+`akubumdes_shard_local` sesuai expectation.
 
 ## Test Results Summary
 

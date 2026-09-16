@@ -7,16 +7,16 @@
 4. Setelah selesai, perbarui konfigurasi server:
    - `DESKTOP_LATEST_VERSION=1.2.0`
    - `DESKTOP_MIN_VERSION=<versi minimum yang masih boleh push>`
-   - `DESKTOP_DOWNLOAD_URL=https://github.com/its-enpii/new_sidbm/releases/latest/download/SIDBM%20Next%20Desktop%20Setup%201.2.0.exe`
-   - `DESKTOP_RELEASE_NOTES_URL=https://github.com/its-enpii/new_sidbm/releases/latest`
+   - `DESKTOP_DOWNLOAD_URL=https://github.com/its-enpii/akubumdes/releases/latest/download/Akubumdes%20Desktop%20Setup%201.2.0.exe`
+   - `DESKTOP_RELEASE_NOTES_URL=https://github.com/its-enpii/akubumdes/releases/latest`
    - `DESKTOP_SHA512=<hash SHA-512 installer, opsional>`
 5. Pastikan `GET /api/v1/desktop/sync/update/check?platform=win&current_version=<versi>` mengembalikan manifest yang benar.
 
 ## Catatan teknis
-- Feed `electron-updater` memakai provider generic dengan URL `https://github.com/its-enpii/new_sidbm/releases/latest/download`, sehingga `latest.yml` dibaca otomatis dari release terbaru.
+- Feed `electron-updater` memakai provider generic dengan URL `https://github.com/its-enpii/akubumdes/releases/latest/download`, sehingga `latest.yml` dibaca otomatis dari release terbaru.
 - Server update check tetap tersedia untuk kontrol rilis, subscription gate, dan kesiapan mobile.
 - Data SQLite dan outbox ada di user-data directory. Installer NSIS tidak menghapus direktori tersebut saat update, sehingga data lokal dan antrean sinkronisasi tetap aman.
-- CI tidak mengunggah installer ke `app.sidbm.id`; server hanya menyimpan metadata versi dan URL.
+- CI tidak mengunggah installer ke `app.akubumdes.id`; server hanya menyimpan metadata versi dan URL.
 
 ## Troubleshooting
 - **Signature tidak valid:** pastikan Windows code signing certificate dikonfigurasi di environment CI sebelum `electron-builder`, lalu pastikan sertifikat belum kedaluwarsa.

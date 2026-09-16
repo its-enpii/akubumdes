@@ -1,11 +1,11 @@
-# Audit Komprehensif SIDBM Next — README
+# Audit Komprehensif Akubumdes — README
 
 Tanggal sesi: 2026-08-14 s/d 2026-08-15 (UTC+7)
 Sesi: `tests/TEST_AUDIT_LOG.md` → komprehensif via Playwright + manual fix.
 
 ## Tujuan
 
-1. Audit keseluruhan codebase (`F:\Workspace\laragon\www\new_sidbm`),
+1. Audit keseluruhan codebase (`F:\Workspace\laragon\www\akubumdes`),
    backend + frontend, dengan **uji coba fitur seperti manusia** (bukan
    hanya inventory route).
 2. Perbaiki flow / alur yang acak-acakan selama audit.
@@ -67,17 +67,17 @@ Lihat `migration-76.md`. Ringkas:
 
 - Cutover end-to-end via GUI admin (`/admin/migration`) **BERHASIL** (run #5).
 - 22.541 jurnal + 1.409 anggota + 1.420 kelompok + 1.721 pinjaman + 41.418
-  angsuran berpindah dari legacy `103.177.95.91/sidbm` (suffix=76) ke
-  tenant lokal `sidbm_shard_local` (MySQL container).
+  angsuran berpindah dari basis data lama `103.177.95.91/legacy` (suffix=76) ke
+  tenant lokal `akubumdes_shard_local` (MySQL container).
 - 3 bug baru ditemukan & diperbaiki selama eksekusi (F008-F010).
 
 ## Environment
 
 - Stack: Docker Compose (`nginx:56586`, `app`, `queue`, `mysql:3307`,
   `redis`, `postgres+pgvector`, `ollama`).
-- Legacy DB: `103.177.95.91:3306/sidbm` (cPanel, SELECT only).
-- Platform DB: `sidbm_platform` (root/root).
-- Tenant DB: `sidbm_shard_local` (root/root).
+- Legacy DB: `103.177.95.91:3306/legacy` (cPanel, SELECT only).
+- Platform DB: `akubumdes_platform` (root/root).
+- Tenant DB: `akubumdes_shard_local` (root/root).
 - Users seeded: `superadmin`/`password`, `dev`/`password` (via `UserSeeder`).
 - Queue worker: `php artisan queue:work redis --tries=3 --timeout=90`.
 
@@ -85,7 +85,7 @@ Lihat `migration-76.md`. Ringkas:
 
 ```bash
 # Pre-flight
-docker exec new_sidbm-app-1 php artisan optimize:clear
+docker exec akubumdes-app-1 php artisan optimize:clear
 
 # Audit penuh
 npx playwright test tests/e2e/full-audit.spec.ts --reporter=list

@@ -11,7 +11,7 @@ import { loginAs, logout, gotoNoErr, noErr, recordTest, uniqueNIK, uniqueCode, h
 test.describe('D1 — Public & Auth', () => {
     test('1.1 Landing page hero & FAQ renders', async ({ page }) => {
         const resp = await gotoNoErr(page, `${BASE}/`);
-        const hero = page.locator('text=/Dana Bergulir|SIDBM/i').first();
+        const hero = page.locator('text=/Dana Bergulir|Akubumdes/i').first();
         const visible = await hero.isVisible({ timeout: 5000 }).catch(() => false);
         recordTest('auth', '1.1 Landing hero + CTA', {
             input: 'GET /',

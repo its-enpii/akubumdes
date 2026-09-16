@@ -7,7 +7,7 @@ namespace App\Support;
 /**
  * Format angka dan nominal dalam gaya Indonesia untuk dokumen PDF.
  *
- * Mirip dengan helper legacy `App\Utils\Keuangan` di `sidbm`, di-port ke
+ * Mirip dengan helper legacy `App\Utils\Keuangan` pada aplikasi lama, di-port ke
  * arsitektur modern.
  */
 final class IndonesianNumber

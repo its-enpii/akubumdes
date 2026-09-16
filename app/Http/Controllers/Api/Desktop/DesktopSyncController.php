@@ -134,7 +134,7 @@ final class DesktopSyncController
         return response()->json([
             'status' => 'success',
             'server_time' => now()->toIso8601String(),
-            'app_name' => config('app.name', 'SIDBM Next'),
+            'app_name' => config('app.name', 'Akubumdes'),
             'app_version' => (string) config('desktop-update.server_version'),
             'tenant' => [
                 'id' => (int) $targetTenant->row_id,

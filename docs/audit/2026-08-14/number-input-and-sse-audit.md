@@ -1,4 +1,4 @@
-# Audit Input Number & SSE Migrasi — SIDBM Next
+# Audit Input Number & SSE Migrasi — Akubumdes
 
 Tanggal: 2026-08-15
 Lingkup:
@@ -282,8 +282,8 @@ method `pollRun`). Tidak ada perubahan perlu.
 ### Untuk A1 (currency input migration)
 
 ```bash
-docker exec new_sidbm-app-1 php artisan optimize:clear
-docker exec new_sidbm-node-1 npm run build
+docker exec akubumdes-app-1 php artisan optimize:clear
+docker exec akubumdes-node-1 npm run build
 ```
 
 Smoke test Playwright:
@@ -313,7 +313,7 @@ test('plan price accepts id-ID format', async ({ page }) => {
    `executeStream`.
 3. Build:
    ```bash
-   docker exec new_sidbm-app-1 php artisan optimize:clear
+   docker exec akubumdes-app-1 php artisan optimize:clear
    ```
 4. Test Playwright `M.3 Monitor SSE stream sampai status=completed`:
    ```bash

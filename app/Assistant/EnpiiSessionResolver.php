@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 /**
  * Resolves the current HTTP request into the assistant session context.
  *
- * - tenant_id  → TenantContext::id() (always available — sidbm is multi-tenant)
+ * - tenant_id  → TenantContext::id() (always available — akubumdes is multi-tenant)
  * - external_user_id → authenticated user row_id (Auth::user() / impersonated)
  * - persona_slug → read from request input (widget can override)
  */

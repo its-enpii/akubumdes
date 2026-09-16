@@ -47,11 +47,11 @@ final class WhatsappGatewayServiceTest extends TestCase
 
     public function test_instance_name_has_app_prefix(): void
     {
-        config(['services.wa_gateway.instance_prefix' => 'app-sidbm']);
+        config(['services.wa_gateway.instance_prefix' => 'app-akubumdes']);
         $http = new HttpFactory;
         $service = $this->createService($http);
 
-        $this->assertSame('app-sidbm-1', $service->getInstance());
+        $this->assertSame('app-akubumdes-1', $service->getInstance());
     }
 
     public function test_normalize_phone(): void
@@ -67,17 +67,17 @@ final class WhatsappGatewayServiceTest extends TestCase
     public function test_create_instance_endpoint(): void
     {
         config([
-            'services.wa_gateway.base_url' => 'https://agent.sidbm.net/webhook-test',
+            'services.wa_gateway.base_url' => 'https://agent.akubumdes.net/webhook-test',
             'services.wa_gateway.api_key' => 'enpii:its.enpii-118',
-            'services.wa_gateway.instance_prefix' => 'app-sidbm',
+            'services.wa_gateway.instance_prefix' => 'app-akubumdes',
         ]);
 
         $http = new HttpFactory;
         $http->fake([
-            'https://agent.sidbm.net/webhook-test/create-instance' => Http::response([
+            'https://agent.akubumdes.net/webhook-test/create-instance' => Http::response([
                 'success' => true,
                 'instance' => [
-                    'name' => 'app-sidbm-1',
+                    'name' => 'app-akubumdes-1',
                     'status' => 'connecting',
                     'qr' => 'data:image/png;base64,iVBORw...',
                 ],
@@ -89,26 +89,26 @@ final class WhatsappGatewayServiceTest extends TestCase
 
         $this->assertTrue($res['success']);
         $this->assertSame('data:image/png;base64,iVBORw...', $res['qr']);
-        $this->assertSame('app-sidbm-1', $res['instance']);
+        $this->assertSame('app-akubumdes-1', $res['instance']);
 
         $http->assertSent(function (Request $request) {
-            return $request->url() === 'https://agent.sidbm.net/webhook-test/create-instance'
+            return $request->url() === 'https://agent.akubumdes.net/webhook-test/create-instance'
                 && $request->hasHeader('Authorization', 'Basic '.base64_encode('enpii:its.enpii-118'))
-                && $request['instance'] === 'app-sidbm-1';
+                && $request['instance'] === 'app-akubumdes-1';
         });
     }
 
     public function test_send_single_message_endpoint(): void
     {
         config([
-            'services.wa_gateway.base_url' => 'https://agent.sidbm.net/webhook-test',
+            'services.wa_gateway.base_url' => 'https://agent.akubumdes.net/webhook-test',
             'services.wa_gateway.api_key' => 'enpii:its.enpii-118',
-            'services.wa_gateway.instance_prefix' => 'app-sidbm',
+            'services.wa_gateway.instance_prefix' => 'app-akubumdes',
         ]);
 
         $http = new HttpFactory;
         $http->fake([
-            'https://agent.sidbm.net/webhook-test/send-message' => Http::response(['success' => true], 200),
+            'https://agent.akubumdes.net/webhook-test/send-message' => Http::response(['success' => true], 200),
         ]);
 
         $service = $this->createService($http, ['whatsapp.is_enabled' => true]);
@@ -116,23 +116,23 @@ final class WhatsappGatewayServiceTest extends TestCase
 
         $this->assertTrue($res['success']);
         $http->assertSent(function (Request $request) {
-            return $request->url() === 'https://agent.sidbm.net/webhook-test/send-message'
+            return $request->url() === 'https://agent.akubumdes.net/webhook-test/send-message'
                 && $request['number'] === '628123456789'
                 && $request['text'] === 'Halo Tes'
-                && $request['instance'] === 'app-sidbm-1';
+                && $request['instance'] === 'app-akubumdes-1';
         });
     }
 
     public function test_send_bulk_messages_endpoint(): void
     {
         config([
-            'services.wa_gateway.base_url' => 'https://agent.sidbm.net/webhook-test',
+            'services.wa_gateway.base_url' => 'https://agent.akubumdes.net/webhook-test',
             'services.wa_gateway.api_key' => 'enpii:its.enpii-118',
         ]);
 
         $http = new HttpFactory;
         $http->fake([
-            'https://agent.sidbm.net/webhook-test/send-messages' => Http::response(['success' => true], 200),
+            'https://agent.akubumdes.net/webhook-test/send-messages' => Http::response(['success' => true], 200),
         ]);
 
         $service = $this->createService($http, ['whatsapp.is_enabled' => true]);
@@ -144,7 +144,7 @@ final class WhatsappGatewayServiceTest extends TestCase
         $this->assertTrue($res['success']);
         $this->assertSame(2, $res['count']);
         $http->assertSent(function (Request $request) {
-            return $request->url() === 'https://agent.sidbm.net/webhook-test/send-messages'
+            return $request->url() === 'https://agent.akubumdes.net/webhook-test/send-messages'
                 && count($request['messages']) === 2
                 && $request['messages'][0]['number'] === '628123456789';
         });

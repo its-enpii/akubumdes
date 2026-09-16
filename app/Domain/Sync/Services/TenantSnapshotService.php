@@ -124,7 +124,7 @@ final class TenantSnapshotService
         $checksum = hash('sha256', $jsonEncoded);
 
         return [
-            'format' => 'sidbm-desktop-snapshot-v1',
+            'format' => 'akubumdes-desktop-snapshot-v1',
             'type' => $sinceCarbon !== null ? 'delta' : 'full',
             'since' => $sinceCarbon?->toIso8601String(),
             'generated_at' => now()->toIso8601String(),

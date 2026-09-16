@@ -1,15 +1,15 @@
-# Roadmap Fitur & Status Implementasi (SIDBM Next vs Legacy)
+# Roadmap Fitur & Status Implementasi (Akubumdes vs Legacy)
 
-Tujuan: **SIDBM Next sepenuhnya menggantikan SIDBM legacy dalam operasional harian tenant dan tingkat Kabupaten.**
+Tujuan: **Akubumdes sepenuhnya menggantikan aplikasi lama (legacy) dalam operasional harian tenant dan tingkat Kabupaten.**
 
-Referensi legacy: F:\Workspace\laragon\www\sidbm
-Dokumentasi Arsitektur: PROJECT_OVERVIEW.md, DATABASE_STRUCTURE.md, CUTOVER_RUNBOOK.md, PERBANDINGAN_SIDBM_LEGACY_VS_NEXT.md.
+Referensi legacy: repositori aplikasi lama (legacy)
+Dokumentasi Arsitektur: PROJECT_OVERVIEW.md, DATABASE_STRUCTURE.md, CUTOVER_RUNBOOK.md, PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md.
 
 ---
 
 ## Status Fitur & Zona (Update 2026-08-18)
 
-| Zona | Status Next | Keterangan |
+| Zona | Status Akubumdes | Keterangan |
 |---|---|---|
 | Landing Page & Auth | ✅ Selesai | Redesain halaman depan profesional (hero, features, steps, FAQ accordion, smooth scroll, CTA), halaman login clean & modern tanpa kebocoran stack teknis. |
 | Master Data | ✅ Selesai | Anggota, Kelompok, Lembaga, Desa + Riwayat Pinjaman + Import/Export CSV |

@@ -29,7 +29,7 @@ final class ShardPageTest extends TestCase
             'code' => 'local',
             'name' => 'Local Shard',
             'host' => 'mysql',
-            'database_name' => 'sidbm_shard_test',
+            'database_name' => 'akubumdes_shard_test',
             'credential_reference' => 'test',
             'status' => 'active',
         ]);

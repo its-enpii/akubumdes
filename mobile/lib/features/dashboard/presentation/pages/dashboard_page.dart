@@ -59,7 +59,7 @@ class DashboardPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              tenant?.name ?? 'SIDBM Next',
+              tenant?.name ?? 'Akubumdes',
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
             if (tenant?.districtName != null)

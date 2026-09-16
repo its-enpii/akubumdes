@@ -31,8 +31,8 @@ final class UpdateManifestTest extends TestCase
         config([
             'desktop-update.latest_version' => '1.2.0',
             'desktop-update.min_version' => '1.1.0',
-            'desktop-update.download_url' => 'https://github.com/its-enpii/new_sidbm/releases/latest/download/SIDBM-Setup.exe',
-            'desktop-update.release_notes_url' => 'https://github.com/its-enpii/new_sidbm/releases/latest',
+            'desktop-update.download_url' => 'https://github.com/its-enpii/akubumdes/releases/latest/download/Akubumdes-Setup.exe',
+            'desktop-update.release_notes_url' => 'https://github.com/its-enpii/akubumdes/releases/latest',
             'desktop-update.sha512' => 'test-sha512',
         ]);
     }
@@ -49,8 +49,8 @@ final class UpdateManifestTest extends TestCase
                 'current_version' => '1.1.0',
                 'min_supported_version' => '1.1.0',
                 'force_update' => false,
-                'download_url' => 'https://github.com/its-enpii/new_sidbm/releases/latest/download/SIDBM-Setup.exe',
-                'release_notes_url' => 'https://github.com/its-enpii/new_sidbm/releases/latest',
+                'download_url' => 'https://github.com/its-enpii/akubumdes/releases/latest/download/Akubumdes-Setup.exe',
+                'release_notes_url' => 'https://github.com/its-enpii/akubumdes/releases/latest',
                 'sha512' => 'test-sha512',
                 'subscription' => [
                     'blocked' => false,

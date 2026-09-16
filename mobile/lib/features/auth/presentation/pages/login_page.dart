@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        'SIDBM Mobile',
+                        'Akubumdes Mobile',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 24,

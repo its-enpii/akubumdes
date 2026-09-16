@@ -14,7 +14,7 @@ use RuntimeException;
 
 final class ProvisionDevUser extends Command
 {
-    protected $signature = 'sidbm:provision-dev-user
+    protected $signature = 'akubumdes:provision-dev-user
         {--username=dev : Development username}
         {--email=dev@example.test : Development email}
         {--password= : Password; required in non-interactive mode}

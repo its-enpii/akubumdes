@@ -16,11 +16,11 @@ final class DesktopStatusCommand extends Command
 
     public function handle(): int
     {
-        $this->info('=== SIDBM Next Desktop Client Status ===');
+        $this->info('=== Akubumdes Desktop Client Status ===');
 
         $isDesktop = (bool) config('desktop.enabled', false);
         $sqlitePath = (string) config('desktop.sqlite_database', database_path('database.sqlite'));
-        $serverUrl = (string) config('desktop.server.url', 'https://app.sidbm.id');
+        $serverUrl = (string) config('desktop.server.url', 'https://app.akubumdes.id');
         $tenantCode = (string) config('desktop.server.tenant_code', 'default');
 
         $this->table(

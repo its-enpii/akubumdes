@@ -1,12 +1,12 @@
-import 'package:sidbm_mobile/core/utils/currency_formatter.dart';
-import 'package:sidbm_mobile/core/utils/date_formatter.dart';
-import 'package:sidbm_mobile/core/error/failures.dart';
-import 'package:sidbm_mobile/features/auth/domain/entities/auth_entities.dart';
-import 'package:sidbm_mobile/features/collection/data/models/collection_models.dart';
-import 'package:sidbm_mobile/features/collection/domain/entities/collection_entities.dart';
-import 'package:sidbm_mobile/features/verification/data/models/verification_models.dart';
-import 'package:sidbm_mobile/features/verification/domain/entities/verification_entities.dart';
-import 'package:sidbm_mobile/features/approval/data/models/approval_models.dart';
+import 'package:akubumdes_mobile/core/utils/currency_formatter.dart';
+import 'package:akubumdes_mobile/core/utils/date_formatter.dart';
+import 'package:akubumdes_mobile/core/error/failures.dart';
+import 'package:akubumdes_mobile/features/auth/domain/entities/auth_entities.dart';
+import 'package:akubumdes_mobile/features/collection/data/models/collection_models.dart';
+import 'package:akubumdes_mobile/features/collection/domain/entities/collection_entities.dart';
+import 'package:akubumdes_mobile/features/verification/data/models/verification_models.dart';
+import 'package:akubumdes_mobile/features/verification/domain/entities/verification_entities.dart';
+import 'package:akubumdes_mobile/features/approval/data/models/approval_models.dart';
 
 void main() {
   int passed = 0;
@@ -23,7 +23,7 @@ void main() {
   }
 
   print('=====================================================');
-  print('     SIDBM MOBILE APPLICATION TEST SUITE (FLUTTER)   ');
+  print('  AKUBUMDES MOBILE APPLICATION TEST SUITE (FLUTTER)  ');
   print('=====================================================\n');
 
   // 1. CORE UTILS & FORMATTERS

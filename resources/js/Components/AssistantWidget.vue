@@ -134,7 +134,7 @@ function pickGreeting() {
 }
 
 // In-process mode: backend resolves tenant + user from the authenticated
-// session via SidbmSessionResolver. No separate session token dance.
+// session via EnpiiSessionResolver. No separate session token dance.
 let personaPromise = null;
 
 function ensureSession() {

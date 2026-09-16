@@ -109,11 +109,11 @@ final class DesktopSyncEngineTest extends TestCase
         $snapshot = app(TenantSnapshotService::class)->export($tenant);
 
         Http::fake([
-            'https://app.sidbm.id/api/v1/desktop/sync/tenants/tenant-a/status' => Http::response(['status' => 'success', 'server_time' => now()->toIso8601String(), 'subscription' => ['blocked' => false]], 200),
-            'https://app.sidbm.id/api/v1/desktop/sync/tenants/tenant-a/snapshot' => Http::response($snapshot, 200),
+            'https://app.akubumdes.id/api/v1/desktop/sync/tenants/tenant-a/status' => Http::response(['status' => 'success', 'server_time' => now()->toIso8601String(), 'subscription' => ['blocked' => false]], 200),
+            'https://app.akubumdes.id/api/v1/desktop/sync/tenants/tenant-a/snapshot' => Http::response($snapshot, 200),
         ]);
 
-        Config::set('desktop.server.url', 'https://app.sidbm.id');
+        Config::set('desktop.server.url', 'https://app.akubumdes.id');
         Config::set('desktop.server.tenant_code', 'tenant-a');
         Config::set('tenancy.tenant_connection', 'desktop_local');
 
@@ -130,11 +130,11 @@ final class DesktopSyncEngineTest extends TestCase
         $snapshot = app(TenantSnapshotService::class)->export($tenant);
 
         Http::fake([
-            'https://app.sidbm.id/api/v1/desktop/sync/tenants/tenant-a/status' => Http::response(['status' => 'success', 'server_time' => now()->toIso8601String(), 'subscription' => ['blocked' => false]], 200),
-            'https://app.sidbm.id/api/v1/desktop/sync/tenants/tenant-a/snapshot' => Http::response($snapshot, 200),
+            'https://app.akubumdes.id/api/v1/desktop/sync/tenants/tenant-a/status' => Http::response(['status' => 'success', 'server_time' => now()->toIso8601String(), 'subscription' => ['blocked' => false]], 200),
+            'https://app.akubumdes.id/api/v1/desktop/sync/tenants/tenant-a/snapshot' => Http::response($snapshot, 200),
         ]);
 
-        Config::set('desktop.server.url', 'https://app.sidbm.id');
+        Config::set('desktop.server.url', 'https://app.akubumdes.id');
         Config::set('tenancy.tenant_connection', 'desktop_local');
 
         $this->artisan('desktop:sync', ['--tenant' => 'tenant-a'])
@@ -148,12 +148,12 @@ final class DesktopSyncEngineTest extends TestCase
         $snapshot = app(TenantSnapshotService::class)->export($tenant);
 
         Http::fake([
-            'https://app.sidbm.id/api/v1/desktop/sync/tenants/tenant-a/status' => Http::response(['status' => 'success', 'server_time' => now()->toIso8601String(), 'subscription' => ['blocked' => false]], 200),
-            'https://app.sidbm.id/api/v1/desktop/sync/status' => Http::response(['status' => 'success', 'server_time' => now()->toIso8601String()], 200),
-            'https://app.sidbm.id/api/v1/desktop/sync/tenants/tenant-a/snapshot' => Http::response($snapshot, 200),
+            'https://app.akubumdes.id/api/v1/desktop/sync/tenants/tenant-a/status' => Http::response(['status' => 'success', 'server_time' => now()->toIso8601String(), 'subscription' => ['blocked' => false]], 200),
+            'https://app.akubumdes.id/api/v1/desktop/sync/status' => Http::response(['status' => 'success', 'server_time' => now()->toIso8601String()], 200),
+            'https://app.akubumdes.id/api/v1/desktop/sync/tenants/tenant-a/snapshot' => Http::response($snapshot, 200),
         ]);
 
-        Config::set('desktop.server.url', 'https://app.sidbm.id');
+        Config::set('desktop.server.url', 'https://app.akubumdes.id');
         Config::set('desktop.server.tenant_code', 'tenant-a');
         Config::set('tenancy.tenant_connection', 'desktop_local');
 

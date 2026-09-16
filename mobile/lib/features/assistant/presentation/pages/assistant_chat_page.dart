@@ -21,7 +21,7 @@ class _AssistantChatPageState extends State<AssistantChatPage> {
   final List<ChatMessage> _messages = [
     ChatMessage(
       sender: 'ai',
-      text: 'Halo! Saya Ariel, Asisten AI SIDBM. Ada yang bisa saya bantu terkait data operasional, kas, atau portofolio pinjaman hari ini?',
+      text: 'Halo! Saya Ariel, Asisten AI Akubumdes. Ada yang bisa saya bantu terkait data operasional, kas, atau portofolio pinjaman hari ini?',
       timestamp: DateTime.now(),
     ),
   ];

@@ -1,6 +1,6 @@
 {
-  "appId": "com.enpiistudio.sidbm.desktop",
-  "productName": "SIDBM Next Desktop",
+  "appId": "com.enpiistudio.akubumdes.desktop",
+  "productName": "Akubumdes Desktop",
   "directories": {
     "output": "dist-electron"
   },
@@ -18,7 +18,7 @@
   "publish": [
     {
       "provider": "generic",
-      "url": "https://github.com/its-enpii/new_sidbm/releases/latest/download"
+      "url": "https://github.com/its-enpii/akubumdes/releases/latest/download"
     }
   ],
   "win": {
@@ -35,7 +35,7 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "SIDBM Next Desktop",
+    "shortcutName": "Akubumdes Desktop",
     "differentialPackage": true
   }
 }

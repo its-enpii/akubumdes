@@ -3,15 +3,15 @@
 Headless Chromium end-to-end smoke tests against the running dev stack.
 
 ## Stack
-- `@playwright/test` is installed under `new_sidbm-node-1` (sandbox path `/usr/bin/chromium`).
-- Tests target the dev stack over `http://new_sidbm-nginx-1` (docker internal network).
+- `@playwright/test` is installed under `akubumdes-node-1` (sandbox path `/usr/bin/chromium`).
+- Tests target the dev stack over `http://akubumdes-nginx-1` (docker internal network).
 - Logged in as `dev` / `password` against the `local` tenant.
 
 ## One-time setup
 ```bash
 # System Chromium (Alpine package, since the headless_shell shipped with Playwright
 # has dynamic-library dependencies that the minimal node image does not provide).
-docker exec new_sidbm-node-1 apk add --no-cache chromium
+docker exec akubumdes-node-1 apk add --no-cache chromium
 ```
 
 Every dev rebuild sets `public/hot`, which makes `@vite` resolve scripts to the
@@ -19,19 +19,19 @@ vite dev server (`localhost:5173`) — unreachable from inside Playwright. Make
 sure `public/hot` is removed before running tests so the built manifest is used:
 
 ```bash
-docker exec new_sidbm-app-1 rm public/hot
+docker exec akubumdes-app-1 rm public/hot
 ```
 
 The local tenant must accept requests via the docker hostname. Add it to the
 tenant's `metadata.domains` once:
 
 ```bash
-docker exec new_sidbm-app-1 php -r '
+docker exec akubumdes-app-1 php -r '
 require "/var/www/html/vendor/autoload.php";
 $app = require "/var/www/html/bootstrap/app.php";
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 DB::connection("platform")->table("tenants")->where("code","local")->update([
-    "metadata" => json_encode(["domains" => ["new_sidbm-nginx-1","localhost"]]),
+    "metadata" => json_encode(["domains" => ["akubumdes-nginx-1","localhost"]]),
 ]);
 '
 ```
@@ -39,8 +39,8 @@ DB::connection("platform")->table("tenants")->where("code","local")->update([
 ## Running
 
 ```bash
-# from project root (host) — runs against new_sidbm-node-1's Playwright
-docker exec new_sidbm-node-1 npm run e2e
+# from project root (host) — runs against akubumdes-node-1's Playwright
+docker exec akubumdes-node-1 npm run e2e
 ```
 
 Tests skip gracefully when prerequisite data (members, etc.) is missing —

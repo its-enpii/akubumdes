@@ -1,12 +1,12 @@
 # Panduan Integrasi API Laporan Keuangan Holding (Holding Financial Reports API)
 
-Dokumentasi ini adalah panduan teknis bagi pengembang aplikasi **Holding / BUMDesma Induk** untuk mengintegrasikan, mengonsumsi, dan mengonsolidasikan laporan keuangan dari seluruh unit usaha / anak perusahaan (tenant BUMDesma) yang berjalan di ekosistem **SIDBM Next**.
+Dokumentasi ini adalah panduan teknis bagi pengembang aplikasi **Holding / BUMDesma Induk** untuk mengintegrasikan, mengonsumsi, dan mengonsolidasikan laporan keuangan dari seluruh unit usaha / anak perusahaan (tenant BUMDesma) yang berjalan di ekosistem **Akubumdes**.
 
 ---
 
 ## 1. Gambaran Umum Arsitektur
 
-SIDBM Next menyediakan RESTful API berstandar JSON yang dirancang khusus untuk komunikasi antar-server (*Server-to-Server / Machine-to-Machine*). Melalui API ini, sistem holding dapat:
+Akubumdes menyediakan RESTful API berstandar JSON yang dirancang khusus untuk komunikasi antar-server (*Server-to-Server / Machine-to-Machine*). Melalui API ini, sistem holding dapat:
 1. **Menemukan Unit Usaha (Tenant Discovery)**: Mengambil daftar seluruh unit anak perusahaan beserta kode wilayah dan status aktifnya.
 2. **Menarik Laporan Keuangan Individual**: Mengambil data Neraca, Laba Rugi, Arus Kas, CALK, dan Perubahan Ekuitas per anak usaha pada periode bulanan maupun tahunan.
 3. **Mengambil Laporan Konsolidasi**: Mengambil kompilasi laporan keuangan gabungan dari seluruh anak usaha atau filter unit tertentu dalam satu request.
@@ -14,8 +14,8 @@ SIDBM Next menyediakan RESTful API berstandar JSON yang dirancang khusus untuk k
 
 ### Base URL & Prefix Rute
 Semua endpoint terdaftar di bawah prefix API:
-- **Rute Utama (Versioned)**: `https://domain-sidbm.com/api/v1/holding/`
-- **Alias Sederhana**: `https://domain-sidbm.com/api/holding/`
+- **Rute Utama (Versioned)**: `https://domain-akubumdes.com/api/v1/holding/`
+- **Alias Sederhana**: `https://domain-akubumdes.com/api/holding/`
 
 ---
 
@@ -23,8 +23,8 @@ Semua endpoint terdaftar di bawah prefix API:
 
 API Holding diamankan melalui middleware `VerifyHoldingApiToken` (`holding.auth`).
 
-### 2.1 Konfigurasi Token pada SIDBM Next
-Tambahkan token rahasia pada berkas `.env` aplikasi SIDBM Next:
+### 2.1 Konfigurasi Token pada Akubumdes
+Tambahkan token rahasia pada berkas `.env` aplikasi Akubumdes:
 ```dotenv
 HOLDING_API_KEY="kunci-rahasia-holding-anda-disini"
 HOLDING_API_ENABLED=true
@@ -395,7 +395,7 @@ Endpoint konsolidasi menggabungkan data keuangan seluruh anak perusahaan di bawa
 
 ### 5.1 Contoh cURL
 ```bash
-curl -X GET "https://app-sidbm.com/api/v1/holding/reports/balance-sheet?tenant=bumdesma-mandiri&year=2026&month=8" \
+curl -X GET "https://app-akubumdes.com/api/v1/holding/reports/balance-sheet?tenant=bumdesma-mandiri&year=2026&month=8" \
      -H "Authorization: Bearer YOUR_HOLDING_API_KEY" \
      -H "Accept: application/json"
 ```
@@ -404,8 +404,8 @@ curl -X GET "https://app-sidbm.com/api/v1/holding/reports/balance-sheet?tenant=b
 ```php
 use Illuminate\Support\Facades\Http;
 
-$response = Http::withToken(config('services.sidbm.holding_key'))
-    ->get('https://app-sidbm.com/api/v1/holding/reports/pack', [
+$response = Http::withToken(config('services.holding.api_key'))
+    ->get('https://app-akubumdes.com/api/v1/holding/reports/pack', [
         'tenant' => 'bumdesma-mandiri',
         'year' => 2026,
         'month' => 8,
@@ -422,16 +422,16 @@ if ($response->successful()) {
 ```typescript
 import axios from 'axios';
 
-const sidbmApi = axios.create({
-  baseURL: 'https://app-sidbm.com/api/v1/holding',
+const holdingApi = axios.create({
+  baseURL: 'https://app-akubumdes.com/api/v1/holding',
   headers: {
-    'Authorization': `Bearer ${process.env.SIDBM_HOLDING_API_KEY}`,
+    'Authorization': `Bearer ${process.env.HOLDING_API_KEY}`,
     'Accept': 'application/json',
   },
 });
 
 export async function fetchHoldingBalanceSheet(tenantCode: string, year: number, month?: number) {
-  const { data } = await sidbmApi.get('/reports/balance-sheet', {
+  const { data } = await holdingApi.get('/reports/balance-sheet', {
     params: { tenant: tenantCode, year, month },
   });
   return data;
@@ -443,9 +443,9 @@ export async function fetchHoldingBalanceSheet(tenantCode: string, year: number,
 import os
 import requests
 
-url = "https://app-sidbm.com/api/v1/holding/reports/balance-sheet"
+url = "https://app-akubumdes.com/api/v1/holding/reports/balance-sheet"
 headers = {
-    "Authorization": f"Bearer {os.getenv('SIDBM_HOLDING_API_KEY')}",
+    "Authorization": f"Bearer {os.getenv('HOLDING_API_KEY')}",
     "Accept": "application/json",
 }
 params = {

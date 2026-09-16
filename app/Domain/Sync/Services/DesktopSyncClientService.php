@@ -36,7 +36,7 @@ final class DesktopSyncClientService
         }
 
         $pushResult = $this->outboxService->flushPendingMutations($tenantCode);
-        $serverUrl = rtrim((string) config('desktop.server.url', 'https://app.sidbm.id'), '/');
+        $serverUrl = rtrim((string) config('desktop.server.url', 'https://app.akubumdes.id'), '/');
         $apiKey = (string) config('desktop.server.api_key', '');
         $targetTenant = $tenantCode ?? (string) config('desktop.server.tenant_code', 'default');
         $timeout = (int) config('desktop.server.timeout_seconds', 30);
@@ -85,7 +85,7 @@ final class DesktopSyncClientService
     public function pingServer(): array
     {
         $startTime = microtime(true);
-        $serverUrl = rtrim((string) config('desktop.server.url', 'https://app.sidbm.id'), '/');
+        $serverUrl = rtrim((string) config('desktop.server.url', 'https://app.akubumdes.id'), '/');
         $apiKey = (string) config('desktop.server.api_key', '');
         $timeout = min(5, (int) config('desktop.server.timeout_seconds', 30));
 
@@ -120,7 +120,7 @@ final class DesktopSyncClientService
      */
     private function getSubscriptionGate(?string $tenantCode = null): array
     {
-        $serverUrl = rtrim((string) config('desktop.server.url', 'https://app.sidbm.id'), '/');
+        $serverUrl = rtrim((string) config('desktop.server.url', 'https://app.akubumdes.id'), '/');
         $apiKey = (string) config('desktop.server.api_key', '');
         $timeout = min(5, (int) config('desktop.server.timeout_seconds', 30));
 

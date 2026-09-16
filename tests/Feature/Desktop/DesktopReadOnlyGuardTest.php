@@ -96,14 +96,14 @@ final class DesktopReadOnlyGuardTest extends TestCase
     {
         Config::set('desktop.enabled', true);
         Config::set('desktop.offline', false);
-        Config::set('desktop.server.url', 'https://app.sidbm.id');
+        Config::set('desktop.server.url', 'https://app.akubumdes.id');
 
         $response = $this->get('/login');
         $response->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->has('desktop')
                 ->where('desktop.is_desktop', true)
-                ->where('desktop.server_url', 'https://app.sidbm.id')
+                ->where('desktop.server_url', 'https://app.akubumdes.id')
             );
     }
 }

@@ -136,8 +136,8 @@ final class DesktopSnapshotIngestionService
      */
     private function validateSnapshotStructure(array $snapshot): void
     {
-        if (($snapshot['format'] ?? '') !== 'sidbm-desktop-snapshot-v1') {
-            throw new InvalidArgumentException('Invalid snapshot format. Expected [sidbm-desktop-snapshot-v1].');
+        if (($snapshot['format'] ?? '') !== 'akubumdes-desktop-snapshot-v1') {
+            throw new InvalidArgumentException('Invalid snapshot format. Expected [akubumdes-desktop-snapshot-v1].');
         }
 
         if (! isset($snapshot['data']) || ! is_array($snapshot['data'])) {

@@ -140,7 +140,7 @@ final class WhatsappSettingController
 
         return response()->json($this->gateway->sendText(
             $validated['phone'],
-            $validated['message'] ?: 'Tes koneksi WhatsApp instance '.$instance->name.' dari SIDBM.',
+            $validated['message'] ?: 'Tes koneksi WhatsApp instance '.$instance->name.' dari Akubumdes.',
             $instance->instance_name,
         ));
     }

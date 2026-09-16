@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "enpiistudio/sidbm-next-boilerplate",
+    "name": "ab1-team/akubumdes",
     "type": "project",
-    "description": "SIDBM Next tenancy and accounting foundation for Laravel 13.",
+    "description": "Akubumdes tenancy and general ledger accounting platform for Laravel 13.",
     "license": "proprietary",
     "require": {
         "php": "^8.3",

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * One-shot pilot smoke for tenant code=local.
- * Run: docker exec new_sidbm-app-1 php scripts/smoke_pilot_local.php
+ * Run: docker exec akubumdes-app-1 php scripts/smoke_pilot_local.php
  */
 
 use App\Domain\Accounting\Models\JournalEntry;

@@ -86,8 +86,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       PLATFORM_DB_USERNAME: ${PLATFORM_DB_USERNAME:-root}
       PLATFORM_DB_PASSWORD: ${PLATFORM_DB_PASSWORD:-}
-      PLATFORM_DB_DATABASE: ${PLATFORM_DB_DATABASE:-sidbm_platform}
-      TENANT_DB_DATABASE: ${TENANT_DB_DATABASE:-sidbm_shard_local}
+      PLATFORM_DB_DATABASE: ${PLATFORM_DB_DATABASE:-akubumdes_platform}
+      TENANT_DB_DATABASE: ${TENANT_DB_DATABASE:-akubumdes_shard_local}
     volumes:
       - mysql-data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro

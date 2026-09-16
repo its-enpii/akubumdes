@@ -16,7 +16,7 @@ use RuntimeException;
  * WA Gateway API client for n8n webhook proxy -> Evolution API.
  * Supports multi-instance per tenant with rotation / load-balancing.
  *
- * @see F:\Workspace\laragon\www\sidbm\WA-GATEWAY-API.md
+ * @see WA-GATEWAY-API.md pada repositori aplikasi lama (legacy).
  */
 final class WhatsappGatewayService
 {
@@ -57,11 +57,11 @@ final class WhatsappGatewayService
 
     public function getInstance(): string
     {
-        $prefix = (string) config('services.wa_gateway.instance_prefix', 'app-sidbm');
+        $prefix = (string) config('services.wa_gateway.instance_prefix', 'app-akubumdes');
         if (! str_starts_with($prefix, 'app-')) {
             $prefix = 'app-'.ltrim($prefix, '-');
         }
-        $prefix = preg_replace('/[^a-zA-Z0-9_-]/', '', $prefix) ?: 'app-sidbm';
+        $prefix = preg_replace('/[^a-zA-Z0-9_-]/', '', $prefix) ?: 'app-akubumdes';
 
         $tenantId = $this->context->id();
 

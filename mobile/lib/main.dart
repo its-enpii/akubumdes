@@ -11,18 +11,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.initDependencies();
   di.sl<MobileOfflineSyncService>().startPeriodicFlush();
-  runApp(const SidbmMobileApp());
+  runApp(const AkubumdesMobileApp());
 }
 
-class SidbmMobileApp extends StatelessWidget {
-  const SidbmMobileApp({super.key});
+class AkubumdesMobileApp extends StatelessWidget {
+  const AkubumdesMobileApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => di.sl<AuthBloc>()..add(AuthCheckRequested()),
       child: MaterialApp(
-        title: 'SIDBM Mobile',
+        title: 'Akubumdes Mobile',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         home: BlocBuilder<AuthBloc, AuthState>(

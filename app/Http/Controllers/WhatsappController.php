@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 /**
  * Controller for WhatsApp Gateway endpoints.
  *
- * @see F:\Workspace\laragon\www\sidbm\WA-GATEWAY-API.md
+ * @see WA-GATEWAY-API.md pada repositori aplikasi lama (legacy).
  */
 final class WhatsappController extends Controller
 {

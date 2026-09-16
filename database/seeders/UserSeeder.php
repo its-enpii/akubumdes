@@ -41,7 +41,7 @@ final class UserSeeder extends Seeder
                 'driver' => 'mysql',
                 'host' => (string) config('database.connections.tenant.host', 'mysql'),
                 'port' => (int) config('database.connections.tenant.port', 3306),
-                'database_name' => (string) config('database.connections.tenant.database', 'sidbm_shard_local'),
+                'database_name' => (string) config('database.connections.tenant.database', 'akubumdes_shard_local'),
                 'credential_reference' => 'local',
                 'placement_type' => 'shared',
                 'status' => 'active',

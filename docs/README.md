@@ -1,6 +1,6 @@
-# Dokumentasi Proyek SIDBM Next
+# Dokumentasi Proyek Akubumdes
 
-Indeks dokumentasi lengkap untuk arsitektur, panduan pengguna, basis data, billing, modul supervisi, RBAC, asisten AI, dan pengujian SIDBM Next:
+Indeks dokumentasi lengkap untuk arsitektur, panduan pengguna, basis data, billing, modul supervisi, RBAC, asisten AI, dan pengujian Akubumdes:
 
 ---
 
@@ -9,7 +9,7 @@ Indeks dokumentasi lengkap untuk arsitektur, panduan pengguna, basis data, billi
 Dokumentasi penggunaan aplikasi untuk pengguna akhir, pengelola BUMDesma/LKD, operator desa, supervisor wilayah, dan administrator:
 
 - [USER_GUIDE.md](USER_GUIDE.md) – **Panduan Pengguna Lengkap (User Manual)**: Mencakup seluruh 86 halaman dan fitur aplikasi (Dashboard, Master Data, Lending Lifecycle, Akuntansi & Jurnal, Inventaris, E-Budgeting, Pelaporan Keuangan & Piutang, Prosedur Periodik, Billing SaaS, WhatsApp Gateway, RBAC, Onboarding, Portal Pengawasan, Superadmin, AI Assistant, dan 36 Dokumen Cetak PDF).
-- [CUTOVER_RUNBOOK.md](CUTOVER_RUNBOOK.md) – Panduan teknis migrasi dan *cutover* data per tenant dari database legacy ke SIDBM Next.
+- [CUTOVER_RUNBOOK.md](CUTOVER_RUNBOOK.md) – Panduan teknis migrasi dan *cutover* data per tenant dari database legacy ke Akubumdes.
 - [VALIDATION.md](VALIDATION.md) – Panduan verifikasi statis, pengujian backend PHPUnit, dan pengujian frontend Playwright browser (E2E).
 
 ---
@@ -30,9 +30,9 @@ Dokumentasi teknis arsitektur, skema basis data, keamanan hak akses, billing, in
 
 ## 3. Analisis Komparatif & Migrasi Legacy
 
-Dokumentasi perbandingan mendalam antara sistem versi legacy (PHP Native) dengan arsitektur modern SIDBM Next:
+Dokumentasi perbandingan mendalam antara sistem versi legacy (PHP Native) dengan arsitektur modern Akubumdes:
 
-- [PERBANDINGAN_SIDBM_LEGACY_VS_NEXT.md](PERBANDINGAN_SIDBM_LEGACY_VS_NEXT.md) – Analisis komparatif menyeluruh SIDBM Legacy (`/sidbm`) vs SIDBM Next (`/new_sidbm`), alasan upgrade, arsitektur, SaaS billing, supervisi wilayah, dan infrastruktur.
+- [PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md](PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md) – Analisis komparatif menyeluruh aplikasi lama (legacy) vs Akubumdes (`/akubumdes`), alasan upgrade, arsitektur, SaaS billing, supervisi wilayah, dan infrastruktur.
 - [PERBANDINGAN_DATABASE_LEGACY_VS_NEXT.md](PERBANDINGAN_DATABASE_LEGACY_VS_NEXT.md) – Perbandingan skema tabel database legacy vs normalisasi tabel modern multi-tenant.
 - [LEGACY_REPORTS_MIGRATION_ROADMAP.md](LEGACY_REPORTS_MIGRATION_ROADMAP.md) – Matriks spesifikasi dan status 100% implementasi laporan akuntansi, laporan piutang, paket LPJ tahunan MAD, dan dokumen perguliran pinjaman.
 

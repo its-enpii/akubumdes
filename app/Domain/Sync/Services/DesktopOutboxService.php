@@ -39,7 +39,7 @@ final class DesktopOutboxService
     public function flushPendingMutations(?string $tenantCode = null, ?string $connectionName = null): array
     {
         $connection = $connectionName ?? (string) config('database.default', 'sqlite');
-        $serverUrl = rtrim((string) config('desktop.server.url', 'https://app.sidbm.id'), '/');
+        $serverUrl = rtrim((string) config('desktop.server.url', 'https://app.akubumdes.id'), '/');
         $apiKey = (string) config('desktop.server.api_key', '');
         $tenant = $tenantCode ?? (string) config('desktop.server.tenant_code', 'default');
         $timeout = (int) config('desktop.server.timeout_seconds', 30);

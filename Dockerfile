@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 #
-# Base image for new_sidbm (PHP-FPM 8.4). All app source, vendor/, and .env
+# Base image for akubumdes (PHP-FPM 8.4). All app source, vendor/, and .env
 # are mounted at runtime from the host via the `app` service's volumes, so
 # this image only ships the runtime — system packages, PHP extensions, and
 # the entrypoint. Code edits on the host take effect after `docker compose
@@ -45,11 +45,11 @@ RUN groupmod -o -g "$GID" www-data \
 
 # Project config & entrypoint.
 WORKDIR /var/www/html
-COPY docker/app/php.ini       /usr/local/etc/php/conf.d/99-sidbm.ini
-COPY docker/app/entrypoint.sh /usr/local/bin/sidbm-entrypoint
-RUN chmod +x /usr/local/bin/sidbm-entrypoint
+COPY docker/app/php.ini       /usr/local/etc/php/conf.d/99-akubumdes.ini
+COPY docker/app/entrypoint.sh /usr/local/bin/akubumdes-entrypoint
+RUN chmod +x /usr/local/bin/akubumdes-entrypoint
 
 USER www-data
 
-ENTRYPOINT ["sidbm-entrypoint"]
+ENTRYPOINT ["akubumdes-entrypoint"]
 CMD ["php-fpm"]

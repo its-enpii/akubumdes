@@ -81,7 +81,7 @@ jobs:
             set -e
             TARGET_PATH="${{ secrets.DEPLOY_PATH }}"
             if [ -z "$TARGET_PATH" ]; then
-              TARGET_PATH="/home/enpii/new_sidbm"
+              TARGET_PATH="/home/enpii/akubumdes"
             fi
             
             echo "Deploying to $TARGET_PATH..."

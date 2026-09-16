@@ -19,7 +19,7 @@ async function performLogin(page: Page, username: string = 'superadmin'): Promis
     return true;
 }
 
-test.describe('SIDBM UI Consistency & E2E Tests', () => {
+test.describe('Akubumdes UI Consistency & E2E Tests', () => {
 
     test('1. Login Page UI component consistency', async ({ page }) => {
         await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });

@@ -1,7 +1,7 @@
 ﻿import 'package:flutter_test/flutter_test.dart';
-import 'package:sidbm_mobile/core/utils/currency_formatter.dart';
-import 'package:sidbm_mobile/core/utils/date_formatter.dart';
-import 'package:sidbm_mobile/features/auth/domain/entities/auth_entities.dart';
+import 'package:akubumdes_mobile/core/utils/currency_formatter.dart';
+import 'package:akubumdes_mobile/core/utils/date_formatter.dart';
+import 'package:akubumdes_mobile/features/auth/domain/entities/auth_entities.dart';
 
 void main() {
   group('CurrencyFormatter', () {

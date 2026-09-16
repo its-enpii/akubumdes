@@ -23,7 +23,7 @@ test('Test Chat Assistant Live', async ({ page }) => {
                 'Accept': 'text/event-stream, application/json',
             },
             body: JSON.stringify({
-                message: 'Halo Ariel! Siapa namamu dan apa tugas utamamu di SIDBM?',
+                message: 'Halo Ariel! Siapa namamu dan apa tugas utamamu di Akubumdes?',
                 persona_slug: 'default'
             })
         });

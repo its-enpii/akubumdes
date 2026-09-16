@@ -1,8 +1,8 @@
-import 'package:sidbm_mobile/core/utils/whatsapp_helper.dart';
-import 'package:sidbm_mobile/features/auth/domain/entities/auth_entities.dart';
-import 'package:sidbm_mobile/features/collection/domain/entities/collection_entities.dart';
-import 'package:sidbm_mobile/features/verification/domain/entities/verification_entities.dart';
-import 'package:sidbm_mobile/features/approval/domain/entities/approval_entities.dart';
+import 'package:akubumdes_mobile/core/utils/whatsapp_helper.dart';
+import 'package:akubumdes_mobile/features/auth/domain/entities/auth_entities.dart';
+import 'package:akubumdes_mobile/features/collection/domain/entities/collection_entities.dart';
+import 'package:akubumdes_mobile/features/verification/domain/entities/verification_entities.dart';
+import 'package:akubumdes_mobile/features/approval/domain/entities/approval_entities.dart';
 
 void main() {
   int passed = 0;
@@ -18,7 +18,7 @@ void main() {
     }
   }
 
-  print('=== SIDBM FLUTTER DOMAIN & UTILS TEST SUITE ===\n');
+  print('=== AKUBUMDES FLUTTER DOMAIN & UTILS TEST SUITE ===\n');
 
   // 1. WHATSAPP HELPER
   print('[1] Testing WhatsApp URL Generator & Phone Normalizer:');

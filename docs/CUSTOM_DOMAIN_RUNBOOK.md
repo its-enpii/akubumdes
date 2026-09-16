@@ -34,9 +34,9 @@ Request Host ──► ResolvePublicSite middleware
 
 ### 3a. Tenant pakai subdomain platform (paling sederhana)
 
-Contoh: platform `sidbm.or.id` (A → VPS), tenant `bumdes-sukamaju.sidbm.or.id`.
+Contoh: platform `akubumdes.or.id` (A → VPS), tenant `bumdes-sukamaju.akubumdes.or.id`.
 
-- Tambahkan wildcard `*.sidbm.or.id` CNAME/A → platform, ATAU tambah per-tenant A/CNAME. Wildcard cukup untuk semua tenant yang tetap di bawah domain platform.
+- Tambahkan wildcard `*.akubumdes.or.id` CNAME/A → platform, ATAU tambah per-tenant A/CNAME. Wildcard cukup untuk semua tenant yang tetap di bawah domain platform.
 - Tidak perlu verifikasi kepemilikan domain di sisi tenant.
 
 ### 3b. Domain kustom penuh (mis. `bumdessukamaju.or.id`)
@@ -51,7 +51,7 @@ Tenant punya domain sendiri — vendor hanya mengarahkan.
 | **A** | `@` (apex) | IP publik VPS platform | 300 |
 | **A** | `www` | IP yang sama | 300 |
 | — ATAU — | | | |
-| **CNAME** | `www` | `sidbm.or.id` | 300 |
+| **CNAME** | `www` | `akubumdes.or.id` | 300 |
 
 > Apex (`@`) tidak boleh CNAME per RFC — pakai **A** (atau ALIAS/ANAME jika provider mendukung). Subdomain (`www`, `bumdes`…) boleh CNAME.
 
@@ -66,7 +66,7 @@ dig +short CNAME www.bumdessukamaju.or.id
 4. Verifikasi di aplikasi:
 
 ```bash
-curl -I -H "Host: bumdessukamaju.or.id" https://sidbm.or.id/          # via platform host + Host header (smoke tanpa DNS)
+curl -I -H "Host: bumdessukamaju.or.id" https://akubumdes.or.id/          # via platform host + Host header (smoke tanpa DNS)
 curl -I https://bumdessukamaju.or.id/                                  # setelah DNS jadi
 curl -s https://bumdessukamaju.or.id/sitemap.xml | head
 curl -s https://bumdessukamaju.or.id/robots.txt
@@ -75,7 +75,7 @@ curl -s https://bumdessukamaju.or.id/robots.txt
 - `/` tenant → `PublicSite/TenantHome` (bukan `Home` vendor).
 - `/kontak` → `PublicSite/Contact`.
 - `/sitemap.xml` memuat `/berita`, post & page published.
-- Host platform (`localhost`/`sidbm.or.id`) ke `/kontak` tetap vendor `Home` — ini expected (test `test_public_contact_page_falls_back_to_vendor_home_on_platform_host`).
+- Host platform (`localhost`/`akubumdes.or.id`) ke `/kontak` tetap vendor `Home` — ini expected (test `test_public_contact_page_falls_back_to_vendor_home_on_platform_host`).
 
 ### 3c. Lokal / Laragon (dev)
 
@@ -165,7 +165,7 @@ Durasi tipikal: DNS 5–30 menit (tergantung TTL), TLS <2 menit setelah DNS jadi
 | Domain kustom masih tampil vendor `Home` | DNS belum propagasi / `metadata.domains` salah / cache 300s belum flush | `dig`, `SELECT metadata FROM tenant_registry`, `PublicSiteResolver::flush()` |
 | `/kontak` 429 | Rate limit `throttle:10,1` di route kontak | Normal — tunggu 1 menit; bot honeypot `website` terisi juga 200 palsu (sengaja) |
 | `sitemap.xml` kosong (hanya `/`) | Tenant suspended atau tidak ada post/page published | `tenants.status`, `site_posts.status='published'` |
-| Mixed content / ikon tidak load | `APP_URL` masih `http` | Set `APP_URL=https://sidbm.or.id`, `ASSET_URL` jika pakai CDN |
+| Mixed content / ikon tidak load | `APP_URL` masih `http` | Set `APP_URL=https://akubumdes.or.id`, `ASSET_URL` jika pakai CDN |
 | Cert error `ERR_CERT_COMMON_NAME_INVALID` | nginx server_name tidak mencakup domain / Caddy ask endpoint return 404 | `nginx -T`, log Caddy, endpoint `/internal/tls-ask` |
 
 ## 8) Referensi kode

@@ -62,7 +62,7 @@ final class DesktopSyncApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('status', 'success')
-            ->assertJsonPath('format', 'sidbm-desktop-snapshot-v1')
+            ->assertJsonPath('format', 'akubumdes-desktop-snapshot-v1')
             ->assertJsonPath('type', 'full')
             ->assertJsonPath('tenant.code', 'tenant-a')
             ->assertJsonStructure([

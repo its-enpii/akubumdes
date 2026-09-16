@@ -1,6 +1,6 @@
-# Dokumen Analisis Perbandingan Komprehensif: SIDBM Legacy vs SIDBM Next
+# Dokumen Analisis Perbandingan Komprehensif: Aplikasi Lama (Legacy) vs Akubumdes
 
-**Dokumen ID**: docs/PERBANDINGAN_SIDBM_LEGACY_VS_NEXT.md  
+**Dokumen ID**: docs/PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md  
 **Tanggal**: 10 Agustus 2026  
 **Penulis**: Team Engineering & System Architecture  
 **Status**: Dokumentasi Resmi Transformasi Arsitektur  
@@ -9,9 +9,9 @@
 
 ## 1. Ringkasan Eksekutif
 
-Aplikasi **SIDBM (Sistem Informasi Dana Bergulir Masyarakat)** telah menjadi tulang punggung operasional pengolahan dana bergulir (UPK / BUMDesma LKD) selama bertahun-tahun. Namun, seiring dengan pertumbuhan entitas, kebutuhan pengawasan tingkat Kabupaten, dan tuntutan standar keandalan perangkat lunak modern, arsitektur **SIDBM Legacy** (berada pada repositori F:\Workspace\laragon\www\sidbm) menghadapi batas kemampuan teknis (*technical ceiling*) yang menghambat skalabilitas, keamanan, dan pemeliharaan kode.
+Aplikasi lama **(Sistem Informasi Dana Bergulir Masyarakat)** telah menjadi tulang punggung operasional pengolahan dana bergulir (UPK / BUMDesma LKD) selama bertahun-tahun. Namun, seiring dengan pertumbuhan entitas, kebutuhan pengawasan tingkat Kabupaten, dan tuntutan standar keandalan perangkat lunak modern, arsitektur **versi lama (legacy)** menghadapi batas kemampuan teknis (*technical ceiling*) yang menghambat skalabilitas, keamanan, dan pemeliharaan kode.
 
-**SIDBM Next** (repositori F:\Workspace\laragon\www\new_sidbm) dibangun kembali secara fundamental (*ground-up architectural rewrite*) untuk menyelesaikan seluruh hambatan tersebut tanpa menghilangkan data historis maupun alur bisnis inti.
+**Akubumdes** (repositori F:\Workspace\laragon\www\akubumdes) dibangun kembali secara fundamental (*ground-up architectural rewrite*) untuk menyelesaikan seluruh hambatan tersebut tanpa menghilangkan data historis maupun alur bisnis inti.
 
 ---
 
@@ -19,7 +19,7 @@ Aplikasi **SIDBM (Sistem Informasi Dana Bergulir Masyarakat)** telah menjadi tul
 
 Mengapa pembaruan aplikasi ini **wajib** dilakukan dan tidak cukup hanya dengan menambal kode legacy?
 
-### 2.1 Hambatan Utama pada SIDBM Legacy:
+### 2.1 Hambatan Utama pada Aplikasi Lama (Legacy):
 1. **Schema Drift & Tabel Dinamis Per-Tenant (	ransaksi_1, 	ransaksi_2, nggota_1, ...)**
    Pada sistem legacy, setiap tenant baru memicu pembuatan puluhan tabel baru dengan suffix angka ID tenant. Ketika terdapat ratusan tenant, database memiliki **puluhan ribu tabel**. Mengubah struktur kolom (*migration*) mengharuskan eksekusi perintah SQL ke ribuan tabel satu per satu, yang sangat rawan memicu ketidakseragaman skema (*schema drift*) dan kegagalan migrasi pertengahan.
 2. **Ketiadaan Foreign Key & Integritas Data Rentan**
@@ -27,7 +27,7 @@ Mengapa pembaruan aplikasi ini **wajib** dilakukan dan tidak cukup hanya dengan 
 3. **Penghitungan Saldo Berbasis Trigger & Teks (VARCHAR Uang)**
    Nilai angka finansial pada beberapa tabel legacy disimpan dalam format teks string (VARCHAR). Penghitungan saldo akun dipelihara melalui *MySQL Triggers* yang kompleks. Jika terjadi koreksi transaksi historis, trigger sering memicu penguncian tabel (*table lock*) dan inkonsistensi saldo.
 4. **Performa Aggregasi & Keterbatasan Portal Kabupaten Legacy**
-   Meskipun SIDBM Legacy telah memiliki modul level Kabupaten (`/kab` dengan guard `auth:kabupaten`), fitur ini terkendala oleh performa aggregasi yang lambat karena harus meloop puluhan tabel dinamis tenant per kecamatan secara runtime, serta keterbatasan visualisasi interaktif & laporan konsolidasi mendalam (seperti CALK konsolidasi kabupaten).
+   Meskipun aplikasi lama telah memiliki modul level Kabupaten (`/kab` dengan guard `auth:kabupaten`), fitur ini terkendala oleh performa aggregasi yang lambat karena harus meloop puluhan tabel dinamis tenant per kecamatan secara runtime, serta keterbatasan visualisasi interaktif & laporan konsolidasi mendalam (seperti CALK konsolidasi kabupaten).
 5. **Proses Bisnis Manual (Tidak Ada Pembayaran Online & Billing Automation)**
    Tagihan biaya langganan aplikasi atau pencatatan pembayaran masih dilakukan secara manual tanpa integrasi Payment Gateway, tanpa penanganan otomatis untuk tenant yang menunggak (*overdue*).
 6. **Keterbatasan Pengujian Automated & Risiko Human Error**
@@ -37,7 +37,7 @@ Mengapa pembaruan aplikasi ini **wajib** dilakukan dan tidak cukup hanya dengan 
 
 ## 3. Perbandingan Arsitektur & Teknologi Core
 
-| Komponen | SIDBM Legacy (/sidbm) | SIDBM Next (/new_sidbm) | Keuntungan & Implikasi SIDBM Next |
+| Komponen | Aplikasi Lama (legacy) | Akubumdes (/akubumdes) | Keuntungan & Implikasi Akubumdes |
 |---|---|---|---|
 | **Framework Backend** | PHP 8.1 / Laravel 10.x | **PHP 8.4 / Laravel 13.x** | Menggunakan fitur PHP/Laravel terbaru (Attribute, Enums, Performance improvements, modern container injection). |
 | **Arsitektur Frontend** | Monolithic Blade Views + jQuery + DataTables (Server-side rendering tradisional) | **Single Page Application (SPA) via Inertia.js 2.0 + Vue 3.5 + Tailwind CSS 4 + Vite 7** | Pengalaman pengguna instan tanpa reload halaman, komponen UI modular yang konsisten, proses build & HMR kilat via Vite 7. |
@@ -51,15 +51,15 @@ Mengapa pembaruan aplikasi ini **wajib** dilakukan dan tidak cukup hanya dengan 
 
 ## 4. Perbandingan Model Basis Data & Tenancy Internals
 
-### 4.1 SIDBM Legacy
+### 4.1 Aplikasi Lama (Legacy)
 - **Topologi Database**: Membuka koneksi database tunggal, lalu mengeksekusi query dengan nama tabel dinamis seperti SELECT * FROM transaksi_12.
 - **Primary Key**: idt / id bertipe integer sederhana.
 - **Isolasi Data**: Mengandalkan penggabungan string nama tabel di PHP Controller ("transaksi_" . ). Sangat rawan error pemanggilan tabel.
 
-### 4.2 SIDBM Next
+### 4.2 Akubumdes
 - **Topologi Database**:
-  - sidbm_platform: Menyimpan data SaaS global, pengguna (users), tenant (	enants), shard database (database_shards), penempatan tenant (	enant_placements), dan tagihan (invoices).
-  - sidbm_shard_XX: Menggunakan skema yang sama untuk seluruh tenant. Setiap baris data operasional memiliki kolom 	enant_id.
+  - akubumdes_platform: Menyimpan data SaaS global, pengguna (users), tenant (	enants), shard database (database_shards), penempatan tenant (	enant_placements), dan tagihan (invoices).
+  - akubumdes_shard_XX: Menggunakan skema yang sama untuk seluruh tenant. Setiap baris data operasional memiliki kolom 	enant_id.
 - **Sistem Identitas Ganda (Legacy Compatibility)**:
   - 
 ow_id: *BIGINT UNSIGNED Auto-Increment* sebagai Primary Key internal teknis database.
@@ -77,7 +77,7 @@ ow_id: *BIGINT UNSIGNED Auto-Increment* sebagai Primary Key internal teknis data
 - Saldo akun dihitung dan diperbarui menggunakan trigger database pada tabel saldo_{tenant}.
 - Reversal transaksi dilakukan dengan menghapus baris transaksi atau mengedit baris historis langsung.
 
-### 5.2 Next Accounting Engine (App\Domain\Accounting)
+### 5.2 Mesin Akuntansi Akubumdes (App\Domain\Accounting)
 - **Double-Entry Journal Balancing**: Setiap transaksi wajib membentuk pasangan berimbang pada tabel journal_entries dan journal_lines (Total Debit = Total Kredit).
 - **Ketat terhadap Tipe Data**: Nilai uang disimpan secara konsisten menggunakan DECIMAL(19,2).
 - **Immutability & Audit Trail**: Jurnal yang telah diposting tidak dapat diubah/dihapus (*immutable*). Reversal dilakukan melalui jurnal pembalik resmi (JournalReversalService) dengan tautan relasi jurnal asal.
@@ -86,7 +86,7 @@ ow_id: *BIGINT UNSIGNED Auto-Increment* sebagai Primary Key internal teknis data
 ---
 
 ### 5.3 Implementasi Lengkap 17 Skenario Jurnal Umum SOP (JournalEntryOptionResolver)
-Seluruh 17 skenario transaksi jurnal umum dari SOP *Panduan Transaksi SI DBM* telah sepenuhnya diintegrasikan ke dalam resolver jurnal umum (JournalEntryOptionResolver), terbagi menjadi 4 kelompok utama:
+Seluruh 17 skenario transaksi jurnal umum dari SOP *Panduan Transaksi* aplikasi lama telah sepenuhnya diintegrasikan ke dalam resolver jurnal umum (JournalEntryOptionResolver), terbagi menjadi 4 kelompok utama:
 1. **Umum**: Aset Masuk (Penerimaan), Aset Keluar (Pengeluaran/Beban), Pemindahan Saldo (Mutasi Kas/Bank), Investasi Unit Usaha.
 2. **Pembelian Aset & DP**: Pembelian Tanah, Gedung, Kendaraan, Peralatan/Inventaris, Aset Tak Berwujud (Lisensi/Sewa/Asuransi), Uang Muka / Konstruksi Dalam Pengerjaan, dan Pengakuan Aset Tetap dari DP.
 3. **Kewajiban & Modal**: Penerimaan Utang Bank/Pihak ke-3, Pembayaran Utang Bank & Bunga, Penyertaan Modal Desa/Masyarakat, Pembayaran Utang Laba Bagian Desa/Masyarakat, Pembayaran Utang Pajak PPh, dan Pembayaran Utang Bonus Prestasi.
@@ -94,7 +94,7 @@ Seluruh 17 skenario transaksi jurnal umum dari SOP *Panduan Transaksi SI DBM* te
 
 ## 6. Fitur Baru: Portal Pengawasan & Konsolidasi Kabupaten (Regency Module)
 
-Modul Supervisi Kabupaten pada SIDBM Next merupakan perombakan total dari portal /kab pada SIDBM Legacy, menghadirkan performa aggregasi instan dan fitur konsolidasi yang jauh lebih komprehensif.
+Modul Supervisi Kabupaten pada Akubumdes merupakan perombakan total dari portal /kab pada aplikasi lama, menghadirkan performa aggregasi instan dan fitur konsolidasi yang jauh lebih komprehensif.
 
 ### Capabilities Modul Kabupaten:
 1. **Multi-Kecamatan Shard Aggregation (RegencyConsolidatedReportService)**:
@@ -113,7 +113,7 @@ Modul Supervisi Kabupaten pada SIDBM Next merupakan perombakan total dari portal
 
 ## 7. Fitur Baru: Automatisasi SaaS Billing & Tripay Payment Gateway
 
-Pada SIDBM Legacy, manajemen langganan tenant tidak tersedia. Pada SIDBM Next, sistem dilengkapi modul **SaaS Billing & Payment Automation** lengkap:
+Pada aplikasi lama, manajemen langganan tenant tidak tersedia. Pada Akubumdes, sistem dilengkapi modul **SaaS Billing & Payment Automation** lengkap:
 
 1. **In-App Payment Channel Interface**:
    Tenant dapat memilih metode pembayaran langsung di dalam aplikasi:
@@ -132,7 +132,7 @@ Pada SIDBM Legacy, manajemen langganan tenant tidak tersedia. Pada SIDBM Next, s
 
 ## 8. Fitur Baru: Asisten AI Interaktif & Vector RAG (enpii/assistant)
 
-SIDBM Next mengintegrasikan asisten cerdas internal **Ariel** yang bertindak sebagai *pair assistant* pengguna:
+Akubumdes mengintegrasikan asisten cerdas internal **Ariel** yang bertindak sebagai *pair assistant* pengguna:
 
 1. **Vector Store RAG (PostgreSQL pgvector)**:
    Membaca dan mencari dokumen SOP, aturan dana bergulir, dan panduan akuntansi menggunakan *Cosine Similarity* sub-milidetik pada indeks HNSW.
@@ -148,13 +148,12 @@ omic-embed-text untuk mengonversi dokumen menjadi vector tanpa mengirim data sen
 
 ## 9. Infrastruktur & Performa Sistem
 
-| Item Infrastruktur | SIDBM Legacy | SIDBM Next |
+| Item Infrastruktur | Aplikasi Lama (Legacy) | Akubumdes |
 |---|---|---|
 | **Koneksi Database** | Single MySQL connection | Dynamic Shard Connection Manager (ShardConnectionManager) |
 | **Cache Engine** | File-based Cache | **Redis 8 Cache (CACHE_STORE=redis)** |
 | **Session Handling** | File-based Session | **Redis 8 Session Driver (SESSION_DRIVER=redis)** |
-| **Queue & Background Jobs** | Synchronous Execution | **Dedicated Redis Queue Worker (QUEUE_CONNECTION=redis, container 
-ew_sidbm-queue-1)** |
+| **Queue & Background Jobs** | Synchronous Execution | **Dedicated Redis Queue Worker (QUEUE_CONNECTION=redis, container `akubumdes-queue-1`** |
 | **Search Engine** | Query SQL LIKE parsial per tabel | **Omnibox Global Search (GlobalSearchService)** menembus Anggota, Kelompok, Pinjaman, Jurnal, & Aset |
 | **UI Components** | HTML Select / Inputs bawaan browser | **Reusable Component Suite** (SmartSelect, ReportPeriodFilter, AppRadioGroup, AppDatePicker, AppCard, AppBadge, AppModal, AppToast) |
 
@@ -162,7 +161,7 @@ ew_sidbm-queue-1)** |
 
 ## 10. Matriks Perbandingan Fitur Samping-demi-Samping (Head-to-Head)
 
-| Fitur / Kemampuan | SIDBM Legacy (/sidbm) | SIDBM Next (/new_sidbm) |
+| Fitur / Kemampuan | Aplikasi Lama (legacy) | Akubumdes (/akubumdes) |
 |---|---|---|
 | **Multi-Tenant Sharding** | ❌ Tidak (Tabel dinamis suffix) | ✅ Ya (Platform DB + Tenant Shards) |
 | **Pencegahan Schema Drift** | ❌ Tidak (Perlu run SQL per tabel) | ✅ Ya (Migration berjalan per Shard DB) |
@@ -185,12 +184,12 @@ ew_sidbm-queue-1)** |
 
 ## 11. Kesimpulan & Rekomendasi
 
-Pembaruan dari **SIDBM Legacy** ke **SIDBM Next** bukan sekadar pembaruan tampilan (*facelift*), melainkan **modernisasi total arsitektur sistem informasi**. 
+Pembaruan dari **aplikasi lama (legacy)** ke **Akubumdes** bukan sekadar pembaruan tampilan (*facelift*), melainkan **modernisasi total arsitektur sistem informasi**. 
 
 ### Rekomendasi Langkah Selanjutnya:
-1. **Lakukan Cutover Data Pilot**: Gunakan Artisan orchestrator (php artisan legacy:cutover-tenant local 1) untuk menguji migrasi data tenant dari legacy ke Next sesuai docs/CUTOVER_RUNBOOK.md.
+1. **Lakukan Cutover Data Pilot**: Gunakan Artisan orchestrator (php artisan legacy:cutover-tenant local 1) untuk menguji migrasi data tenant dari legacy ke Akubumdes sesuai docs/CUTOVER_RUNBOOK.md.
 2. **Sosialisasi Portal Kabupaten**: Aktifkan akun supervisor kabupaten (is_regency_user = true) agar pihak pengawas dapat langsung memantau laporan konsolidasi keuangan seluruh kecamatan.
 3. **Pengaktifan Tripay Merchant**: Masukkan TRIPAY_API_KEY, TRIPAY_PRIVATE_KEY, dan TRIPAY_MERCHANT_CODE produksi pada .env untuk mengaktifkan penerimaan pembayaran langganan secara otomatis.
 
-Dokumen ini menjadi acuan resmi mengenai keputusan teknis, arsitektur, dan keunggulan SIDBM Next dibanding versi legacy.
+Dokumen ini menjadi acuan resmi mengenai keputusan teknis, arsitektur, dan keunggulan Akubumdes dibanding versi legacy.
 

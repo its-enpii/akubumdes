@@ -87,7 +87,7 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 - **Sistem Angsuran Legacy (23 Sistem) & Grace Period:**
-  - Master data tabel shard `installment_systems` berisi 23 sistem angsuran legacy SI DBM (seeder `InstallmentSystemSeeder`, provisioning otomatis per-tenant via `TenantInstallmentSystemProvisioner`).
+  - Master data tabel shard `installment_systems` berisi 23 sistem angsuran dari aplikasi lama (seeder `InstallmentSystemSeeder`, provisioning otomatis per-tenant via `TenantInstallmentSystemProvisioner`).
   - Enum frekuensi baru pada mesin pinjaman & simulasi: `every_4` s/d `every_12`, `every_24`, dan `every_36` bulan; `weekly`, `bimonthly`, `quarterly`, dan `at_maturity` tetap didukung.
   - Kolom `principal_grace_months` & `interest_grace_months` pada tabel `loans`: sistem M1/M2/M3/M6/M12/M24/Musiman kini menghasilkan jadwal yang benar (pokok dan/atau jasa ditunda N bulan setelah cair; total pokok tetap, pembulatan diserap angsuran terakhir; M1 menunda pokok+jasa, sisanya pokok saja).
   - `LegacyLendingNormalizer` & `LegacyLoanLoader` tidak lagi memaksa `flat`: `sistem_angsuran`/`sa_jasa` legacy dipetakan ke frekuensi + grace yang sesuai.
@@ -120,7 +120,7 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
   - OTP lupa password kini mencoba instance platform terlebih dahulu, lalu fallback ke instance tenant; akun tanpa `tenant_id` (superadmin) hanya menggunakan instance platform agar tidak ada NPE pada resolver tenant.
   - Automated feature test `tests/Feature/Admin/PlatformWhatsappTest.php` serta skenario fallback OTP pada `tests/Feature/Auth/ForgotPasswordTest.php`.
 - **Situs Publik Ber-branding Tenant di Domain Kustom (Fase 1):**
-  - Resolusi host → tenant untuk halaman publik via `PublicSiteResolver` (`app/Tenancy/Services/`) dengan cache berversi (TTL 300 detik, flush O(1) lewat kenaikan versi) — `localhost`/host platform/`SITE_PLATFORM_HOSTS` selalu merender halaman vendor SIDBM.
+  - Resolusi host → tenant untuk halaman publik via `PublicSiteResolver` (`app/Tenancy/Services/`) dengan cache berversi (TTL 300 detik, flush O(1) lewat kenaikan versi) — `localhost`/host platform/`SITE_PLATFORM_HOSTS` selalu merender halaman vendor Akubumdes.
   - Middleware `ResolvePublicSite` (alias `public.site`): menghubungkan shard + inisialisasi `TenantContext` untuk host tenant, **tanpa fail keras** — host tak dikenal jatuh lembut ke halaman vendor, bukan 403; context & koneksi dilepas di blok `finally` agar tidak bocor antar-request worker.
   - Route `/` kini dipegang `PublicSiteController` (`app/Http/Controllers/PublicSite/`): host tenant aktif merender halaman landing `PublicSite/TenantHome` ber-branding `OrganizationProfile` (logo, nama legal/singkat, alamat, kontak, tahun berdiri, CTA "Masuk Sistem" ke `/login`), tenant `suspended` dan host tak dikenal tetap ke halaman vendor, short-circuit desktop (`X-Desktop-Client` / `DESKTOP_MODE`) ke `/login` tetap terjaga.
   - `Tenant::matchesHost()` di `app/Models/Platform/Tenant.php` — logika pencocokan domain (exact + wildcard `*.domain`) dipindah dari `TenantResolver::candidateMatchesHost()` (dihapus) agar dipakai bersama resolver tenancy & resolver situs publik.
@@ -132,7 +132,7 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
   - Admin CRUD berita (`/website/posts`) dan halaman (`/website/pages`) dengan editor rich text `AppRichEditor`, upload/hapus gambar sampul (JPG/PNG/WebP maks 2 MB), filter status, pencarian, sort, per-page, soft delete + pulihkan; nama penulis distempel otomatis dari pengguna yang membuat berita.
   - Slug stabil untuk URL publik: otomatis dari judul (transliterasi ASCII, akhiran `-2`, `-3`, … bila bentrok) saat baris baru, dipertahankan saat edit kecuali penulis mengosongkannya; `published_at` dicap saat pertama tayang dan tidak berubah pada edit berikutnya.
   - Render publik di domain tenant: `/berita` (indeks paginated 9 per halaman + pencarian judul/ringkasan), `/berita/{slug}` (detail berita), `/p/{slug}` (halaman statis); hanya konten `published` dengan `published_at <= now()` yang tampil, slug tak dikenal jatuh lembut ke landing tenant — bukan 404 — agar branding tetap milik desa.
-  - Halaman `PublicSite/BlogIndex`, `PublicSite/BlogPost`, `PublicSite/StaticPage` dengan styling artikel `.prose-sidbm` (`resources/css/app.css`) dan tombol "Berita" pada landing tenant yang mengarah ke `/berita`.
+  - Halaman `PublicSite/BlogIndex`, `PublicSite/BlogPost`, `PublicSite/StaticPage` dengan styling artikel `.prose-akubumdes` (`resources/css/app.css`) dan tombol "Berita" pada landing tenant yang mengarah ke `/berita`.
   - Permission baru `website.view` / `website.manage` (`config/permissions.php`): nav sidebar "Website" disembunyikan tanpa izin, index/crud dikawal `denyUnless`, dan — perbaikan keamanan — `request_map` kini memetakan kelas FormRequest **konkret** (`SitePostRequest`/`SitePageRequest`), bukan kelas abstrak `SiteContentRequest` yang tidak pernah cocok dengan lookup `static::class` sehingga store/update sebelumnya lolos tanpa cek `website.manage`.
   - Update `docs/RBAC_MATRIX.md`: baris nav Website, aksi konten, dan status enforcement.
   - Automated feature test `tests/Feature/Website/WebsiteContentTest.php` (15 test): slug unik & stabil, stamping publish, upload/hapus cover, soft delete + restore, guard permission (kasir 403 termasuk pada store), render publik index/search/detail/fallback, dan eksklusi outbox desktop dengan kontrol positif; ditambah asersi `website.*` pada `tests/Unit/Access/PermissionConfigTest.php`.
@@ -336,13 +336,13 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
   - Peningkatan komponen tombol aksi asisten (`ActionButton.vue`) dan parser markdown (`useMarkdown.js`) dengan dukungan tautan URL eksternal/internal otomatis.
 - **Sistem Notifikasi Toast Global & Reaktif (`useToast.js` & `AppToast.vue`):**
   - Pembuatan composable `useToast.js` berbasis event-bus reaktif dengan queue notifikasi mengambang (*stacked floating toasts*), timer *auto-dismiss*, *progress bar* durasi, dan method praktis: `toast.success()`, `toast.error()`, `toast.warning()`, dan `toast.info()`.
-  - Refaktor komponen `AppToast.vue` dengan animasi transisi masuk/keluar yang mulus, tema visual berbasis palet Tailwind UI SIDBM, dan tombol tutup instan.
+  - Refaktor komponen `AppToast.vue` dengan animasi transisi masuk/keluar yang mulus, tema visual berbasis palet Tailwind UI Akubumdes, dan tombol tutup instan.
   - Migrasi seluruh alert banner statis ke sistem `useToast` terpusat pada halaman Pembuatan Jurnal (`JournalEntries/Create.vue`), AI Assistant (`AiAssistant/Index.vue`), Payment Gateways (`PaymentGateways/Index.vue`), dan Pengaturan Lembaga (`Settings/Index.vue`).
 - **Layar Pembuka (*Desktop Splash Screen*) & Kontrol Window IPC (`DesktopSplashScreen.vue` & `DesktopTitleBar.vue`):**
-  - Komponen `DesktopSplashScreen.vue` untuk transisi startup aplikasi Desktop Electron dengan animasi *pulsing logo* SIDBM Next, simulasi status inisialisasi koneksi database SQLite lokal, dan efek *fade-out* otomatis saat halaman utama siap.
+  - Komponen `DesktopSplashScreen.vue` untuk transisi startup aplikasi Desktop Electron dengan animasi *pulsing logo* Akubumdes, simulasi status inisialisasi koneksi database SQLite lokal, dan efek *fade-out* otomatis saat halaman utama siap.
   - Penambahan sinkronisasi status maximize/unmaximize window melalui listener event IPC Electron pada `DesktopTitleBar.vue`.
 - **Arsitektur Aplikasi Desktop & Infrastruktur Sinkronisasi Offline (Hybrid Cloud-Desktop / Electron):**
-  - Framework Desktop Hybrid SIDBM Next berbasis Electron + SQLite lokal + Cloud Sync Engine (`docs/DESKTOP_ROADMAP.md`).
+  - Framework Desktop Hybrid Akubumdes berbasis Electron + SQLite lokal + Cloud Sync Engine (`docs/DESKTOP_ROADMAP.md`).
   - Service Provider `DesktopAppServiceProvider.php` dan konfigurasi `config/desktop.php` dengan deteksi otomatis runtime desktop/offline.
   - Snapshot & Ingestion Engine: `TenantSnapshotService.php`, `DesktopSnapshotIngestionService.php`, dan `DesktopSyncClientService.php` untuk ekspor/impor snapshot database tenant (full & delta) yang aman dengan verifikasi checksum SHA-256.
   - Endpoint RESTful API Sync Desktop (`/api/v1/desktop/sync/*` dan `/desktop/sync/*`) dengan proteksi middleware `VerifyDesktopApiToken.php`.
@@ -408,7 +408,7 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
   - **Beranda (`Home.vue`)**: Interaksi 3D tilt parallax pada kartu mockup hero dengan respon pergerakan kursor mouse, floating pills multi-layer, animasi ambient glowing orbs berkala, dan micro-interaction spring pada kartu fitur.
   - **Portal Login (`Login.vue`)**: Interaksi 3D parallax pada panel informasi kiri, animasi live breathing bar chart keuangan, micro-interaction scale bounce pada toggle sandi, dan spring shake form saat validasi gagal.
 - **Dokumentasi Lengkap Panduan Pengguna (User Manual) (`docs/USER_GUIDE.md`):**
-  - Penyusunan dokumen panduan operasional komprehensif (35,7 KB, 452 baris) dalam Bahasa Indonesia mencakup seluruh 86 halaman dan alur kerja aplikasi SIDBM Next.
+  - Penyusunan dokumen panduan operasional komprehensif (35,7 KB, 452 baris) dalam Bahasa Indonesia mencakup seluruh 86 halaman dan alur kerja aplikasi Akubumdes.
   - Dokumentasi lengkap untuk 24 bab: Mulai dari Autentikasi, Dashboard Drilldown, Master Data, Siklus Perguliran Pinjaman (6 tahapan), Akuntansi Double-Entry & Immutable Ledger, Inventaris Aset, E-Budgeting, 16 Laporan Keuangan & Piutang, Billing SaaS Multi-Gateway, Notifikasi WhatsApp, RBAC 37 permissions, Wizard Onboarding, Portal Supervisi Kabupaten/Provinsi, Superadmin SaaS, AI Assistant (Ariel), hingga Katalog 36 Dokumen Cetak PDF.
 - **Restrukturisasi Indeks Dokumentasi (`docs/README.md` & `README.md`):**
   - Pengelompokan seluruh 15 dokumen teknis ke dalam 4 kategori terstruktur: Panduan Pengguna & Operasional, Arsitektur & Spesifikasi Sistem, Analisis Komparatif & Migrasi Legacy, serta Roadmap & Riwayat Pengujian.
@@ -538,7 +538,7 @@ Format penulisan mengikuti panduan [Keep a Changelog](https://keepachangelog.com
 - **Sistem Notifikasi WhatsApp Gateway:**
   - Pengiriman pesan otomatis untuk jadwal angsuran, konfirmasi pembayaran, dan tagihan invoice.
 - **Penyempurnaan Modul Onboarding & Migrasi Shard:**
-  - Runner cutover data eksisting (SIDBM Access / Excel) dengan validasi akun debit-kredit otomatis.
+  - Runner cutover data eksisting (aplikasi lama / Excel) dengan validasi akun debit-kredit otomatis.
   - Peningkatan idempotensi loader master data anggota dan kelompok.
 - **Komponen UI Baru:**
   - `AppFilterPill.vue` untuk filter status interaktif.

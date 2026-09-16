@@ -9,7 +9,7 @@ let isForceClosing = false;
 let updateTimer = null;
 
 const DEFAULT_CONFIG = {
-    title: 'SIDBM Next Desktop',
+    title: 'Akubumdes Desktop',
     width: 1440,
     height: 900,
     minWidth: 1024,
@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
 
 // Set App User Model ID for Windows Action Center Notifications
 if (process.platform === 'win32') {
-    app.setAppUserModelId('com.enpiistudio.sidbm.desktop');
+    app.setAppUserModelId('com.enpiistudio.akubumdes.desktop');
 }
 
 
@@ -199,7 +199,7 @@ function sendUpdateEvent(channel, payload = {}) {
 function requireRestartAfterUpdate(force = false) {
     if (Notification.isSupported()) {
         new Notification({
-            title: 'SIDBM Next Desktop',
+            title: 'Akubumdes Desktop',
             body: 'Update baru sudah diunduh. Restart untuk menerapkan pembaruan.',
         }).show();
     }
@@ -287,7 +287,7 @@ ipcMain.on('desktop:send-notification', (_, { title, body, icon, url }) => {
     if (Notification.isSupported()) {
         const iconPath = icon ? path.resolve(icon) : path.join(__dirname, '../public/favicon.ico');
         const notif = new Notification({
-            title: title || 'SIDBM Next Desktop',
+            title: title || 'Akubumdes Desktop',
             body: body || '',
             icon: iconPath,
             silent: false,

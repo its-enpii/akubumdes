@@ -1,6 +1,6 @@
-# Roadmap & Arsitektur SIDBM Next Desktop App (NativePHP + SQLite Read-Only Sync)
+# Roadmap & Arsitektur Akubumdes Desktop App (NativePHP + SQLite Read-Only Sync)
 
-Dokumen ini memetakan rancangan arsitektur, strategi sinkronisasi data, pembagian tanggung jawab sistem, dan tahapan implementasi aplikasi desktop **SIDBM Next**.
+Dokumen ini memetakan rancangan arsitektur, strategi sinkronisasi data, pembagian tanggung jawab sistem, dan tahapan implementasi aplikasi desktop **Akubumdes**.
 
 ---
 
@@ -18,7 +18,7 @@ Dokumen ini memetakan rancangan arsitektur, strategi sinkronisasi data, pembagia
                                 | JSON Snapshot with SHA256
                                 v
    +---------------------------------------------------------+
-   |                SIDBM DESKTOP CLIENT APP                 |
+   |                AKUBUMDES DESKTOP CLIENT                 |
    |  - Framework : Electron + Embedded PHP/Laravel          |
    |  - Database  : Local SQLite (Single Tenant Lock)        |
    |  - Mode      : Hybrid (Online Read/Write + Offline Read)|

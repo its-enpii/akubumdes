@@ -56,7 +56,7 @@ final class AssistantToolService
     }
 
     /**
-     * Same as dispatch() but without permission check — used by Sidbm
+     * Same as dispatch() but without permission check — used by Akubumdes
      * handlers where permissions are already enforced upstream.
      *
     public function execute(string $tool, array $params, User $actor): array

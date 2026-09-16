@@ -1,8 +1,8 @@
-# SIDBM Next — Struktur Database Baru
+# Akubumdes — Struktur Database Baru
 
 ## 1. Tujuan dokumen
 
-Dokumen ini mendefinisikan rancangan database target untuk SIDBM Next dengan kebutuhan utama:
+Dokumen ini mendefinisikan rancangan database target untuk Akubumdes dengan kebutuhan utama:
 
 - hampir 500 tenant;
 - skema mudah dirawat;
@@ -18,7 +18,7 @@ Dokumen ini mendefinisikan rancangan database target untuk SIDBM Next dengan keb
 ## 2. Topologi database
 
 ```text
-sidbm_platform
+akubumdes_platform
 ├── users
 ├── tenants
 ├── tenant_memberships
@@ -30,7 +30,7 @@ sidbm_platform
 ├── subscriptions
 └── licenses
 
-sidbm_shard_01
+akubumdes_shard_01
 ├── tenant_registry
 ├── tenant_sequences
 ├── organization_profiles
@@ -46,14 +46,14 @@ sidbm_shard_01
 ├── loan_payments
 └── ...
 
-sidbm_shard_02
+akubumdes_shard_02
 └── skema identik
 
-sidbm_tenant_dedicated_x
+akubumdes_tenant_dedicated_x
 └── skema identik dengan shard bersama
 ```
 
-`sidbm_tenant_dedicated_x` secara teknis tetap dianggap sebagai shard dengan satu tenant. Dengan demikian, kode aplikasi dan migration tidak mempunyai jalur khusus.
+`akubumdes_tenant_dedicated_x` secara teknis tetap dianggap sebagai shard dengan satu tenant. Dengan demikian, kode aplikasi dan migration tidak mempunyai jalur khusus.
 
 ---
 
@@ -1748,11 +1748,11 @@ Semua perbedaan harus menghasilkan exception record yang disetujui, bukan diperb
 Cron existing harus menemukan:
 
 ```text
-sidbm_platform
-sidbm_shard_01
-sidbm_shard_02
+akubumdes_platform
+akubumdes_shard_01
+akubumdes_shard_02
 ...
-sidbm_tenant_dedicated_*
+akubumdes_tenant_dedicated_*
 legacy_* selama masa retensi
 ```
 

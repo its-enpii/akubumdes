@@ -84,7 +84,7 @@ final class ForgotPasswordTest extends TestCase
         Http::assertSent(fn ($request) => $request->url() === 'https://wa-gateway.test/send-message'
             && $request['instance'] === 'platform-wa-otp'
             && $request['number'] === '6281234567890'
-            && str_contains((string) $request['text'], 'Kode reset password SIDBM'));
+            && str_contains((string) $request['text'], 'Kode reset password Akubumdes'));
 
         $this->assertDatabaseHas('password_reset_tokens', [
             'user_row_id' => $user->row_id,

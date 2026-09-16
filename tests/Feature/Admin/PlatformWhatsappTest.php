@@ -33,7 +33,7 @@ final class PlatformWhatsappTest extends TestCase
             'base_url' => 'https://wa-gateway.test',
             'api_key' => 'test-api-key',
             'timeout' => 15,
-            'instance_prefix' => 'app-sidbm',
+            'instance_prefix' => 'app-akubumdes',
         ]);
 
         Http::fake([

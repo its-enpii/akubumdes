@@ -1,12 +1,12 @@
-# Perbandingan Database SIMAK Legacy vs. Next (Modern)
+# Perbandingan Database Aplikasi Lama (Legacy) vs Akubumdes
 
-Dokumen ini berisi panduan komparasi arsitektur database, pemetaan tabel (*table mapping*), transformasi kolom (*column transformation*), dan relasi data antara **SIDBM Legacy** (sistem monolitik tabel dinamis) dan **SIDBM Next** (arsitektur multi-tenant modern dengan database platform dan sharding).
+Dokumen ini berisi panduan komparasi arsitektur database, pemetaan tabel (*table mapping*), transformasi kolom (*column transformation*), dan relasi data antara **aplikasi lama (legacy, sistem monolitik tabel dinamis)** dan **Akubumdes** (arsitektur multi-tenant modern dengan database platform dan sharding).
 
 ---
 
 ## 1. Ringkasan Perubahan Paradigma Arsitektur
 
-| Aspek | SIDBM Legacy (`sidbm`) | SIDBM Next (`new_sidbm`) | Rationale & Dampak |
+| Aspek | Aplikasi Lama (legacy) | Akubumdes (`akubumdes`) | Rationale & Dampak |
 |---|---|---|---|
 | **Model Tenancy** | **Tabel Dinamis Per-Tenant**<br>`anggota_1`, `transaksi_1`, `pinjaman_kelompok_1`, dst. dalam 1 database tunggal. | **Platform DB + Shared/Dedicated Shard DB**<br>Semua tabel tenant distandarisasi dan diisolasi dengan kolom `tenant_id` pada database shard. | Menghilangkan puluhan ribu tabel dinamis, mencegah *schema drift*, dan mempermudah migrasi struktur database. |
 | **Integritas Relasional** | **Tidak ada Foreign Key (FK)**.<br>Relasi hanya dijaga pada level aplikasi atau trigger MySQL. | **Foreign Key Constraint Ketat**.<br>Menggunakan *composite foreign key* `[tenant_id, parent_id]` untuk menjamin data tidak bocor antar-tenant. | Menghilangkan *orphan records*, inkonsistensi transaksi, dan *ghost data*. |
@@ -20,9 +20,9 @@ Dokumen ini berisi panduan komparasi arsitektur database, pemetaan tabel (*table
 
 ## 2. Tabel Pemetaan Lengkap (Master Table Mapping)
 
-Tabel berikut memetakan setiap tabel/model pada SIDBM Legacy ke entitas tabel pada SIDBM Next, beserta penempatan basis datanya (**Platform DB** atau **Shard DB**):
+Tabel berikut memetakan setiap tabel/model pada aplikasi lama (legacy) ke entitas tabel pada Akubumdes, beserta penempatan basis datanya (**Platform DB** atau **Shard DB**):
 
-| # | Tabel Legacy (`sidbm`) | Tabel Target SIDBM Next (`new_sidbm`) | Lokasi DB | Kategori / Keterangan Transformasi |
+| # | Tabel Legacy (aplikasi lama) | Tabel Target Akubumdes (`akubumdes`) | Lokasi DB | Kategori / Keterangan Transformasi |
 |---|---|---|---|---|
 | **A** | **Kelembagaan, Tenant & Wilayah** | | | |
 | 1 | `kecamatan` | `tenants` | `Platform DB` | Master tenant di tingkat platform SaaS (berisi kode kecamatan, nama, status langganan, dsb). |
@@ -82,19 +82,19 @@ Tabel berikut memetakan setiap tabel/model pada SIDBM Legacy ke entitas tabel pa
 | 50 | Riwayat kondisi/mutasi aset | `asset_status_histories` | `Shard DB` | Catatan kondisi (baik/rusak/hilang) dan mutasi inventaris. |
 | **G** | **Billing Platform, Lisensi & Integrasi Pembayaran** | | | |
 | 51 | `licenses` | `licenses` / `subscriptions` | `Platform DB` | Lisensi aktif per tenant dengan tanggal kedaluwarsa dan batasan kuota. |
-| 52 | `admin_invoice` | `invoices` | `Platform DB` | Tagihan biaya langganan aplikasi SIDBM Next yang dibuat otomatis per siklus. |
+| 52 | `admin_invoice` | `invoices` | `Platform DB` | Tagihan biaya langganan aplikasi Akubumdes yang dibuat otomatis per siklus. |
 | 53 | `admin_transaksi` | `invoice_payments` | `Platform DB` | Pencatatan pelunasan tagihan terintegrasi Payment Gateway (Tripay QRIS, VA, Bank Transfer). |
 | 54 | `admin_jenis_pembayaran` & `admin_rekening` | `Platform Settings` / Payment Channels | `Platform DB` | Konfigurasi metode pembayaran gateway dan rekening penampung platform. |
-| **H** | **Entitas Khusus Baru pada SIDBM Next (Next-Only Entities)** | | | |
+| **H** | **Entitas Khusus Baru pada Akubumdes (Next-Only Entities)** | | | |
 | 55 | *Tidak ada di legacy* | `database_shards` | `Platform DB` | Manajemen server/koneksi database shard multi-tenant. |
 | 56 | *Tidak ada di legacy* | `tenant_placements` | `Platform DB` | Pemetaan tenant ke database shard target. |
 | 57 | *Tidak ada di legacy* | `plans` | `Platform DB` | Master paket fitur & harga langganan SaaS. |
 | 58 | *Tidak ada di legacy* | `tenant_sequences` | `Shard DB` | Sequence atomic per-tenant untuk nomor dokumen, nomor anggota, dan nomor pinjaman. |
 | 59 | *Tidak ada di legacy* | `legacy_migration_batches` | `Shard DB` | Tracking batch eksekusi migrasi data cutover dari sistem legacy. |
-| 60 | *Tidak ada di legacy* | `legacy_record_mappings` | `Shard DB` | Tabel jembatan (*cross-reference mapping*) antara ID record legacy dan `row_id` Next. |
+| 60 | *Tidak ada di legacy* | `legacy_record_mappings` | `Shard DB` | Tabel jembatan (*cross-reference mapping*) antara ID record legacy dan `row_id` Akubumdes. |
 | 61 | *Tidak ada di legacy* | `migration_reconciliation_results` | `Shard DB` | Log verifikasi rekonsiliasi data migrasi (jumlah baris, total nominal, baki debet). |
 | 62 | *Tidak ada di legacy* | `audit_logs` | `Shard DB` | Audit trail lengkap seluruh aksi CRUD data pengguna. |
-| 63 | *Tidak ada di legacy* | `ai_conversations` & `ai_messages` | `Shard DB` | Riwayat percakapan dengan AI Assistant SIDBM. |
+| 63 | *Tidak ada di legacy* | `ai_conversations` & `ai_messages` | `Shard DB` | Riwayat percakapan dengan AI Assistant Akubumdes. |
 | 64 | *Tidak ada di legacy* | `ai_knowledge_sources` & `ai_document_chunks` | `Shard DB / Vector DB` | Basis pengetahuan SOP BUMDesma/UPK untuk RAG (Retrieval-Augmented Generation). |
 
 ---
@@ -105,7 +105,7 @@ Berikut adalah perbandingan struktur kolom secara mendalam untuk modul-modul bis
 
 ### 3.1 Modul Kependudukan & Anggota: `anggota_{id}` $\rightarrow$ `people` + `members` + `member_addresses`
 
-Di sistem legacy, semua data bercampur dalam satu baris `anggota_{id}`. Pada SIDBM Next, entitas kependudukan (`people`) dipisahkan dari entitas keanggotaan tenant (`members`).
+Di sistem legacy, semua data bercampur dalam satu baris `anggota_{id}`. Pada Akubumdes, entitas kependudukan (`people`) dipisahkan dari entitas keanggotaan tenant (`members`).
 
 ```
 +------------------------------------+
@@ -135,7 +135,7 @@ Di sistem legacy, semua data bercampur dalam satu baris `anggota_{id}`. Pada SID
                        +-------------------------------+
 ```
 
-| Kolom Legacy `anggota_{id}` | Tabel & Kolom Target Next | Tipe Data & Transformasi |
+| Kolom Legacy `anggota_{id}` | Tabel & Kolom Target Akubumdes | Tipe Data & Transformasi |
 |---|---|---|
 | `id` | `legacy_record_mappings.source_id` $\rightarrow$ `members.id` | Disimpan sebagai ID urut tenant dan dicatat pada tabel mapping migrasi. |
 | `nik` | `people.national_identity_number` | `CHAR(16)`, diindeks per tenant. |
@@ -155,7 +155,7 @@ Di sistem legacy, semua data bercampur dalam satu baris `anggota_{id}`. Pada SID
 
 ### 3.2 Modul Akuntansi: `transaksi_{id}` $\rightarrow$ `journal_entries` + `journal_lines`
 
-Sistem legacy menggunakan satu baris per transaksi dengan menyebutkan rekening debit dan rekening kredit secara horizontal. SIDBM Next mentransformasikan setiap transaksi menjadi satu header jurnal dan minimal dua baris jurnal (double-entry).
+Sistem legacy menggunakan satu baris per transaksi dengan menyebutkan rekening debit dan rekening kredit secara horizontal. Akubumdes mentransformasikan setiap transaksi menjadi satu header jurnal dan minimal dua baris jurnal (double-entry).
 
 ```
 LEGACY: transaksi_1 (Flat Row)
@@ -189,7 +189,7 @@ NEXT: journal_entries (Header)
         +--------+------------------+------------+--------------+---------------+
 ```
 
-| Kolom Legacy `transaksi_{id}` | Tabel & Kolom Target Next | Tipe Data & Transformasi |
+| Kolom Legacy `transaksi_{id}` | Tabel & Kolom Target Akubumdes | Tipe Data & Transformasi |
 |---|---|---|
 | `idt` | `journal_entries.legacy_id` + mapping | Disimpan pada `legacy_record_mappings` dan metadata jurnal. |
 | `idtp` | `journal_entries.source_row_id` / reference | ID transaksi induk / pengelompokan batch. |
@@ -205,7 +205,7 @@ NEXT: journal_entries (Header)
 
 ### 3.3 Modul Pinjaman & Setoran: `pinjaman_kelompok_{id}` & `real_angsuran_{id}` $\rightarrow$ `loans`, `loan_installments`, `loan_payments`, `loan_payment_allocations`
 
-Pada SIDBM Legacy, pinjaman kelompok dan pinjaman anggota sering mengalami selisih karena alur pencatatan yang terpisah. Pada Next, struktur pinjaman diatur secara hierarkis dengan alokasi setoran yang presisi.
+Pada aplikasi lama (legacy), pinjaman kelompok dan pinjaman anggota sering mengalami selisih karena alur pencatatan yang terpisah. Pada Akubumdes, struktur pinjaman diatur secara hierarkis dengan alokasi setoran yang presisi.
 
 ```
 +---------------------------------------+
@@ -246,7 +246,7 @@ Pada SIDBM Legacy, pinjaman kelompok dan pinjaman anggota sering mengalami selis
                                    +------------------------------------+
 ```
 
-| Kolom Legacy Pinjaman & Angsuran | Tabel & Kolom Target Next | Keterangan & Transformasi |
+| Kolom Legacy Pinjaman & Angsuran | Tabel & Kolom Target Akubumdes | Keterangan & Transformasi |
 |---|---|---|
 | `pinjaman_kelompok.id` | `loans.id` + `legacy_record_mappings` | ID pinjaman lama dipertahankan untuk referensi historis. |
 | `pinjaman_kelompok.id_kel` | `loan_borrowers.group_row_id` | Menghubungkan pinjaman ke entitas `groups`. |
@@ -270,12 +270,12 @@ Pada SIMAK Legacy, struktur akun terbagi berdasarkan varian lembaga (`usaha.jeni
 - **Unit Perdagangan (`jenis_akun = 7`)**: `akun_level_1s`, `akun_level_2s`, `akun_{lokasi}`, `accounts_{lokasi}`
 - **Koperasi (`jenis_akun = 8`)**: `akun_level_1_koperasi`, `akun_level_2_koperasi`, `akun_{lokasi}`, `rekening_{lokasi}`
 
-Pada Next, seluruh hierarki akun disatukan ke dalam satu tabel rekursif `accounts` yang fleksibel dengan relasi `parent_row_id` dan atribut `coa_variant` pada level tenant.
+Pada Akubumdes, seluruh hierarki akun disatukan ke dalam satu tabel rekursif `accounts` yang fleksibel dengan relasi `parent_row_id` dan atribut `coa_variant` pada level tenant.
 
-Pada SIDBM Next, seluruh hirarki akun disatukan ke dalam satu tabel rekursif `accounts` yang fleksibel dengan relasi `parent_row_id`:
+Pada Akubumdes, seluruh hirarki akun disatukan ke dalam satu tabel rekursif `accounts` yang fleksibel dengan relasi `parent_row_id`:
 
 ```sql
--- SIDBM Next: Struktur accounts terpadu
+-- Akubumdes: Struktur accounts terpadu
 CREATE TABLE `accounts` (
     `row_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `tenant_id` BIGINT UNSIGNED NOT NULL,
@@ -298,9 +298,9 @@ CREATE TABLE `accounts` (
 
 ---
 
-## 5. Tooling & Perintah Migrasi Data (Legacy to Next)
+## 5. Tooling & Perintah Migrasi Data (Legacy ke Akubumdes)
 
-Untuk mengeksekusi transformasi data dari tabel legacy ke skema Next, telah disediakan serangkaian perintah artisan otomatis yang aman dan dapat diuji coba (*dry-run*):
+Untuk mengeksekusi transformasi data dari tabel legacy ke skema Akubumdes, telah disediakan serangkaian perintah artisan otomatis yang aman dan dapat diuji coba (*dry-run*):
 
 ```bash
 # 1. Discover & Analisis Struktur Data Legacy SIMAK
@@ -324,7 +324,7 @@ php artisan tenancy:initialize-sequences {tenant}
 
 ## 6. Kesimpulan
 
-Transformasi database dari SIDBM Legacy ke SIDBM Next tidak hanya memodernisasi nama tabel, tetapi juga:
+Transformasi database dari aplikasi lama (legacy) ke Akubumdes tidak hanya memodernisasi nama tabel, tetapi juga:
 1. **Mengeliminasi bottleneck arsitektur tabel dinamis** (dari ribuan tabel per instansi menjadi skema sharding terpadu).
 2. **Menjamin keabsahan finansial tingkat tinggi** melalui pembukuan *double-entry* dan tipe data desimal presisi.
 3. **Mempersiapkan sistem untuk skalabilitas ribuan kecamatan**, integrasi payment gateway otomatis, serta kecerdasan buatan (*AI Assistant*) terintegrasi.

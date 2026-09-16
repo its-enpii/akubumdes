@@ -1,12 +1,12 @@
-# Asisten Orchestrator × SIDBM
+# Asisten Orchestrator × Akubumdes
 
-SIDBM = **Tenant Adapter** (RBAC + domain tools).  
+Akubumdes = **Tenant Adapter** (RBAC + domain tools).  
 Orchestrator (repo terpisah) = brain + chat SSE + RAG FAQ + tool loop.
 
 ## Alur
 
 ```
-User login SIDBM
+User login Akubumdes
   → FAB Ariel (AssistantWidget)
   → GET /api/assistant/session-token   (web session + tenant + assistant.use)
   → Orchestrator mint session (Bearer shared secret, server-side only)
@@ -14,12 +14,12 @@ User login SIDBM
   → tool call
   → POST /api/assistant/tools/{tool}  (HMAC)
        body: { tool, external_user_id, params, ts }
-  → SIDBM: verifikasi sig → resolve user → permission → Domain service
+  → Akubumdes: verifikasi sig → resolve user → permission → Domain service
 ```
 
 `external_user_id` = `users.row_id` (platform).
 
-## Env SIDBM
+## Env Akubumdes
 
 ```env
 ASSISTANT_ORCHESTRATOR_BASE_URL=http://host.docker.internal:8100
@@ -82,7 +82,7 @@ TENANCY_ALLOW_HEADER=true
 
 Lookup: `{ "items": [...], "match_count": 2, "needs_clarification": true }`
 
-### HMAC tool headers (orchestrator → SIDBM)
+### HMAC tool headers (orchestrator → Akubumdes)
 
 ```
 secret = sha256(ASSISTANT_SHARED_SECRET)
@@ -106,7 +106,7 @@ POST {APP_URL}/api/assistant/tools   body.tool = "..."
 Dump schema seed orchestrator:
 
 ```
-php artisan sidbm:assistant-tools --base=http://host.docker.internal:8080
+php artisan akubumdes:assistant-tools --base=http://host.docker.internal:8080
 ```
 
 ## Session (browser)

@@ -12,7 +12,7 @@ use RuntimeException;
 
 final class ProvisionSuperadmin extends Command
 {
-    protected $signature = 'sidbm:provision-superadmin
+    protected $signature = 'akubumdes:provision-superadmin
         {--username=superadmin : Superadmin username}
         {--email= : Superadmin email}
         {--password= : Password; required in non-interactive mode}';

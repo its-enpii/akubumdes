@@ -3,8 +3,8 @@ import { loginAs, noErr, recordTest, BASE } from './_helpers';
 
 // LIVE MIGKASI LEGACY kecamatan_id 76 → tenant `local` via admin GUI.
 // Tujuannya: mengeksekusi satu kali cutover end-to-end dan memastikan
-// data riil dari remote MySQL (103.177.95.91/sidbm) berpindah ke tenant
-// `sidbm_shard_local` di MySQL container lokal (port 3307).
+// data riil dari remote MySQL (103.177.95.91/legacy) berpindah ke tenant
+// `akubumdes_shard_local` di MySQL container lokal (port 3307).
 //
 // Expected output counts (diambil dari Tahap 0 discovery):
 //   - 26.635 transaksi, 8.794 saldo, 1.409 anggota, 1.420 kelompok

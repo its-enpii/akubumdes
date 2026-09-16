@@ -103,7 +103,7 @@ final class PlatformWhatsappController
 
         return response()->json($this->gateway->sendText(
             (string) $validated['phone'],
-            (string) ($validated['message'] ?? 'Tes koneksi WhatsApp platform dari SIDBM.'),
+            (string) ($validated['message'] ?? 'Tes koneksi WhatsApp platform dari Akubumdes.'),
             $instance->instance_name,
         ));
     }

@@ -13,11 +13,11 @@ final class DesktopInitCommand extends Command
 {
     protected $signature = 'desktop:init {--force : Force recreation of local SQLite database}';
 
-    protected $description = 'Initialize local SQLite database and environment for SIDBM Next Desktop Client';
+    protected $description = 'Initialize local SQLite database and environment for Akubumdes Desktop Client';
 
     public function handle(): int
     {
-        $this->info('Initializing SIDBM Next Desktop Client...');
+        $this->info('Initializing Akubumdes Desktop Client...');
 
         $sqlitePath = (string) config('desktop.sqlite_database', database_path('database.sqlite'));
         $directory = dirname($sqlitePath);

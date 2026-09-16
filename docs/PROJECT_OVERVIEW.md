@@ -1,8 +1,8 @@
-# SIDBM Next — Project Overview
+# Akubumdes — Project Overview
 
 ## 1. Ringkasan
 
-SIDBM Next adalah proyek penataan ulang arsitektur aplikasi dan basis data SIDBM agar mampu melayani sekitar 500 tenant dan terus bertumbuh tanpa mengulang pola tabel dinamis seperti `transaksi_1`, `transaksi_4`, `anggota_1`, dan seterusnya.
+Akubumdes adalah proyek penataan ulang arsitektur aplikasi dan basis data BUMDes agar mampu melayani sekitar 500 tenant dan terus bertumbuh tanpa mengulang pola tabel dinamis seperti `transaksi_1`, `transaksi_4`, `anggota_1`, dan seterusnya.
 
 Desain target menggunakan pola:
 
@@ -141,13 +141,13 @@ flowchart TB
     UI[Vue 3 + Inertia] --> APP[Laravel Modular Monolith]
 
     APP --> RESOLVER[Tenant Resolver]
-    RESOLVER --> PLATFORM[(sidbm_platform)]
+    RESOLVER --> PLATFORM[(akubumdes_platform)]
     RESOLVER --> ROUTER[Shard Connection Manager]
 
-    ROUTER --> S1[(sidbm_shard_01)]
-    ROUTER --> S2[(sidbm_shard_02)]
-    ROUTER --> S3[(sidbm_shard_03)]
-    ROUTER --> SD[(sidbm_tenant_dedicated_x)]
+    ROUTER --> S1[(akubumdes_shard_01)]
+    ROUTER --> S2[(akubumdes_shard_02)]
+    ROUTER --> S3[(akubumdes_shard_03)]
+    ROUTER --> SD[(akubumdes_tenant_dedicated_x)]
 
     CRON[Existing Midnight Backup Cron] --> PLATFORM
     CRON --> S1
@@ -312,8 +312,8 @@ Menargetkan seluruh database server
 
 Setelah desain baru diterapkan, database yang wajib masuk daftar backup:
 
-- `sidbm_platform`;
-- seluruh `sidbm_shard_*`;
+- `akubumdes_platform`;
+- seluruh `akubumdes_shard_*`;
 - database dedicated tenant;
 - database legacy read-only selama masa retensi migrasi.
 
@@ -419,7 +419,7 @@ Boilerplate tidak membuat sistem backup baru. Ia hanya memastikan semua tabel te
 
 ### Phase 1 — Platform dan tenancy foundation
 
-- buat `sidbm_platform`;
+- buat `akubumdes_platform`;
 - registrasikan tenant;
 - registrasikan shard;
 - buat placement;

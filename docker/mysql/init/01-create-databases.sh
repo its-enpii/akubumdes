@@ -5,8 +5,8 @@ set -e
 # Defaults match .env.example so "docker compose up" works out of the box.
 APP_USER="${PLATFORM_DB_USERNAME:-root}"
 APP_PASS="${PLATFORM_DB_PASSWORD:-}"
-PLATFORM_DB="${PLATFORM_DB_DATABASE:-sidbm_platform}"
-TENANT_DB="${TENANT_DB_DATABASE:-sidbm_shard_local}"
+PLATFORM_DB="${PLATFORM_DB_DATABASE:-akubumdes_platform}"
+TENANT_DB="${TENANT_DB_DATABASE:-akubumdes_shard_local}"
 
 mysql -u root -p"${MYSQL_ROOT_PASSWORD}" <<-EOSQL
     CREATE DATABASE IF NOT EXISTS \`${PLATFORM_DB}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;

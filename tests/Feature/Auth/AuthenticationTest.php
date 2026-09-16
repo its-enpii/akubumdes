@@ -128,13 +128,13 @@ final class AuthenticationTest extends TestCase
         $user = $this->createUser(['password' => 'secret-password']);
 
         // Stale HTTP intended URL in session
-        $this->withSession(['url.intended' => 'http://next.sidbm.net/dashboard'])
+        $this->withSession(['url.intended' => 'http://app.akubumdes.test/dashboard'])
             ->withHeaders(['X-Forwarded-Proto' => 'https'])
             ->post('/login', [
                 'identifier' => $user->username,
                 'password' => 'secret-password',
             ])
-            ->assertRedirect('https://next.sidbm.net/dashboard');
+            ->assertRedirect('https://app.akubumdes.test/dashboard');
     }
 
     public function test_logout_invalidates_session(): void

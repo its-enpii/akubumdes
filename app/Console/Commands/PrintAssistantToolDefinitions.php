@@ -9,8 +9,8 @@ use Illuminate\Console\Command;
 /** Dump tool registry payload for orchestrator tool seed / admin import. */
 final class PrintAssistantToolDefinitions extends Command
 {
-    protected $signature = 'sidbm:assistant-tools
-        {--base= : SIDBM public base URL, default APP_URL}';
+    protected $signature = 'akubumdes:assistant-tools
+        {--base= : Akubumdes public base URL, default APP_URL}';
 
     protected $description = 'Print assistant tool definitions (JSON) for orchestrator seed.';
 

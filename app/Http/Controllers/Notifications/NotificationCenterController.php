@@ -121,7 +121,7 @@ final class NotificationCenterController
             $items[] = [
                 'id' => $id,
                 'type' => 'system',
-                'title' => 'Sistem Informasi SIDBM',
+                'title' => 'Sistem Informasi Akubumdes',
                 'message' => 'Selamat datang di Sistem Informasi Dana Bergulir Masyarakat.',
                 'time' => 'Informasi',
                 'target_url' => '/dashboard',

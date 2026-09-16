@@ -1,12 +1,12 @@
-# Roadmap & Arsitektur SIDBM Mobile App (Flutter)
+# Roadmap & Arsitektur Akubumdes Mobile App (Flutter)
 
-Dokumen ini memetakan arsitektur, pembagian tanggung jawab fitur, strategi integrasi API multi-tenant, dan tahapan implementasi aplikasi mobile **SIDBM Mobile** berbasis **Flutter**.
+Dokumen ini memetakan arsitektur, pembagian tanggung jawab fitur, strategi integrasi API multi-tenant, dan tahapan implementasi aplikasi mobile **Akubumdes Mobile** berbasis **Flutter**.
 
 ---
 
 ## 1. Ringkasan Eksekutif & Tujuan
 
-Aplikasi mobile **SIDBM Mobile** dirancang sebagai pendamping operasional (*companion app*) untuk melengkapi sistem **SIDBM Next Web & Desktop**. 
+Aplikasi mobile **Akubumdes Mobile** dirancang sebagai pendamping operasional (*companion app*) untuk melengkapi sistem **Akubumdes Web & Desktop**. 
 
 ### Tujuan Utama:
 1. **Kecepatan Operasional Lapangan**: Memfasilitasi petugas penagihan (kolektor/mantri) dan surveyor lapangan dengan aplikasi ringan, responsif, dan siap digunakan langsung di depan nasabah.
@@ -31,7 +31,7 @@ Aplikasi mobile **SIDBM Mobile** dirancang sebagai pendamping operasional (*comp
                                   | (Sanctum Auth + Push FCM)
                                   v
    +-------------------------------------------------------------+
-   |              SIDBM MOBILE APP (FLUTTER 3.x)                 |
+   |             AKUBUMDES MOBILE APP (FLUTTER 3.x)              |
    |                                                             |
    |  +-------------------------------------------------------+  |
    |  | Presentation Layer: BLoC / Riverpod + Material 3 UI   |  |
