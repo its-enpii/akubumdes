@@ -9,7 +9,11 @@ const model = defineModel({ type: [String, Number], default: '' });
 const props = defineProps({
     id: { type: String, default: null },
     label: { type: String, required: true },
-    type: { type: String, default: 'text' },
+    type: {
+        type: String,
+        default: 'text',
+        validator: (value) => ['text', 'email', 'password', 'number'].includes(value),
+    },
     icon: { type: String, default: null },
     error: { type: String, default: null },
     hint: { type: String, default: null },
