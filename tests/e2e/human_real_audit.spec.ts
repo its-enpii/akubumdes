@@ -47,7 +47,7 @@ test.describe('HUMAN-LIKE E2E REAL AUDIT - ALL FEATURES & WORKFLOWS', () => {
         await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('body')).toBeVisible();
 
-        const hero = page.locator('text=Dana Bergulir').first();
+        const hero = page.locator('text=/Akuntansi|Akubumdes/i').first();
         await expect(hero).toBeVisible();
 
         const faqBtn = page.locator('button:has-text("Apa itu"), button:has-text("Apakah")').first();
@@ -77,7 +77,7 @@ test.describe('HUMAN-LIKE E2E REAL AUDIT - ALL FEATURES & WORKFLOWS', () => {
 
             const nameInput = page.getByLabel('Nama Tenant').first();
             if (await nameInput.isVisible().catch(() => false)) {
-                await nameInput.fill('UPK Audit Kecamatan Real');
+                await nameInput.fill('BUMDes Audit Kecamatan Real');
             }
 
             const saveBtn = page.locator('button:has-text("Simpan")').first();

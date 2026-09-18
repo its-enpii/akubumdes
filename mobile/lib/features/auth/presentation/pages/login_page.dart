@@ -100,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 6),
                       const Text(
-                        'Sistem Informasi Dana Bergulir Masyarakat',
+                        'Sistem Informasi Akuntansi & Keuangan BUMDes',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13,

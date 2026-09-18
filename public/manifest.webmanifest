@@ -1,7 +1,7 @@
 ﻿{
   "name": "Akubumdes - Sistem Informasi Akuntansi & Keuangan BUMDes",
   "short_name": "Akubumdes",
-  "description": "Sistem Informasi Dana Bergulir Masyarakat BUMDesma / UPK LKD Modern",
+  "description": "Sistem Informasi Akuntansi & Keuangan BUMDes Modern (Modern Re-engineering SIMAK)",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",

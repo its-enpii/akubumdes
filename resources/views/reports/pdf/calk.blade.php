@@ -21,7 +21,7 @@
         <div style="text-transform: uppercase;">Gambaran Umum</div>
         <div style="text-align: justify;">
             {{ $identity['short_name'] ?? $identity['legal_name'] ?? config('app.name') }} adalah Badan Usaha Milik Desa
-            Bersama (Bumdesma Lkd) yang mengelola Dana Bergulir Masyarakat (DBM) melalui produk usahanya. Laporan
+            Bersama (BUMDesma) yang mengelola kegiatan usaha dan penatausahaan akuntansi keuangan desa. Laporan
             Keuangan ini disusun dengan basis pencatatan akrual dan disajikan untuk periode
             {{ $period['period_label'] ?? '' }}.
         </div>

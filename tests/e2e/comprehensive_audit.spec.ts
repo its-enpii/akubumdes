@@ -46,7 +46,7 @@ test.describe('1. Public Pages', () => {
     test('1.1 Landing page hero, FAQ, CTA', async ({ page }) => {
         await go(page, '/');
         await noErr(page);
-        await expect(page.locator('body')).toContainText('Dana Bergulir');
+        await expect(page.locator('body')).toContainText('Akubumdes');
         const faq = page.locator('button:has-text("Apa itu"), button:has-text("Apakah"), button:has-text("Bagaimana")');
         const c = await faq.count();
         for (let i = 0; i < Math.min(c, 3); i++) { await faq.nth(i).click(); await page.waitForTimeout(300); }

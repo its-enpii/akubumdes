@@ -728,7 +728,7 @@
 
     <!-- Footer -->
     <footer class="error-footer">
-        <p>&copy; {{ date('Y') }} <strong>akubumdes</strong> &bull; Tata Kelola Dana Bergulir BUMDesma LKD &bull; Standar SAK EP & PP No. 11/2021</p>
+        <p>&copy; {{ date('Y') }} <strong>akubumdes</strong> &bull; Tata Kelola Akuntansi & Keuangan BUMDes &bull; Standar SAK EP & PP No. 11/2021</p>
     </footer>
 
     <!-- Toast Component -->

@@ -122,7 +122,7 @@ final class NotificationCenterController
                 'id' => $id,
                 'type' => 'system',
                 'title' => 'Sistem Informasi Akubumdes',
-                'message' => 'Selamat datang di Sistem Informasi Dana Bergulir Masyarakat.',
+                'message' => 'Selamat datang di Akubumdes — Sistem Informasi Akuntansi & Keuangan BUMDes.',
                 'time' => 'Informasi',
                 'target_url' => '/dashboard',
                 'icon' => 'info',

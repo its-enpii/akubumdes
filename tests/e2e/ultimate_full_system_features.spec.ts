@@ -45,7 +45,7 @@ test.describe('ULTIMATE COMPLETE SYSTEM FEATURES AUDIT', () => {
 
         const descIn = page.getByLabel('Keterangan').first();
         if (await descIn.isVisible().catch(() => false)) {
-            await descIn.fill('Penerimaan Sewa Gedung Serbaguna UPK');
+            await descIn.fill('Penerimaan Sewa Gedung Serbaguna BUMDes');
         }
 
         await page.goto(`${BASE}/accounting/journals`, { waitUntil: 'domcontentloaded' });

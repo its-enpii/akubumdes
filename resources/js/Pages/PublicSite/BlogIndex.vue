@@ -78,7 +78,7 @@ function formatDateTime(value) {
                         Kabar Terbaru dari {{ organization.name }}
                     </h1>
                     <p class="mt-3 max-w-2xl text-base leading-relaxed text-on-surface-variant">
-                        Informasi kegiatan, pengumuman, dan laporan seputar pengelolaan dana bergulir masyarakat.
+                        Informasi kegiatan, pengumuman, dan laporan seputar tata kelola akuntansi dan keuangan BUMDes.
                     </p>
 
                     <form class="mt-6 flex max-w-xl gap-2" @submit.prevent>
@@ -166,7 +166,7 @@ function formatDateTime(value) {
                 <p class="mt-1.5 text-xs text-on-surface-variant">
                     Dikelola dengan
                     <a href="/" class="font-semibold text-primary hover:underline">akubumdes</a>
-                    — Sistem Informasi Dana Bergulir Masyarakat
+                    — Sistem Informasi Akuntansi & Keuangan BUMDes
                 </p>
             </div>
         </footer>

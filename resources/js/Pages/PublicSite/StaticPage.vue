@@ -85,7 +85,7 @@ const props = defineProps({
                 <p class="mt-1.5 text-xs text-on-surface-variant">
                     Dikelola dengan
                     <a href="/" class="font-semibold text-primary hover:underline">akubumdes</a>
-                    — Sistem Informasi Dana Bergulir Masyarakat
+                    — Sistem Informasi Akuntansi & Keuangan BUMDes
                 </p>
             </div>
         </footer>

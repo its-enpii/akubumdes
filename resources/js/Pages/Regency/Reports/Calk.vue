@@ -115,14 +115,14 @@ const calkColumns = [
           <p>
             Laporan keuangan konsolidasi Kabupaten
             <strong>{{ regency_name }}</strong> mencakup seluruh unit pengelola
-            kegiatan (UPK DBM / BUMDesma) yang berada dalam naungan administrasi
+            unit usaha (BUMDes / BUMDesma) yang berada dalam naungan administrasi
             kabupaten.
           </p>
           <p>
             Penggabungan laporan menggunakan basis data shard tunggal yang
             memastikan standarisasi bagan akun standar (Chart of Accounts),
             eliminasi transaksi intra-kabupaten, serta kepatuhan pada regulasi
-            pelaporan keuangan dana bergulir masyarakat.
+            pelaporan keuangan entitas BUMDes / BUMDesma.
           </p>
         </div>
       </AppCard>
@@ -138,8 +138,7 @@ const calkColumns = [
             <p>
               <strong>Dasar Penyusunan:</strong> Laporan disajikan menggunakan
               basis akrual dan standar akuntansi entitas tanpa akuntabilitas
-              publik (SAK ETAP / EP) yang disesuaikan untuk lembaga pengelola
-              DBM.
+              publik (SAK ETAP / EP) yang disesuaikan untuk entitas BUMDes / BUMDesma.
             </p>
           </div>
           <div class="flex gap-3">

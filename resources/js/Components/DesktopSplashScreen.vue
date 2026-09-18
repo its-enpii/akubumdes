@@ -124,7 +124,7 @@ onUnmounted(() => {
 
             <!-- Footer copyright / version -->
             <div class="absolute bottom-6 text-[11px] text-slate-400">
-                Sistem Informasi Dana Bergulir Masyarakat
+                Sistem Informasi Akuntansi & Keuangan BUMDes
             </div>
         </div>
     </Transition>

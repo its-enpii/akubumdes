@@ -96,7 +96,7 @@ const steps = [
 const faqs = [
     {
         q: 'Apa itu akubumdes dan siapa saja yang dapat menggunakannya?',
-        a: 'akubumdes adalah sistem informasi tata kelola keuangan terpadu yang dirancang khusus untuk BUMDesma LKD (Lembaga Keuangan Desa / Eks UPK PNPM-MPd), operasional keuangan desa, serta instansi pembina teknis di tingkat Kabupaten (Dinas PMD & Inspektorat).',
+        a: 'akubumdes adalah sistem informasi akuntansi dan tata kelola keuangan terpadu yang dirancang khusus untuk BUMDes / BUMDesma, operasional keuangan desa, serta instansi pembina teknis di tingkat Kabupaten (Dinas PMD & Inspektorat). Akubumdes merupakan modern re-engineering dari SIMAK (Sistem Informasi Manajemen Akuntansi Keuangan BUMDes).',
     },
     {
         q: 'Apakah sistem ini sesuai dengan regulasi pemerintah dan standar akuntansi terkini?',
@@ -356,14 +356,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head title="akubumdes - Sistem Informasi Dana Bergulir Masyarakat" />
+    <Head title="akubumdes - Sistem Informasi Akuntansi & Keuangan BUMDes" />
 
     <div class="min-h-screen bg-surface font-sans text-on-surface antialiased scroll-smooth selection:bg-primary selection:text-on-primary">
         <!-- Top Banner -->
         <div class="top-banner-bar bg-primary-deep px-4 py-2 text-center text-xs font-semibold tracking-wide text-on-primary">
             <div class="mx-auto flex max-w-7xl items-center justify-center gap-2">
                 <span class="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-extrabold tracking-wider text-on-secondary shadow-sm">RESMI</span>
-                <span>Sistem Tata Kelola Keuangan & Dana Bergulir BUMDesma LKD Sesuai Regulasi PP No. 11/2021</span>
+                <span>Sistem Tata Kelola Akuntansi & Keuangan BUMDes Sesuai Regulasi PP No. 11/2021</span>
             </div>
         </div>
 
@@ -442,7 +442,7 @@ onUnmounted(() => {
                         <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                             <div class="hero-badge-item inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-xs font-semibold text-primary shadow-xs">
                                 <AppIcon name="verified" class="text-base text-primary" />
-                                <span>Platform Dana Bergulir & Akuntansi SAK EP Generasi Baru</span>
+                                <span>Platform Akuntansi & Keuangan BUMDes Generasi Baru (Modern Re-engineering SIMAK)</span>
                             </div>
 
                             <h1 class="hero-anim-title font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-[-0.02em] text-on-surface leading-[1.12]">
@@ -615,7 +615,7 @@ onUnmounted(() => {
                             Solusi Komprehensif untuk BUMDesma & Instansi Pembina
                         </h2>
                         <p class="text-on-surface-variant text-base sm:text-lg">
-                            Dirancang dari pengalaman lapangan pengelolaan dana bergulir, memenuhi standar tata kelola modern dan regulasi perundang-undangan.
+                            Dirancang dari pengalaman lapangan pengelolaan akuntansi dan keuangan BUMDes (evolusi arsitektur modern dari SIMAK), memenuhi standar tata kelola modern dan regulasi perundang-undangan.
                         </p>
                     </div>
 
@@ -715,7 +715,7 @@ onUnmounted(() => {
         <!-- Footer -->
         <footer class="border-t border-outline-variant/60 bg-surface-container-lowest py-8 text-center text-xs text-outline">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p>&copy; 2026 akubumdes &mdash; BUMDesma/LKD Financial Information System.</p>
+        <p>&copy; 2026 akubumdes &mdash; Sistem Informasi Akuntansi & Keuangan BUMDes.</p>
                 <div class="flex items-center gap-4">
                     <a href="#" class="hover:text-primary transition-colors">Kebijakan Privasi</a>
                     <span>&bull;</span>

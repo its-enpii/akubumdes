@@ -26,7 +26,7 @@ test.describe('1. Landing Page & Public UI', () => {
         await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
         
         await expect(page.locator('body')).toBeVisible();
-        await expect(page.locator('text=Dana Bergulir').first()).toBeVisible();
+        await expect(page.locator('text=Akubumdes').first()).toBeVisible();
 
         const faqButton = page.locator('button:has-text("Apa itu"), button:has-text("Apakah")').first();
         if (await faqButton.isVisible().catch(() => false)) {

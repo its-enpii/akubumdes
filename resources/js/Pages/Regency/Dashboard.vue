@@ -74,8 +74,7 @@ function resetTenantFilter() {
             Dashboard Kabupaten {{ regency_name }}
           </h1>
           <p class="mt-1 text-sm text-on-surface-variant">
-            Rekapitulasi dan monitoring keuangan gabungan seluruh kecamatan (UPK
-            DBM).
+            Rekapitulasi dan monitoring keuangan gabungan seluruh kecamatan (BUMDes / BUMDesma).
           </p>
         </div>
 
@@ -125,7 +124,7 @@ function resetTenantFilter() {
             {{ money(metrics.summary.total_turnover) }}
           </p>
           <p class="mt-1 text-xs text-on-surface-variant">
-            Total dana bergulir gabungan
+            Total omset/pendapatan gabungan
             {{ metrics.summary.total_kecamatans }} Kecamatan
           </p>
         </AppCard>

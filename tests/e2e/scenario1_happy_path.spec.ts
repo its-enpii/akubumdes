@@ -50,7 +50,7 @@ test.describe('Scenario 1: Happy Path — Full CRUD & Core Workflows', () => {
         await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('body')).toBeVisible();
 
-        const heroText = page.locator('text=Dana Bergulir').first();
+        const heroText = page.locator('text=/Akuntansi|Akubumdes/i').first();
         await expect(heroText).toBeVisible({ timeout: 10000 });
 
         const faqButtons = page.locator('button:has-text("Apa itu"), button:has-text("Apakah"), button:has-text("Bagaimana")');

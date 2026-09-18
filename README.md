@@ -1,6 +1,8 @@
 # Akubumdes — Sistem Informasi Akuntansi & Keuangan BUMDes
 
-Aplikasi **Akubumdes (Sistem Informasi Akuntansi & Keuangan BUMDes / BUMDesma LKD)** berbasis **PHP 8.4 + Laravel 13**, **Vue 3.5 + Inertia 2.0**, **Tailwind CSS 4**, **MySQL 8.4 / SQLite multi-tenant shard**, **Redis 8 (Cache, Session, Queue Worker)**, **PostgreSQL 16 (pgvector RAG AI)**, dan **Docker Architecture**.
+> **Akubumdes (Sistem Informasi Akuntansi & Keuangan BUMDes)** adalah *modern upgrade & re-engineering* dari **SIMAK (Sistem Informasi Manajemen Akuntansi Keuangan BUMDes, [`ab1-team/simak`](https://github.com/ab1-team/simak))**, dan **BUKAN** dari SIDBM (Sistem Informasi Dana Bergulir Masyarakat).
+
+Aplikasi **Akubumdes** berbasis **PHP 8.4 + Laravel 13**, **Vue 3.5 + Inertia 2.0**, **Tailwind CSS 4**, **MySQL 8.4 / SQLite multi-tenant shard**, **Redis 8 (Cache, Session, Queue Worker)**, **PostgreSQL 16 (pgvector RAG AI)**, dan **Docker Architecture**.
 
 ---
 
@@ -13,6 +15,25 @@ Aplikasi **Akubumdes (Sistem Informasi Akuntansi & Keuangan BUMDes / BUMDesma LK
 - **Cache, Session & Antrean**: Redis 8 (predis) + Dedicated Redis Background Queue Worker
 - **AI Engine / LLM**: Local Ollama Server (`nomic-embed-text` / `enpii/assistant` orchestrator)
 - **Web Server / Proxy**: Nginx 1.29 + PHP-FPM 8.4 (Dockerized)
+
+---
+
+## Positioning: Modern Re-engineering dari SIMAK
+
+**Akubumdes** adalah *modern upgrade & re-engineering* dari **SIMAK (Sistem Informasi Manajemen Akuntansi Keuangan BUMDes, `ab1-team/simak`)**, dan **BUKAN** dari SIDBM (aplikasi pinjaman/lending UPK).
+
+SIMAK lama adalah aplikasi akuntansi keuangan BUMDes berbasis **satu database monolitik dengan tabel dinamis per unit usaha**: setiap baris `usaha` menciptakan ratusan tabel sendiri (`rekening_{usaha_id}`, `accounts_{usaha_id}`, `transaksi_{usaha_id}`, `saldo_{usaha_id}`, `akun_level_1`, `akun_level_2`, dsb.), tanpa foreign key, dengan saldo yang dipelihara via *MySQL trigger*, dan nilai finansial yang disimpan sebagai teks.
+
+Akubumdes mentransformasi basis data & aplikasi SIMAK tersebut menjadi:
+
+- **Multi-tenant cloud SaaS sharding** — 1 platform database (`akubumdes_platform`) + banyak shard database (`akubumdes_shard_*`); menghilangkan puluhan ribu tabel dinamis per unit usaha.
+- **Immutable double-entry general ledger** — `journal_entries` + `journal_lines` berpasangan (menggantikan flat row `transaksi_{n}`); koreksi melalui *reverse + recreate* atomik.
+- **3 varian Chart of Accounts otomatis** dalam satu tabel rekursif `accounts` — `standard` (jasa/umum), `trading` (perdagangan dengan HPP), dan `cooperative` (koperasi), sesuai `usaha.jenis_akun` pada SIMAK.
+- **API holding & konsolidasi** — pelaporan keuangan lintas unit usaha (Neraca, Laba Rugi, Arus Kas, CALK, Perubahan Ekuitas, paket 5-in-1) real-time.
+- **SaaS billing otomatis** — multi payment gateway (Tripay, Duitku, Xendit), auto-invoice scheduler, dan penangguhan tenant *overdue*.
+- **Antarmuka web modern** — Vue 3.5 + Inertia 2.0 + Tailwind CSS 4 (menggantikan Blade + jQuery).
+
+> Dokumen perbandingan lengkap: [docs/PERBANDINGAN_SIMAK_LEGACY_VS_AKUBUMDES.md](docs/PERBANDINGAN_SIMAK_LEGACY_VS_AKUBUMDES.md) & [docs/PERBANDINGAN_DATABASE_SIMAK_VS_AKUBUMDES.md](docs/PERBANDINGAN_DATABASE_SIMAK_VS_AKUBUMDES.md).
 
 ---
 
@@ -88,7 +109,8 @@ Perintah `akubumdes:bootstrap-local` bersifat *idempotent*: mendaftarkan shard/t
 ## Indeks Dokumentasi Terkait (`/docs`)
 
 - **Panduan Pengguna Lengkap (User Manual)**: [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
-- **Perbandingan Aplikasi Lama vs Akubumdes**: [docs/PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md](docs/PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md)
+- **Perbandingan SIMAK Legacy vs Akubumdes**: [docs/PERBANDINGAN_SIMAK_LEGACY_VS_AKUBUMDES.md](docs/PERBANDINGAN_SIMAK_LEGACY_VS_AKUBUMDES.md)
+- **Perbandingan Database SIMAK vs Akubumdes**: [docs/PERBANDINGAN_DATABASE_SIMAK_VS_AKUBUMDES.md](docs/PERBANDINGAN_DATABASE_SIMAK_VS_AKUBUMDES.md)
 - **Roadmap Migrasi Laporan Legacy**: [docs/LEGACY_REPORTS_MIGRATION_ROADMAP.md](docs/LEGACY_REPORTS_MIGRATION_ROADMAP.md)
 - **Status Fitur & Roadmap**: [docs/FEATURE_ROADMAP.md](docs/FEATURE_ROADMAP.md)
 - **Arsitektur & Topologi Database**: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) & [docs/DATABASE_STRUCTURE.md](docs/DATABASE_STRUCTURE.md)

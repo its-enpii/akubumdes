@@ -27,7 +27,7 @@
             <tr>
                 <td>
                     <div style="font-size: 13px; font-weight: bold;">PEMERINTAH KABUPATEN {{ strtoupper($regency_name ?? 'KABUPATEN') }}</div>
-                    <div style="font-size: 11px; color: #374151;">SISTEM INFORMASI KEUANGAN GABUNGAN KECAMATAN / UPK DBM</div>
+                    <div style="font-size: 11px; color: #374151;">SISTEM INFORMASI KEUANGAN GABUNGAN KECAMATAN / BUMDES</div>
                 </td>
                 <td style="text-align: right; vertical-align: bottom;">
                     <div style="font-size: 10px; color: #6b7280;">Dicetak: {{ date('d/m/Y H:i') }}</div>

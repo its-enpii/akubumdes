@@ -156,4 +156,4 @@ Test: `tests/Feature/Migration/TenantFinalizeCutoverCommandTest.php`.
 ## Referensi
 
 - `docs/DATABASE_STRUCTURE.md`
-- `docs/PERBANDINGAN_DATABASE_LEGACY_VS_NEXT.md`
+- `docs/PERBANDINGAN_DATABASE_SIMAK_VS_AKUBUMDES.md`

@@ -22,7 +22,7 @@ function submit() {
     <Head title="Masuk - akubumdes" />
 
     <main class="flex min-h-screen bg-surface font-sans text-on-surface">
-        <section class="bg-navy-gradient relative hidden w-[55%] flex-col overflow-hidden p-12 lg:flex" aria-label="akubumdes — BUMDesma/LKD">
+        <section class="bg-navy-gradient relative hidden w-[55%] flex-col overflow-hidden p-12 lg:flex" aria-label="akubumdes — BUMDes / BUMDesma">
             <div class="pointer-events-none absolute right-0 top-1/4 h-80 w-80 border-l border-t border-white/10" aria-hidden="true" />
             <div class="pointer-events-none absolute bottom-24 left-10 h-24 w-1 bg-secondary" aria-hidden="true" />
 
@@ -35,7 +35,7 @@ function submit() {
                 </span>
                 <div>
                     <p class="font-display text-xl font-bold tracking-[-0.02em] text-white">akubumdes</p>
-                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-on-primary-container/90">BUMDesma/LKD Financial Management</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-on-primary-container/90">BUMDes / BUMDesma Financial Management</p>
                 </div>
             </div>
 
@@ -49,7 +49,7 @@ function submit() {
                 </svg>
                 <h2 class="mt-8 font-display text-3xl font-semibold leading-snug tracking-[-0.02em] text-white">Transformasi Digital Ekonomi Desa</h2>
                 <p class="mt-4 max-w-md text-lg text-on-primary-container/90">
-                    Mewujudkan kemandirian finansial masyarakat melalui pengelolaan dana bergulir yang transparan dan akuntabel.
+                    Mewujudkan kemandirian ekonomi desa melalui pengelolaan keuangan BUMDes yang transparan dan akuntabel.
                 </p>
             </div>
 
@@ -70,13 +70,13 @@ function submit() {
                         <AppIcon name="account_balance" class="text-3xl" />
                     </span>
                     <p class="mt-3 font-display text-2xl font-bold tracking-[-0.02em] text-primary">akubumdes</p>
-                    <p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-on-surface-variant">BUMDesma/LKD</p>
+                    <p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-on-surface-variant">BUMDes / BUMDesma</p>
                 </div>
 
                 <header class="mb-10">
-                    <p class="eyebrow">Sistem Informasi Dana Bergulir Masyarakat</p>
+                    <p class="eyebrow">Sistem Informasi Akuntansi & Keuangan BUMDes</p>
                     <h1 class="mt-1 font-display text-3xl font-semibold tracking-[-0.02em] text-on-surface">Masuk ke Akun Anda</h1>
-                    <p class="mt-2 text-base text-on-surface-variant">Kelola keuangan BUMDesma/LKD Anda dari satu tempat.</p>
+                    <p class="mt-2 text-base text-on-surface-variant">Kelola akuntansi dan keuangan BUMDes Anda dari satu tempat.</p>
                 </header>
 
                 <div v-if="form.hasErrors" class="mb-6" role="alert" aria-live="assertive">

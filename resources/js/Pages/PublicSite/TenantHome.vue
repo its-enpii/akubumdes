@@ -10,10 +10,10 @@ defineProps({
 </script>
 
 <template>
-    <Head :title="`${organization.name} — Sistem Informasi Dana Bergulir Masyarakat`">
-        <meta head-key="description" name="description" :content="settings.hero_description ?? settings.about_short ?? `Situs resmi ${organization.name} — portal informasi dan pengelolaan dana bergulir masyarakat.`" />
+    <Head :title="`${organization.name} — Sistem Informasi Akuntansi & Keuangan BUMDes`">
+        <meta head-key="description" name="description" :content="settings.hero_description ?? settings.about_short ?? `Situs resmi ${organization.name} — portal informasi tata kelola akuntansi dan keuangan BUMDes.`" />
         <meta head-key="og:title" property="og:title" :content="`${organization.name} — Situs Resmi`" />
-        <meta head-key="og:description" property="og:description" :content="settings.hero_description ?? settings.about_short ?? `Situs resmi ${organization.name} — pengelolaan dana bergulir masyarakat.`" />
+        <meta head-key="og:description" property="og:description" :content="settings.hero_description ?? settings.about_short ?? `Situs resmi ${organization.name} — tata kelola akuntansi dan keuangan BUMDes.`" />
         <meta head-key="og:type" property="og:type" content="website" />
         <meta head-key="og:url" property="og:url" :content="$page.url" />
         <meta v-if="organization.logo_url" head-key="og:image" property="og:image" :content="organization.logo_url" />
@@ -79,7 +79,7 @@ defineProps({
                     </h1>
 
                     <p class="max-w-2xl text-base leading-relaxed text-on-primary-container sm:text-lg">
-                        {{ settings.hero_description ?? `Portal informasi resmi ${organization.name} — pengelolaan dana bergulir masyarakat yang transparan, akuntabel, dan berorientasi pada kesejahteraan warga.` }}
+                        {{ settings.hero_description ?? `Portal informasi resmi ${organization.name} — tata kelola akuntansi dan keuangan BUMDes yang transparan, akuntabel, dan berorientasi pada kesejahteraan warga.` }}
                     </p>
 
                     <img
@@ -163,7 +163,7 @@ defineProps({
                             <h2 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">Berdiri</h2>
                         </div>
                         <p v-if="organization.operational_start_year" class="mt-3 text-sm text-on-surface">
-                            Sejak {{ organization.operational_start_year }} melayani pengelolaan dana bergulir masyarakat.
+                            Sejak {{ organization.operational_start_year }} melayani tata kelola akuntansi dan keuangan BUMDes.
                         </p>
                         <p v-else class="mt-3 text-sm italic text-on-surface-variant">Informasi tahun berdiri belum tersedia.</p>
                     </div>
@@ -183,7 +183,7 @@ defineProps({
                 <p v-else class="mt-1.5 text-xs text-on-surface-variant">
                     Dikelola dengan
                     <a href="/" class="font-semibold text-primary hover:underline">akubumdes</a>
-                    — Sistem Informasi Dana Bergulir Masyarakat
+                    — Sistem Informasi Akuntansi & Keuangan BUMDes
                 </p>
                 <div v-if="settings.social?.facebook || settings.social?.instagram || settings.social?.youtube" class="mt-3 flex justify-center gap-2">
                     <a v-if="settings.social?.facebook" :href="settings.social.facebook" target="_blank" rel="noopener" class="grid size-9 place-items-center rounded-full bg-primary-container text-on-primary-container transition hover:bg-primary hover:text-on-primary" aria-label="Facebook">f</a>

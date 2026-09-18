@@ -1,6 +1,8 @@
 # Dokumentasi Proyek Akubumdes
 
-Indeks dokumentasi lengkap untuk arsitektur, panduan pengguna, basis data, billing, modul supervisi, RBAC, asisten AI, dan pengujian Akubumdes:
+Akubumdes adalah modern upgrade & re-engineering dari **SIMAK (Sistem Informasi Manajemen Akuntansi Keuangan BUMDes, `ab1-team/simak`)**, dan **BUKAN** dari SIDBM (aplikasi pinjaman/lending UPK).
+
+Indeks dokumentasi arsitektur, panduan pengguna, basis data, billing, modul supervisi, RBAC, asisten AI, dan pengujian Akubumdes:
 
 ---
 
@@ -8,8 +10,7 @@ Indeks dokumentasi lengkap untuk arsitektur, panduan pengguna, basis data, billi
 
 Dokumentasi penggunaan aplikasi untuk pengguna akhir, pengelola BUMDesma/LKD, operator desa, supervisor wilayah, dan administrator:
 
-- [USER_GUIDE.md](USER_GUIDE.md) – **Panduan Pengguna Lengkap (User Manual)**: Mencakup seluruh 86 halaman dan fitur aplikasi (Dashboard, Master Data, Lending Lifecycle, Akuntansi & Jurnal, Inventaris, E-Budgeting, Pelaporan Keuangan & Piutang, Prosedur Periodik, Billing SaaS, WhatsApp Gateway, RBAC, Onboarding, Portal Pengawasan, Superadmin, AI Assistant, dan 36 Dokumen Cetak PDF).
-- [CUTOVER_RUNBOOK.md](CUTOVER_RUNBOOK.md) – Panduan teknis migrasi dan *cutover* data per tenant dari database legacy ke Akubumdes.
+- [USER_GUIDE.md](USER_GUIDE.md) – **Panduan Pengguna Lengkap (User Manual)**: Mencakup seluruh modul akuntansi & keuangan aplikasi (Dashboard, Master Data, Akuntansi & Jurnal, Inventaris & Aset, E-Budgeting, Pelaporan Keuangan, Prosedur Periodik, Billing SaaS, Notifikasi, RBAC, Onboarding, Portal Supervisi Kabupaten/Provinsi, Superadmin, dan AI Assistant).
 - [VALIDATION.md](VALIDATION.md) – Panduan verifikasi statis, pengujian backend PHPUnit, dan pengujian frontend Playwright browser (E2E).
 
 ---
@@ -28,13 +29,14 @@ Dokumentasi teknis arsitektur, skema basis data, keamanan hak akses, billing, in
 
 ---
 
-## 3. Analisis Komparatif & Migrasi Legacy
+## 3. Analisis Komparatif & Migrasi SIMAK (Legacy)
 
-Dokumentasi perbandingan mendalam antara sistem versi legacy (PHP Native) dengan arsitektur modern Akubumdes:
+Akubumdes adalah modern upgrade & re-engineering dari **SIMAK (`ab1-team/simak`)**, dan **BUKAN** dari SIDBM. Dokumentasi perbandingan mendalam antara SIMAK (legacy, sistem monolitik tabel dinamis per unit usaha) dengan arsitektur modern Akubumdes:
 
-- [PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md](PERBANDINGAN_APLIKASI_LAMA_VS_AKUBUMDES.md) – Analisis komparatif menyeluruh aplikasi lama (legacy) vs Akubumdes (`/akubumdes`), alasan upgrade, arsitektur, SaaS billing, supervisi wilayah, dan infrastruktur.
-- [PERBANDINGAN_DATABASE_LEGACY_VS_NEXT.md](PERBANDINGAN_DATABASE_LEGACY_VS_NEXT.md) – Perbandingan skema tabel database legacy vs normalisasi tabel modern multi-tenant.
-- [LEGACY_REPORTS_MIGRATION_ROADMAP.md](LEGACY_REPORTS_MIGRATION_ROADMAP.md) – Matriks spesifikasi dan status 100% implementasi laporan akuntansi, laporan piutang, paket LPJ tahunan MAD, dan dokumen perguliran pinjaman.
+- [PERBANDINGAN_SIMAK_LEGACY_VS_AKUBUMDES.md](PERBANDINGAN_SIMAK_LEGACY_VS_AKUBUMDES.md) – Analisis komparatif menyeluruh **SIMAK (Legacy) vs Akubumdes**: alasan upgrade, arsitektur, double-entry ledger, 3 varian CoA, SaaS billing, supervisi wilayah, dan infrastruktur.
+- [PERBANDINGAN_DATABASE_SIMAK_VS_AKUBUMDES.md](PERBANDINGAN_DATABASE_SIMAK_VS_AKUBUMDES.md) – Pemetaan & perbandingan skema tabel database **SIMAK vs Akubumdes** (`usaha`, `akun_level_*`, `rekening_{n}`, `accounts_{n}`, `transaksi_{n}`, `saldo_{n}` → `tenants`, `accounts`, `journal_entries`/`journal_lines`, `account_monthly_balances`).
+- [LEGACY_REPORTS_MIGRATION_ROADMAP.md](LEGACY_REPORTS_MIGRATION_ROADMAP.md) – Matriks spesifikasi dan status 100% implementasi 9 laporan akuntansi core SIMAK, CALK, paket LPJ tahunan, dan rekap aset.
+- [CUTOVER_RUNBOOK.md](CUTOVER_RUNBOOK.md) – Panduan teknis migrasi & cutover data per tenant dari basis data SIMAK ke Akubumdes.
 
 ---
 
@@ -53,7 +55,7 @@ Dokumentasi perbandingan mendalam antara sistem versi legacy (PHP Native) dengan
 - **Identitas**: `row_id` sebagai PK internal teknis, `id` lama dipertahankan utuh untuk laporan & audit.
 - **Akuntansi**: Double-entry journal (`journal_entries` & `journal_lines`) yang seimbang dan bersifat *immutable* ? koreksi jurnal posted melalui reverse + recreate atomik (`JournalEditService`).
 - **Supervisi Berjenjang (Kabupaten & Provinsi)**: Dashboard & laporan keuangan konsolidasi real-time lintas kecamatan & kabupaten (Neraca, LR, BB, Arus Kas, CALK, PDF Pack).
-- **Pembatasan Operator Desa (Village Scope)**: Pengguna level desa (`is_village_user`) hanya dapat melihat dan mengelola data anggota/kelompok/proposal pinjaman milik desa bersangkutan via global scope `VillageScope`.
+- **Pembatasan Operator Desa (Village Scope)**: Pengguna level desa (`is_village_user`) hanya dapat melihat dan mengelola data wilayah desa bersangkutan via global scope `VillageScope`.
 - **SaaS Billing**: Integrasi Multi-Payment Gateway (Tripay, Duitku, Xendit) dengan auto-invoice scheduler & penangguhan otomatis tenant overdue.
-- **Automated Testing**: 100% Passed across layers (PHPUnit 258 tests/1779 assertions + Playwright 47 E2E page tests + Playwright 25 Interactive CRUD tests).
+- **Automated Testing**: 100% Passed across layers (PHPUnit 391 tests + Playwright E2E page & interactive CRUD tests).
 

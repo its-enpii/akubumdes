@@ -320,7 +320,7 @@ onUnmounted(() => {
                 </div>
 
                 <div class="space-y-1.5 text-xs text-on-surface-variant">
-                    <p class="text-[11px]">Pin lokasi merepresentasikan titik kantor BUMDesma / UPK per kecamatan.</p>
+                    <p class="text-[11px]">Pin lokasi merepresentasikan titik kantor BUMDes / BUMDesma per kecamatan.</p>
                     <div class="flex items-center gap-2 pt-1 border-t border-outline-variant/30 text-[11px] text-primary font-medium">
                         <AppIcon name="touch_app" />
                         <span>Klik pin untuk melihat rincian keuangan</span>

@@ -133,7 +133,7 @@ test.describe('DEEP EXHAUSTIVE ALL FEATURES AUDIT — FULL ACTION WORKFLOWS', ()
 
         const descIn = page.getByLabel('Keterangan').first();
         if (await descIn.isVisible().catch(() => false)) {
-            await descIn.fill('Penerimaan Dana Hibah Operasional UPK');
+            await descIn.fill('Penerimaan Dana Hibah Operasional BUMDes');
         }
 
         await page.goto(`${BASE}/accounting/period-close`, { waitUntil: 'domcontentloaded' });

@@ -2,7 +2,11 @@
 
 ## 1. Ringkasan
 
-Akubumdes adalah proyek penataan ulang arsitektur aplikasi dan basis data BUMDes agar mampu melayani sekitar 500 tenant dan terus bertumbuh tanpa mengulang pola tabel dinamis seperti `transaksi_1`, `transaksi_4`, `anggota_1`, dan seterusnya.
+> **Akubumdes (`ab1-team/akubumdes`) adalah modernisasi & re-engineering arsitektur dari SIMAK — Sistem Informasi Manajemen Akuntansi Keuangan BUMDes (`ab1-team/simak`).**
+> Basis data SIMAK (tabel dinamis per unit usaha seperti `transaksi_{usaha_id}`, `rekening_{usaha_id}`, `accounts_{usaha_id}`, `saldo_{usaha_id}`) adalah satu-satunya sumber migrasi resmi.
+> Akubumdes **BUKAN** derivatif dari SIDBM (aplikasi pinjaman/lending UPK) dan tidak mewarisi modul lending; ruang lingkupnya murni akuntansi & keuangan BUMDes / BUMDesma.
+
+Akubumdes adalah proyek penataan ulang arsitektur aplikasi dan basis data **SIMAK** agar mampu melayani sekitar 500 tenant (unit usaha BUMDes) dan terus bertumbuh tanpa mengulang pola tabel dinamis per unit usaha seperti `transaksi_1`, `transaksi_4`, `rekening_1`, `accounts_2`, `saldo_1`, dan seterusnya.
 
 Desain target menggunakan pola:
 
@@ -21,7 +25,7 @@ Sistem backup yang telah ada tetap dipertahankan. Cron tengah malam tetap membac
 
 ## 2. Latar belakang
 
-Skema lama mempunyai karakteristik berikut:
+Skema SIMAK (legacy) mempunyai karakteristik berikut — master unit usaha berada di tabel `usaha`, dan setiap baris `usaha` menciptakan ratusan tabel operasionalnya sendiri:
 
 - tabel operasional dibuat per tenant menggunakan suffix angka;
 - perubahan skema harus diterapkan ke banyak tabel yang mempunyai fungsi sama;

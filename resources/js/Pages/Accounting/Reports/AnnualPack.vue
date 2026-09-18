@@ -54,7 +54,7 @@ const docs = computed(() => [
     },
     {
         title: 'Naskah Kerjasama Antar Desa (MoU)',
-        desc: 'Kesepakatan bersama Kepala Desa se-Kecamatan atas pengelolaan usaha dana bergulir',
+        desc: 'Kesepakatan bersama Kepala Desa se-Kecamatan atas pengelolaan unit usaha BUMDes / BUMDesma',
         href: `/accounting/reports/annual-pack/mou/pdf?year=${selectedYear.value}`,
         icon: 'handshake',
     },

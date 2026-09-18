@@ -74,7 +74,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
     {
         $this->actingAs($this->user)->put('/website/settings', [
             'hero_tagline' => 'Situs Resmi Desa',
-            'hero_description' => 'Portal dana bergulir.',
+            'hero_description' => 'Portal akuntansi keuangan BUMDes.',
             'about_short' => 'Tentang singkat kami.',
             'facebook_url' => 'https://facebook.com/ruteng',
             'instagram_url' => null,
@@ -89,7 +89,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
 
         $settings = SiteSetting::query()->firstOrFail();
         self::assertSame('Situs Resmi Desa', $settings->hero_tagline);
-        self::assertSame('Portal dana bergulir.', $settings->hero_description);
+        self::assertSame('Portal akuntansi keuangan BUMDes.', $settings->hero_description);
         self::assertSame('Tentang singkat kami.', $settings->about_short);
         self::assertSame('https://facebook.com/ruteng', $settings->facebook_url);
         self::assertSame('Hak cipta desa.', $settings->footer_note);

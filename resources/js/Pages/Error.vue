@@ -229,7 +229,7 @@ function reloadPage() {
 
         <!-- Footer -->
         <footer class="relative z-10 text-center py-5 text-xs text-on-surface-variant border-t border-outline-variant/30">
-            <p>&copy; {{ new Date().getFullYear() }} <strong>akubumdes</strong> &bull; Tata Kelola Dana Bergulir BUMDesma LKD</p>
+            <p>&copy; {{ new Date().getFullYear() }} <strong>akubumdes</strong> &bull; Tata Kelola Akuntansi & Keuangan BUMDes</p>
         </footer>
     </div>
 </template>
