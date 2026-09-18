@@ -39,9 +39,10 @@ Akubumdes mentransformasi basis data & aplikasi SIMAK tersebut menjadi:
 
 ## Modul & Fitur Utama
 
-1. **Clean & Modern Professional Landing & Auth Suite**:
-   - Redesain halaman depan (`/`) dan halaman login (`/login`) dengan tampilan profesional, bersih, responsif, animasi smooth scroll, dan FAQ interaktif.
-   - Tanpa kebocoran info versi/stack teknis (*security hardening*).
+1. **Pure Operational & Auth Suite**:
+   - Akubumdes beroperasi dalam mode operasional internal murni tanpa landing page marketing ataupun portal CMS publik.
+   - Akses root (`/`) langsung mengarahkan pengunjung ke halaman login (`/login`), atau ke dashboard operasional sesuai peran (*tenant dashboard*, *superadmin admin-panel*, atau *regency supervisor*) jika telah terotentikasi.
+   - Halaman login bersih, responsif, dan mengedepankan keamanan tanpa kebocoran info versi/stack teknis (*security hardening*).
 2. **Multi-Tenant Sharding Engine**:
    - Skalabilitas hingga 500+ tenant tanpa menggunakan nama tabel dinamis legacy (`transaksi_1`, `anggota_1`).
    - Isolasi data berbasis `tenant_id` + komposit Foreign Key + Shard Connection Manager.

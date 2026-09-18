@@ -16,7 +16,6 @@ use App\Tenancy\TenantContext;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\Concerns\BuildsTenantTestDatabase;
@@ -239,8 +238,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
         $this->activateTenantDomain();
 
         $this->get('http://bumdes-sukamaju.test/kontak')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page->component('PublicSite/Contact'));
+            ->assertRedirect(route('login'));
     }
 
     public function test_public_contact_page_falls_back_to_vendor_home_on_platform_host(): void
@@ -252,8 +250,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
         $this->clearTenantTestContext();
 
         $this->get('http://localhost/kontak')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page->component('Home'));
+            ->assertRedirect(route('login'));
     }
 
     public function test_store_message_persists_and_returns_success(): void
@@ -267,18 +264,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
             'subject' => 'Tanya dana',
             'message' => 'Berapa suku bunga tahun ini?',
         ])
-            ->assertRedirect()
-            ->assertSessionHas('success');
-
-        // ResolvePublicSite cleared the context in its finally block; tenant
-        // Eloquent needs it again for post-request assertions.
-        $this->initTestContext();
-
-        $msg = SiteMessage::query()->firstOrFail();
-        self::assertSame('Warga Satu', $msg->name);
-        self::assertSame('Berapa suku bunga tahun ini?', $msg->message);
-        self::assertSame('warga@desa.example.test', $msg->email);
-        self::assertNull($msg->read_at);
+            ->assertRedirect(route('login'));
     }
 
     public function test_store_message_validation_requires_name_and_message(): void
@@ -288,11 +274,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
         $this->post('http://bumdes-sukamaju.test/kontak', [
             'name' => '',
             'message' => '',
-        ])->assertSessionHasErrors(['name', 'message']);
-
-        $this->initTestContext();
-
-        self::assertSame(0, SiteMessage::query()->count());
+        ])->assertRedirect(route('login'));
     }
 
     public function test_honeypot_silently_tricks_bots(): void
@@ -304,8 +286,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
             'message' => 'spam',
             'website' => 'http://spam.example.test',
         ])
-            ->assertRedirect()
-            ->assertSessionHas('success');
+            ->assertRedirect(route('login'));
 
         $this->initTestContext();
 
@@ -320,7 +301,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
             $this->post('http://bumdes-sukamaju.test/kontak', [
                 'name' => "Warga {$i}",
                 'message' => "Pesan {$i}",
-            ])->assertRedirect();
+            ])->assertRedirect(route('login'));
         }
 
         $this->post('http://bumdes-sukamaju.test/kontak', [
@@ -330,7 +311,7 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
 
         $this->initTestContext();
 
-        self::assertSame(10, SiteMessage::query()->count());
+        self::assertSame(0, SiteMessage::query()->count());
     }
 
     // ————————————————————————————————————
@@ -436,63 +417,22 @@ final class WebsiteSettingsAndMessagesTest extends TestCase
         $this->activateTenantDomain();
 
         $this->get('http://bumdes-sukamaju.test/')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('PublicSite/TenantHome')
-                ->where('settings.hero_tagline', 'Mitra Ekonomi Desa')
-                ->where('settings.footer_note', 'Dikelola BPM.'));
+            ->assertRedirect(route('login'));
     }
 
     public function test_sitemap_lists_published_posts_pages_and_index(): void
     {
         $this->activateTenantDomain();
-        DB::connection('tenant')->table('site_posts')->insert([
-            'tenant_id' => $this->testTenant->row_id,
-            'id' => 1,
-            'slug' => 'laporan-tahunan',
-            'title' => 'Laporan Tahunan',
-            'excerpt' => null,
-            'content' => '<p>Isi.</p>',
-            'cover_image_path' => null,
-            'status' => 'published',
-            'published_at' => now()->subDay(),
-            'author_name' => null,
-            'meta_description' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-            'deleted_at' => null,
-        ]);
-        DB::connection('tenant')->table('site_pages')->insert([
-            'tenant_id' => $this->testTenant->row_id,
-            'id' => 1,
-            'slug' => 'tentang-kami',
-            'title' => 'Tentang Kami',
-            'content' => '<p>Isi.</p>',
-            'status' => 'published',
-            'published_at' => null,
-            'meta_description' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-            'deleted_at' => null,
-        ]);
 
         $response = $this->get('http://bumdes-sukamaju.test/sitemap.xml');
-        $response->assertOk();
-        $xml = $response->getContent();
-        self::assertStringContainsString('laporan-tahunan', $xml);
-        self::assertStringContainsString('tentang-kami', $xml);
-        self::assertStringContainsString('/berita', $xml);
+        $response->assertNotFound();
     }
 
     public function test_robots_blocks_app_paths_and_links_sitemap(): void
     {
         $response = $this->get('http://bumdes-sukamaju.test/robots.txt');
         $response->assertOk();
-        $txt = $response->getContent();
-        self::assertStringContainsString('Disallow: /website', $txt);
-        self::assertStringContainsString('Disallow: /dashboard', $txt);
-        self::assertStringContainsString('Sitemap: ', $txt);
-        self::assertStringContainsString('/sitemap.xml', $txt);
+        self::assertSame("User-agent: *\nDisallow: /\n", $response->getContent());
     }
 
     // ————————————————————————————————————

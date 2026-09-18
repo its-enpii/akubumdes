@@ -59,17 +59,16 @@ final class DesktopFoundationTest extends TestCase
 
     public function test_root_url_redirects_to_login_for_desktop_clients(): void
     {
-        // 1. Regular web client visits / -> receives OK (renders Home)
+        // Root always routes into the operational flow: any guest web or
+        // desktop client visiting / is redirected to /login.
         Config::set('desktop.enabled', false);
         $webResponse = $this->get('/');
-        $webResponse->assertOk();
+        $webResponse->assertRedirect('/login');
 
-        // 2. Desktop mode enabled -> redirects to /login
         Config::set('desktop.enabled', true);
         $desktopResponse = $this->get('/');
         $desktopResponse->assertRedirect('/login');
 
-        // 3. Desktop header sent -> redirects to /login
         Config::set('desktop.enabled', false);
         $headerResponse = $this->withHeader('X-Desktop-Client', '1')->get('/');
         $headerResponse->assertRedirect('/login');

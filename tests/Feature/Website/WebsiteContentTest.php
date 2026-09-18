@@ -219,12 +219,7 @@ final class WebsiteContentTest extends TestCase
         $this->seedPublicPosts();
 
         $this->get('http://bumdes-sukamaju.test/berita')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('PublicSite/BlogIndex')
-                ->where('posts.data.0.title', 'Laporan Tahunan')
-                ->where('posts.total', 1)
-                ->where('search', ''));
+            ->assertRedirect(route('login'));
     }
 
     public function test_public_blog_search_filters_results(): void
@@ -233,17 +228,10 @@ final class WebsiteContentTest extends TestCase
         $this->seedPublicPosts();
 
         $this->get('http://bumdes-sukamaju.test/berita?q=laporan')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('PublicSite/BlogIndex')
-                ->where('posts.total', 1));
+            ->assertRedirect(route('login'));
 
         $this->get('http://bumdes-sukamaju.test/berita?q=tidak-ada-kabar')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('PublicSite/BlogIndex')
-                ->where('posts.total', 0)
-                ->where('search', 'tidak-ada-kabar'));
+            ->assertRedirect(route('login'));
     }
 
     public function test_public_blog_detail_renders_published_post_and_falls_back_for_missing(): void
@@ -252,17 +240,11 @@ final class WebsiteContentTest extends TestCase
         $this->seedPublicPosts();
 
         $this->get('http://bumdes-sukamaju.test/berita/laporan-tahunan')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('PublicSite/BlogPost')
-                ->where('post.title', 'Laporan Tahunan')
-                ->where('post.content', '<p>Isi laporan.</p>')
-                ->where('post.author_name', 'Admin Desa'));
+            ->assertRedirect(route('login'));
 
-        // Draft slug falls back to the blog index, never a 404.
+        // Draft slugs redirect to the login flow as well.
         $this->get('http://bumdes-sukamaju.test/berita/draf-rahasia')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page->component('PublicSite/BlogIndex'));
+            ->assertRedirect(route('login'));
     }
 
     public function test_public_static_page_renders_and_unknown_slug_keeps_tenant_branding(): void
@@ -282,16 +264,11 @@ final class WebsiteContentTest extends TestCase
         ]));
 
         $this->get('http://bumdes-sukamaju.test/p/tentang-kami')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('PublicSite/StaticPage')
-                ->where('page.title', 'Tentang Kami')
-                ->where('page.content', '<p>Profil lembaga.</p>'));
+            ->assertRedirect(route('login'));
 
-        // Unpublished slugs stay on the tenant's own landing page.
+        // Unpublished slugs also redirect to the login flow.
         $this->get('http://bumdes-sukamaju.test/p/draf-halaman')
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page->component('PublicSite/TenantHome'));
+            ->assertRedirect(route('login'));
     }
 
     public function test_site_content_is_excluded_from_desktop_outbox(): void

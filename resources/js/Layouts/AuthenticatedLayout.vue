@@ -287,15 +287,6 @@ const sections = [
         ],
     },
     {
-        label: 'Website',
-        items: [
-            { label: 'Berita', icon: 'article', href: '/website/posts' },
-            { label: 'Halaman', icon: 'description', href: '/website/pages' },
-            { label: 'Pengaturan Situs', icon: 'tune', href: '/website/settings' },
-            { label: 'Pesan Masuk', icon: 'inbox', href: '/website/messages' },
-        ],
-    },
-    {
         label: 'Pengaturan',
         items: [
             { label: 'Pengaturan', icon: 'settings', href: '/settings' },
